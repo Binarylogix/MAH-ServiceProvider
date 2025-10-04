@@ -10,6 +10,8 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { getImageUri } from '../../constants/BASE_URl';
+import { useNavigation } from '@react-navigation/native';
+
 
 const ServiceProvidersList = () => {
   const [categories, setCategories] = useState([]);
@@ -17,6 +19,8 @@ const ServiceProvidersList = () => {
   const [search, setSearch] = useState('');
   const [salons, setSalons] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigation = useNavigation();
+
 
   // Fetch categories on mount
   useEffect(() => {
@@ -54,27 +58,39 @@ const ServiceProvidersList = () => {
   );
 
   const renderSalonCard = ({ item }) => (
-    <View style={styles.salonCard}>
-      <Image
-        source={{ uri: getImageUri('business', item.businessCard) }}
-        style={styles.salonImage}
-      />
-      <View style={styles.salonDetails}>
-        <Text style={styles.salonName}>{item.businessName}</Text>
-        <Text style={styles.salonLocation}>📍 {item.city || ''}</Text>
-        <Text style={styles.salonServices}>
-          <Text style={{ fontWeight: '600' }}>Services:</Text>{' '}
-          {item.services && item.services.length > 0
-            ? item.services.map(s => s.name).join(', ')
-            : 'Not provided'}
-        </Text>
-        <Text style={styles.salonRating}>⭐ {item.avgRating || '0.0'}</Text>
-      </View>
-      <TouchableOpacity style={styles.heartIcon}>
-        <Text style={{ fontSize: 20, color: '#18A558' }}>♡</Text>
-      </TouchableOpacity>
+  <TouchableOpacity
+    style={styles.salonCard}
+    activeOpacity={0.9}
+    onPress={() => navigation.navigate('ShopProfile', { salon: item })}
+  >
+    <Image
+      source={
+        item?.businessCard
+          ? {
+              uri: `https://www.makeahabit.com/api/v1/uploads/business/${item.businessCard}`,
+            }
+          : require('../../assets/images/noimage.jpg')
+      }
+      style={styles.salonImage}
+      resizeMode="cover"
+    />
+    <View style={styles.salonDetails}>
+      <Text style={styles.salonName}>{item.businessName}</Text>
+      <Text style={styles.salonLocation}>📍 {item.city || ''}</Text>
+      <Text style={styles.salonServices}>
+        <Text style={{ fontWeight: '600' }}>Services:</Text>{' '}
+        {item.services && item.services.length > 0
+          ? item.services.map(s => s.name).join(', ')
+          : 'Not provided'}
+      </Text>
+      <Text style={styles.salonRating}>⭐ {item.avgRating || '0.0'}</Text>
     </View>
-  );
+    <TouchableOpacity style={styles.heartIcon}>
+      <Text style={{ fontSize: 20, color: '#18A558' }}>♡</Text>
+    </TouchableOpacity>
+  </TouchableOpacity>
+);
+
 
   return (
     <View style={styles.container}>
@@ -102,10 +118,16 @@ const ServiceProvidersList = () => {
             ]}
             onPress={() => setSelectedCategory(cat._id)}
           >
-            <Image
-              source={{ uri: getImageUri(cat.img) }}
-              style={styles.avatar}
-            />
+           <Image
+  source={
+    cat?.img
+      ? { uri: `https://www.makeahabit.com/api/v1/uploads/category/${cat.img}` }
+      : require('../../assets/images/noimage.jpg')
+  }
+  style={styles.avatar}
+  resizeMode="cover"
+/>
+
             <Text
               style={[
                 styles.categoryText,

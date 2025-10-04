@@ -109,7 +109,7 @@ const AllBooking = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, paddingHorizontal: 16, backgroundColor: '#fff', paddingTop: 50 },
+  container: { flex: 1, paddingHorizontal: 16, backgroundColor: '#fff', paddingTop: 30 },
   screenTitle: { fontSize: 20, fontWeight: '600', marginBottom: 10 },
   tabs: { flexDirection: 'row', marginBottom: 16, gap: 12, },
   tabText: { marginRight: 20, fontSize: 14, fontWeight: '600', color: '#888' },

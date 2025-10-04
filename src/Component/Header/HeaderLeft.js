@@ -1,5 +1,8 @@
 import React from 'react';
-import { TouchableOpacity, StyleSheet, Text, View, Dimensions } from 'react-native';
+import { TouchableOpacity, StyleSheet, Text, View, Dimensions, Platform } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
+
 
 const SIZES = {
   width: Dimensions.get('window').width,
@@ -7,7 +10,7 @@ const SIZES = {
 };
 
 const COLORS = {
-  primary: '#18A558',
+  primary: 'black',
   black: '#181818',
   white: '#fff',
 };
@@ -18,23 +21,35 @@ const HeaderLeft = ({
   title,
   mainStyle,
   type,
-  icon, // icon can be a string emoji or left blank for arrow
 }) => {
+  const navigation = useNavigation();
+
+  // ✅ Default to navigation.goBack() if no custom press is provided
+  const handlePress = onPress ? onPress : () => navigation.goBack();
+
   return (
-    <View style={[
-      styles.row,
-      mainStyle,
-      type === "withoutHeader" && styles.withoutHeader
-    ]}>
+    <View
+      style={[
+        styles.row,
+        mainStyle,
+        type === 'withoutHeader' && styles.withoutHeader,
+      ]}
+    >
       <TouchableOpacity
         style={[styles.btn, touchStyle, styles.elevatedBtn]}
-        onPress={onPress}
+        onPress={handlePress}
         activeOpacity={0.7}
       >
-        <Text style={styles.iconStyle}>{icon ? icon : '←'}</Text>
+        <View style={styles.iconContainer}>
+<FontAwesome6 name="arrow-left-long" style={styles.iconStyle} size={20} color="#000" />
+          {/* <Text style={styles.iconStyle}>{icon || ''}</Text> */}
+        </View>
       </TouchableOpacity>
+
       {title ? (
-        <Text style={styles.title} numberOfLines={1}>{title}</Text>
+        <Text style={styles.title} numberOfLines={1}>
+          {title}
+        </Text>
       ) : null}
     </View>
   );
@@ -42,7 +57,7 @@ const HeaderLeft = ({
 
 HeaderLeft.defaultProps = {
   icon: '←',
-  onPress: () => {}, // default: do nothing, override as needed
+  onPress: null,
 };
 
 const styles = StyleSheet.create({
@@ -50,50 +65,61 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginLeft: 12,
-    backgroundColor: '#eaf4ebff',
-    borderRadius: 24,
     paddingRight: 18,
     paddingLeft: 4,
     paddingVertical: 5,
-    shadowColor: '#18A558',
-    shadowOpacity: 0.08,
-    shadowOffset: { width: 0, height: 3 },
-    shadowRadius: 10,
-    elevation: 2,
   },
+
   withoutHeader: {
     position: 'absolute',
     top: SIZES.height * 0.02,
     left: 0,
   },
+
   btn: {
     width: SIZES.width * 0.085,
     height: SIZES.width * 0.085,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 32,
+    borderRadius: 50,
     backgroundColor: COLORS.white,
-    marginRight: 2,
+    marginRight: 4,
   },
+
   elevatedBtn: {
-    elevation: 5,
-    shadowColor: '#61ba79',
-    shadowOpacity: 0.1,
-    shadowRadius: 15,
-    shadowOffset: { width: 0, height: 2 },
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOpacity: 0.1,
+        shadowRadius: 6,
+        shadowOffset: { width: 0, height: 3 },
+      },
+      android: {
+        elevation: 5,
+      },
+    }),
   },
+
+  iconContainer: {
+    flex: 1,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
   iconStyle: {
-    fontSize: SIZES.width * 0.07,
+    // fontSize: SIZES.width * 0.06,
     color: COLORS.primary,
-    fontWeight: 'bold',
+    fontWeight: '600',
+    paddingTop: Platform.OS === 'android' ? 0 : 0,
   },
+
   title: {
-    fontSize: SIZES.width * 0.05,
+    fontSize: SIZES.width * 0.045,
     color: COLORS.primary,
-    marginBottom: -4,
     paddingHorizontal: 14,
     fontWeight: 'bold',
-    letterSpacing: 0.1,
+    letterSpacing: 0.2,
     flexShrink: 1,
   },
 });

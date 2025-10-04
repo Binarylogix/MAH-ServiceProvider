@@ -42,7 +42,7 @@ export default function StackNavigator() {
         
          <Stack.Screen name="ServiceProvidersList" component={ServiceProvidersList} 
          options={{
-          headerShown: true,
+          // headerShown: true,
           title: 'Shops List',
           headerTitleAlign: 'center',
           headerTitleStyle: { fontSize: 18, fontWeight: 'bold' },
@@ -50,7 +50,7 @@ export default function StackNavigator() {
 
         <Stack.Screen name="ShopProfile" component={ShopProfile} 
          options={{
-          headerShown: true,
+          // headerShown: true,
            title: 'Shops Details',
           headerTitleAlign: 'center',
           headerTitleStyle: { fontSize: 18, fontWeight: 'bold' },

@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import HeaderLeft from '../../Component/Header/HeaderLeft';
 
 const ActionButton = ({ label, icon }) => (
   <TouchableOpacity style={styles.actionButton}>
@@ -41,6 +42,7 @@ const ShopProfile = ({ route }) => {
 
   return (
     <View style={styles.container}>
+      <HeaderLeft title="Shop Details" />
       <ScrollView contentContainerStyle={{ paddingBottom: 120 }}>
         {/* Cover Photo */}
         <Image
