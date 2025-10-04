@@ -7,10 +7,14 @@ import {
   TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
-   Image,
+  Image,
   Dimensions,
-  Alert,
+  
+ 
 } from 'react-native';
+import { BackHandler, Alert } from 'react-native';
+// import { useEffect } from 'react';
+
 import LinearGradient from 'react-native-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
@@ -26,6 +30,24 @@ export default function OwnerOtpIndex({ navigation, route }) {
   const [resendLoading, setResendLoading] = useState(false);
 
   const otpValue = otp.join('');
+
+useEffect(() => {
+  const backAction = () => {
+    Alert.alert('Hold on!', 'Are you sure you want to go back?', [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'YES', onPress: () => navigation.goBack() },
+    ]);
+    return true; // default back action block
+  };
+
+  const backHandler = BackHandler.addEventListener(
+    'hardwareBackPress',
+    backAction
+  );
+
+  return () => backHandler.remove(); // ✅ cleanup
+}, []);
+
 
   // Countdown timer
   useEffect(() => {
@@ -53,7 +75,7 @@ export default function OwnerOtpIndex({ navigation, route }) {
     }
   };
 
-  // Verify OTP function
+  // Verify OTP
   const verifyOtp = async () => {
     if (otpValue.length < 6) {
       Alert.alert('Validation', 'Please enter 6-digit OTP');
@@ -65,33 +87,25 @@ export default function OwnerOtpIndex({ navigation, route }) {
       const response = await axios.post(
         'https://www.mandlamart.co.in/api/auth/verify-otp/deliveryPerson',
         { email, otp: otpValue },
-        { headers: { 'Content-Type': 'application/json' } }
+        { headers: { 'Content-Type': 'application/json' } },
       );
 
-       console.log("API Response:", response.data);        
-  
-   
+      console.log('API Response:', response.data);
+
       if (response.data?.token) {
-  // ✅ User ke paas token mila → OrderScreen
-  await AsyncStorage.multiSet([
-    ['userToken', response.data.token],
-    ['userEmail', email],
-  ]);
-
-  navigation.reset({ index: 0, routes: [{ name: 'OderScreen' }] });
-} 
-else if (response.data?.data === null) {
-  // ✅ Jab data null ho → AdminControl screen pe le jao
-  navigation.reset({
-    index: 0,
-    routes: [{ name: 'AdminControl', params: { email } }],
-  });
-} 
-else {
-  // ❌ Invalid OTP or error message
-  Alert.alert('Error', response.data?.message || 'Invalid OTP');
-}
-
+        await AsyncStorage.multiSet([
+          ['userToken', response.data.token],
+          ['userEmail', email],
+        ]);
+        navigation.reset({ index: 0, routes: [{ name: 'OrderScreenIndex' }] });
+      } else if (response.data?.data === null) {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'AdminControl', params: { email } }],
+        });
+      } else {
+        Alert.alert('Error', response.data?.message || 'Invalid OTP');
+      }
     } catch (error) {
       console.log('Verify OTP Error:', error.response?.data || error.message);
       Alert.alert('Error', 'Network error, please try again.');
@@ -100,14 +114,14 @@ else {
     }
   };
 
-  // Resend OTP function
+  // Resend OTP
   const resendOtp = async () => {
     setResendLoading(true);
     try {
       const response = await axios.post(
         'https://www.mandlamart.co.in/api/auth/send-otp',
         { email },
-        { headers: { 'Content-Type': 'application/json' } }
+        { headers: { 'Content-Type': 'application/json' } },
       );
 
       if (response.status === 200) {
@@ -125,30 +139,27 @@ else {
 
   return (
     <View style={styles.container}>
-      {/* <Image
-                source={require('../../../assets/Logo/logo2.png')}
-                style={styles.logoimage}
-                resizeMode="contain"
-              /> */}
-              <Image
-                source={require('../../../assets/Logo/shop.png')}
-                style={styles.image}
-                resizeMode="contain"
-              />
+      <Image
+        source={require('../../../assets/Logo/shop.png')}
+        style={styles.image}
+        resizeMode="contain"
+      />
       <Text style={styles.title}>Verification Code</Text>
-      <Text style={styles.subText}>Enter the 6-digit code sent to your email</Text>
+      <Text style={styles.subText}>
+        Enter the 6-digit code sent to your email
+      </Text>
 
       <View style={styles.otpContainer}>
         {otp.map((digit, index) => (
           <TextInput
             key={index}
-            ref={(ref) => (inputRefs.current[index] = ref)}
+            ref={ref => (inputRefs.current[index] = ref)}
             style={styles.otpInput}
             keyboardType="numeric"
             maxLength={1}
             value={digit}
-            onChangeText={(text) => handleChange(text, index)}
-            onKeyPress={(e) => handleKeyPress(e, index)}
+            onChangeText={text => handleChange(text, index)}
+            onKeyPress={e => handleKeyPress(e, index)}
           />
         ))}
       </View>
@@ -178,7 +189,11 @@ else {
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
         >
-          {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Confirm</Text>}
+          {loading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.buttonText}>Confirm</Text>
+          )}
         </LinearGradient>
       </TouchableOpacity>
     </View>
@@ -189,14 +204,13 @@ const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: width * 0.05, backgroundColor: '#fff' },
   title: { fontSize: width * 0.06, fontWeight: 'bold', marginBottom: 10 },
   subText: { color: '#888', fontSize: width * 0.04, marginBottom: 20, textAlign: 'center' },
-//  logoimage: { width: 200, height: 40, alignSelf: 'center' },
   image: { width: 250, height: 120, alignSelf: 'center', marginBottom: 20 },
   otpContainer: { flexDirection: 'row', justifyContent: 'space-between', width: '100%', marginBottom: 20 },
   otpInput: { flex: 1, height: width * 0.14, marginHorizontal: 5, borderWidth: 1, borderColor: '#ccc', borderRadius: 10, textAlign: 'center', fontSize: width * 0.05, fontWeight: 'bold' },
   timerContainer: { marginBottom: 20, alignItems: 'center' },
   timerText: { color: '#555', fontSize: width * 0.04 },
   resendText: { color: '#fd5858ff', fontSize: width * 0.045, fontWeight: 'bold' },
-  buttonWrapper: { width: '100%'},
+  buttonWrapper: { width: '100%' },
   gradientButton: { paddingVertical: width * 0.045, borderRadius: 30, alignItems: 'center' },
   buttonText: { color: '#fff', fontSize: width * 0.045, fontWeight: 'bold' },
 });

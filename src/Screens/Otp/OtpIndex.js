@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Alert,
   ActivityIndicator,
+  Image,
   Dimensions,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
@@ -72,29 +73,28 @@ export default function OtpIndex({ route, navigation }) {
         console.log('otpindex token : ', token);
         console.log('otpindex userId : ', userId);
 
-      
-showMessage({
-  message: "Success!",
-  description: response.data.message || "OTP Verified Successfully",
-  type: "success",
-  icon: "success",
-  floating: true,
-  duration: 3500,
-  animated: true,
-  style: {
-    borderRadius: 15,
-    paddingVertical: 18,
-    paddingHorizontal: 20,
-    shadowColor: "#28a745",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 5,
-    elevation: 8,
-    backgroundColor: "#28a745", // green success color
-  },
-  titleStyle: { fontWeight: "bold", fontSize: 16, color: "#fff" },
-  textStyle: { fontSize: 14, color: "#fff" },
-});
+        showMessage({
+          message: 'Success!',
+          description: response.data.message || 'OTP Verified Successfully',
+          type: 'success',
+          icon: 'success',
+          floating: true,
+          duration: 3500,
+          animated: true,
+          style: {
+            borderRadius: 15,
+            paddingVertical: 18,
+            paddingHorizontal: 20,
+            shadowColor: '#28a745',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.4,
+            shadowRadius: 5,
+            elevation: 8,
+            backgroundColor: '#28a745', // green success color
+          },
+          titleStyle: { fontWeight: 'bold', fontSize: 16, color: '#fff' },
+          textStyle: { fontSize: 14, color: '#fff' },
+        });
 
         // ✅ Role-based navigation
         if (response.data?.role === 'guest') {
@@ -187,6 +187,11 @@ showMessage({
 
   return (
     <View style={styles.container}>
+      <Image
+        source={require('../../assets/images/customer.png')}
+        style={styles.image}
+        resizeMode="contain"
+      />
       <Text style={styles.title}>Verification Code</Text>
       <Text style={styles.subText}>
         We have sent 6 digit verification code {email}
@@ -260,6 +265,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 10,
   },
+   image: { width: 250, height: 120, alignSelf: 'center', marginBottom: 20 },
   subText: {
     color: '#888',
     fontSize: width * 0.04,

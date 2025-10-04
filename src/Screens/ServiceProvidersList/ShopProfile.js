@@ -8,10 +8,11 @@ import {
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// ActionButton component for buttons like Location, Share
 const ActionButton = ({ label, icon }) => (
   <TouchableOpacity style={styles.actionButton}>
     <Text style={styles.actionButtonIcon}>{icon}</Text>
@@ -20,31 +21,15 @@ const ActionButton = ({ label, icon }) => (
 );
 
 const ShopProfile = ({ route }) => {
-  const { salonId } = route.params;
+  const { salon } = route.params;  // पूरा salon object यहाँ
 
-  const [salonDetails, setSalonDetails] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [selectedTab, setSelectedTab] = useState('Services');
   const [selectedServices, setSelectedServices] = useState([]);
 
-  // Fetch salon details using API
-  useEffect(() => {
-    if (!salonId) return;
-    const fetchDetails = async () => {
-      try {
-        const response = await axios.get(`https://www.makeahabit.com/api/v1/vendor/details/${salonId}`);
-
-        if (response.data.success) {
-          setSalonDetails(response.data.data);
-        }
-      } catch (error) {
-        console.error('Error fetching salon details:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchDetails();
-  }, [salonId]);
+  const services = salon.services || [];
+  const totalPrice = services
+    .filter((s) => selectedServices.includes(s._id))
+    .reduce((acc, cur) => acc + cur.price, 0);
 
   const toggleService = (serviceId) => {
     setSelectedServices((prev) =>
@@ -54,72 +39,82 @@ const ShopProfile = ({ route }) => {
     );
   };
 
-  if (loading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#18A558" />
-      </View>
-    );
-  }
-
-  const services = salonDetails?.services || [];
-  const totalPrice = services
-    .filter((s) => selectedServices.includes(s._id))
-    .reduce((acc, cur) => acc + cur.price, 0);
-
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={{ paddingBottom: 120 }}>
         {/* Cover Photo */}
         <Image
-          source={{ uri: salonDetails.coverPhotoUrl || 'https://images.unsplash.com/photo-1517841905240-472988babdf9' }}
+          source={
+            salon.businessCard
+              ? { uri: `https://www.makeahabit.com/api/v1/uploads/business/${salon.businessCard}` } 
+              : require('../../assets/images/noimage.jpg') // Local fallback image
+          }
           style={styles.coverPhoto}
+          resizeMode="cover"
         />
 
         {/* Action Buttons */}
-        <View style={styles.actionButtonsRow}>
+        {/* <View style={styles.actionButtonsRow}>
           <ActionButton label="Location" icon="📍" />
           <ActionButton label="Share" icon="🔗" />
+        </View> */}
+
+        {/* Salon Info */}
+        <View style={{ paddingHorizontal: 20, marginBottom: 10 }}>
+          <Text style={styles.salonName}>{salon.name}</Text>
+          <Text style={styles.locationText}>
+            📍 {salon.city}, {salon.state}
+          </Text>
+          {/* <Text style={styles.ratingText}>⭐ {salon.rating}</Text> */}
+          {/* {salon.description && (
+            <Text style={styles.description}>{salon.description}</Text>
+          )} */}
         </View>
 
         {/* Specialists */}
-        <View style={styles.specialistSection}>
-          <Text style={styles.sectionTitle}>Salon Specialist</Text>
-          <FlatList
-            data={salonDetails.specialists || []}
-            horizontal
-            keyExtractor={(item) => item._id}
-            showsHorizontalScrollIndicator={false}
-            renderItem={({ item }) => (
-              <View style={styles.specialistCard}>
-                <Image source={{ uri: item.image }} style={styles.specialistAvatar} />
-                <Text style={styles.specialistName}>{item.name}</Text>
-                <Text style={styles.specialistRole}>{item.role}</Text>
-              </View>
-            )}
-          />
-        </View>
+        {salon.specialists?.length > 0 && (
+          <View style={styles.specialistSection}>
+            <Text style={styles.sectionTitle}>Salon Specialist</Text>
+            <FlatList
+              data={salon.specialists}
+              horizontal
+              keyExtractor={(item) => item._id}
+              showsHorizontalScrollIndicator={false}
+              renderItem={({ item }) => (
+                <View style={styles.specialistCard}>
+                  <Image source={{ uri: item.image }} style={styles.specialistAvatar} />
+                  <Text style={styles.specialistName}>{item.name}</Text>
+                  <Text style={styles.specialistRole}>{item.role}</Text>
+                </View>
+              )}
+            />
+          </View>
+        )}
 
         {/* Tabs */}
         <View style={styles.tabsRow}>
-          {['Services', 'Products', 'About', 'Gallery'].map((tab) => (
+          {['Services', 'About', 'Gallery'].map((tab) => (
             <TouchableOpacity
               key={tab}
               style={[styles.tab, selectedTab === tab && styles.activeTab]}
               onPress={() => setSelectedTab(tab)}
             >
-              <Text style={[styles.tabLabel, selectedTab === tab && styles.activeTabLabel]}>{tab}</Text>
+              <Text style={[styles.tabLabel, selectedTab === tab && styles.activeTabLabel]}>
+                {tab}
+              </Text>
             </TouchableOpacity>
           ))}
         </View>
 
-        {/* Services Tab Content */}
+        {/* Services */}
         {selectedTab === 'Services' && (
           <View style={styles.servicesSection}>
             {services.map((service) => (
               <View key={service._id} style={styles.serviceCard}>
                 <Image
-                  source={{ uri: service.icon?.img || 'https://cdn-icons-png.flaticon.com/512/1973/1973701.png' }}
+                  source={{
+                    uri: service.icon?.img || 'https://cdn-icons-png.flaticon.com/512/1973/1973701.png',
+                  }}
                   style={styles.serviceImage}
                 />
                 <View style={{ flex: 1 }}>
@@ -136,7 +131,15 @@ const ShopProfile = ({ route }) => {
           </View>
         )}
 
-        {/* Other tabs (Products, About, Gallery) can be added similarly */}
+        {/* About */}
+        {selectedTab === 'About' && (
+          <View style={{ paddingHorizontal: 20 }}>
+            <Text style={styles.sectionTitle}>About Us</Text>
+            <Text style={{ color: '#555', fontSize: 14, lineHeight: 20 }}>
+              {salon.description || 'No additional details provided.'}
+            </Text>
+          </View>
+        )}
       </ScrollView>
 
       {/* Total Price & Booking Button */}
@@ -151,16 +154,21 @@ const ShopProfile = ({ route }) => {
   );
 };
 
+
+
+
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   coverPhoto: {
-    height: 260,
-    margin: 12,
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
-    marginBottom: 18,
-  },
+  width: '100%',          // make image span full width
+  height: 260,
+  marginHorizontal: 12,
+  borderBottomLeftRadius: 24,
+  borderBottomRightRadius: 24,
+  marginBottom: 18,
+  overflow: 'hidden',     // important to apply border radius on Image
+},
   actionButtonsRow: {
     flexDirection: 'row',
     justifyContent: 'space-around',
@@ -177,6 +185,11 @@ const styles = StyleSheet.create({
   },
   actionButtonIcon: { fontSize: 18, marginRight: 4, color: '#fff' },
   actionButtonLabel: { fontSize: 14, color: '#fff', fontWeight: '600' },
+
+  salonName: { fontSize: 20, fontWeight: '700', color: '#111' },
+  locationText: { fontSize: 13, color: '#666', marginTop: 3 },
+  ratingText: { fontSize: 14, color: '#18A558', marginTop: 3 },
+  description: { fontSize: 13, color: '#555', marginTop: 8 },
 
   specialistSection: { paddingHorizontal: 25, marginBottom: 10 },
   sectionTitle: { fontSize: 18, fontWeight: '700', marginBottom: 7 },
@@ -247,10 +260,6 @@ const styles = StyleSheet.create({
     elevation: 5,
     borderTopWidth: 1,
     borderColor: '#eee',
-    shadowColor: '#111',
-    shadowOpacity: 0.06,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: -4 },
   },
   totalPriceLabel: { fontSize: 15, fontWeight: '600' },
   totalPriceValue: { color: '#18A558', fontSize: 19, fontWeight: '700' },
@@ -267,12 +276,60 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 3,
-    shadowColor: '#18A558',
-    shadowOpacity: 0.15,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 5 },
   },
   bookingBtnText: { color: '#fff', fontSize: 18, fontWeight: '700' },
 });
 
 export default ShopProfile;
+
+
+
+// import React from 'react';
+// import { View, Text, Image, StyleSheet, ScrollView } from 'react-native';
+// import { useRoute } from '@react-navigation/native';
+
+// const ShopProfile = () => {
+//   const route = useRoute();
+//   const { salon } = route.params; // यहाँ पूरा data मिल जाएगा
+
+//   return (
+//     <ScrollView style={styles.container}>
+//       <Image source={salon.image} style={styles.image} />
+
+//       <Text style={styles.title}>{salon.name}</Text>
+//       <Text style={styles.location}>📍 {salon.city}, {salon.state}</Text>
+//       <Text style={styles.rating}>⭐ {salon.rating}</Text>
+
+//       {salon.description ? (
+//         <Text style={styles.desc}>{salon.description}</Text>
+//       ) : (
+//         <Text style={styles.desc}>No description available</Text>
+//       )}
+
+//       {/* Services list */}
+//       {salon.services?.length > 0 && (
+//         <View style={{ marginTop: 15 }}>
+//           <Text style={styles.sectionTitle}>Services:</Text>
+//           {salon.services.map((srv, i) => (
+//             <Text key={i} style={styles.serviceItem}>
+//               • {srv.name} — ₹{srv.price}
+//             </Text>
+//           ))}
+//         </View>
+//       )}
+//     </ScrollView>
+//   );
+// };
+
+// const styles = StyleSheet.create({
+//   container: { flex: 1, backgroundColor: '#fff', padding: 16 },
+//   image: { width: '100%', height: 180, borderRadius: 8, marginBottom: 12 },
+//   title: { fontSize: 18, fontWeight: 'bold', color: '#000' },
+//   location: { fontSize: 14, color: '#333', marginVertical: 4 },
+//   rating: { fontSize: 14, color: '#01A449', marginBottom: 10 },
+//   desc: { fontSize: 13, color: '#555', lineHeight: 18 },
+//   sectionTitle: { fontSize: 15, fontWeight: 'bold', marginBottom: 5 },
+//   serviceItem: { fontSize: 13, color: '#444', marginVertical: 2 },
+// });
+
+// export default ShopProfile;

@@ -79,10 +79,10 @@ export default function LoginScreen({ navigation }) {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
+    // <KeyboardAvoidingView
+    //   style={styles.container}
+    //   behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    // >
       <ScrollView
         contentContainerStyle={styles.scrollContainer}
         showsVerticalScrollIndicator={false}
@@ -122,7 +122,7 @@ export default function LoginScreen({ navigation }) {
         {/* Button */}
         <GradientButton title="Continue" onPress={sendOtp} loading={loading} />
       </ScrollView>
-    </KeyboardAvoidingView>
+    // </KeyboardAvoidingView>
   );
 }
 

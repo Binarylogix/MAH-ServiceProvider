@@ -20,7 +20,7 @@ const { width } = Dimensions.get('window');
 const CARD_WIDTH = width * 0.34; // card width is responsive
 const IMAGE_HEIGHT = width * 0.20; // proportional image height
 
-const FALLBACK_IMAGE = require('../../assets/salt.png');
+const FALLBACK_IMAGE = require('../../assets/images/noimage.jpg'); // Local fallback image
 
 const Productcard = ({ listName }) => {
   const navigation = useNavigation();
@@ -75,7 +75,9 @@ const fetchProducts = async () => {
   const renderProduct = ({ item }) => (
   <TouchableOpacity
     style={styles.productCard}
-   onPress={() => navigation.navigate('ShopProfile', { salonId: item._id })}
+  //  onPress={() => navigation.navigate('ShopProfile', { salonId: item })}
+  onPress={() => navigation.navigate('ShopProfile', { salon: item })}
+
 
   >
     {/* Image */}

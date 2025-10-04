@@ -30,11 +30,10 @@ export default function CreateUserProfile({ navigation }) {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const fetchEmail = async () => {
+    (async () => {
       const storedEmail = await AsyncStorage.getItem('userEmail');
-      setEmail(storedEmail);
-    };
-    fetchEmail();
+      if (storedEmail) setEmail(storedEmail);
+    })();
   }, []);
 
   const requestPermission = async () => {
@@ -44,7 +43,7 @@ export default function CreateUserProfile({ navigation }) {
           PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
           {
             title: 'Storage Permission',
-            message: 'App needs access to your photos to upload profile image',
+            message: 'App needs access to your gallery to upload your photo',
             buttonPositive: 'OK',
           },
         );
@@ -58,35 +57,35 @@ export default function CreateUserProfile({ navigation }) {
   };
 
   const selectProfileImage = async () => {
-    const hasPermission = await requestPermission();
-    if (!hasPermission) return;
+    const permission = await requestPermission();
+    if (!permission) return;
 
-    launchImageLibrary({ mediaType: 'photo', quality: 0.7 }, response => {
+    launchImageLibrary({ mediaType: 'photo', quality: 0.8 }, response => {
       if (response.didCancel) return;
       if (response.errorCode) {
-        Alert.alert('Error', 'Failed to select image');
+        Alert.alert('Error', 'Unable to open gallery');
         return;
       }
-      const uri = response.assets[0].uri;
-      setProfileImage(uri);
+      const uri = response.assets?.[0]?.uri;
+      if (uri) setProfileImage(uri);
     });
   };
 
   const createProfile = async () => {
     if (!name.trim()) return Alert.alert('Validation', 'Full Name is required');
-    if (!gender) return Alert.alert('Validation', 'Select Gender');
+    if (!gender) return Alert.alert('Validation', 'Please select Gender');
     if (!/^\d{10}$/.test(mobile))
-      return Alert.alert('Validation', 'Enter valid 10-digit mobile number');
+      return Alert.alert('Validation', 'Enter a valid 10-digit mobile number');
 
     setLoading(true);
     try {
       const body = {
         fullName: name,
-        email: email,
+        email,
         phone: mobile,
-        gender: gender,
+        gender,
         role: 'user',
-        address: address,
+        address,
         userprofileImage: profileImage || null,
       };
 
@@ -96,23 +95,16 @@ export default function CreateUserProfile({ navigation }) {
         { headers: { 'Content-Type': 'application/json' } },
       );
 
-      // === Handle Success === //
-      Alert.alert('Success', res.data?.msg || 'Profile created!');
+      Alert.alert('Success', res.data?.msg || 'Profile created successfully!');
 
-      if (res.data?.user?._id) {
+      if (res.data?.user?._id)
         await AsyncStorage.setItem('userId', res.data.user._id);
-      }
-      console.log(res.data.user._id);
-
-      if (res.data?.token) {
+      if (res.data?.token)
         await AsyncStorage.setItem('userToken', res.data.token);
-      }
-      console.log(res.data.token);
 
       navigation.navigate('TabScreen');
-    } catch (e) {
-      const msg = e.response?.data?.msg || e.message || 'Profile update error';
-      console.log('Profile update error:', msg);
+    } catch (err) {
+      const msg = err.response?.data?.msg || 'Profile creation failed';
       Alert.alert('Error', msg);
     } finally {
       setLoading(false);
@@ -121,40 +113,40 @@ export default function CreateUserProfile({ navigation }) {
 
   return (
     <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       style={{ flex: 1, backgroundColor: '#fff' }}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      {/* Scrollable Content */}
       <ScrollView
-        // contentContainerStyle={styles.scrollContainer}
         showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.container}
       >
-        {/* Gradient Header (fixed) */}
-        <LinearGradient colors={['#40196C', '#6b3db8']} style={styles.header}>
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={styles.backButton}
-          >
-            <Icon name="arrow-left" size={24} color="#fff" />
-            <Text style={styles.headerText}>Edit Profile</Text>
+        {/* Header */}
+        <LinearGradient colors={['#01823A', '#00D65F']} style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Icon name="arrow-left" size={22} color="#fff" />
           </TouchableOpacity>
+          <Text style={styles.headerTitle}>Create Profile</Text>
         </LinearGradient>
+
+        {/* Form Card */}
         <View style={styles.card}>
-          {/* Profile Image */}
-          <TouchableOpacity
-            style={styles.imageWrapper}
-            onPress={selectProfileImage}
-          >
+          <TouchableOpacity style={styles.imageWrapper} onPress={selectProfileImage}>
             {profileImage ? (
               <Image source={{ uri: profileImage }} style={styles.image} />
             ) : (
-              <View style={styles.imagePlaceholder}>
-                <Text style={{ color: '#888' }}>Select Image</Text>
+              <View style={styles.placeholder}>
+                <Icon name="user" size={36} color="#aaa" />
+                <Text style={{ color: '#888', marginTop: 6 }}>Add Photo</Text>
               </View>
             )}
           </TouchableOpacity>
 
-          {/* Full Name */}
+             <TextInput
+            style={[styles.input, { backgroundColor: '#f5f5f5' }]}
+            value={email}
+            editable={false}
+          />
+
           <TextInput
             style={styles.input}
             placeholder="Full Name"
@@ -162,8 +154,17 @@ export default function CreateUserProfile({ navigation }) {
             onChangeText={setName}
           />
 
-          {/* Gender Dropdown */}
-          <Dropdown
+
+          <TextInput
+            style={styles.input}
+            placeholder="Mobile Number"
+            keyboardType="number-pad"
+            maxLength={10}
+            value={mobile}
+            onChangeText={setMobile}
+          />
+
+           <Dropdown
             style={styles.input}
             data={[
               { label: 'Male', value: 'male' },
@@ -177,28 +178,13 @@ export default function CreateUserProfile({ navigation }) {
             onChange={item => setGender(item.value)}
           />
 
-          {/* Address */}
-          <TextInput
+           <TextInput
             style={styles.input}
             placeholder="Address"
             value={address}
             onChangeText={setAddress}
           />
 
-          {/* Email (read-only) */}
-          <TextInput style={styles.input} value={email} editable={false} />
-
-          {/* Mobile */}
-          <TextInput
-            style={styles.input}
-            placeholder="Mobile Number"
-            value={mobile}
-            keyboardType="number-pad"
-            maxLength={10}
-            onChangeText={setMobile}
-          />
-
-          {/* Update Button */}
           <TouchableOpacity
             style={styles.button}
             onPress={createProfile}
@@ -217,72 +203,69 @@ export default function CreateUserProfile({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  header: {
-    paddingTop: 0,
-    height: 180,
-    paddingHorizontal: 20,
+  container: {
+    // flexGrow: 1,
+    // paddingHorizontal: 20,
     paddingBottom: 30,
-    borderBottomLeftRadius: 35,
-    borderBottomRightRadius: 35,
   },
-  backButton: {
+  header: {
+    height: 150,
+    borderBottomLeftRadius: 40,
+    borderBottomRightRadius: 40,
+    padding: 20,
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 10,
+    gap: 20,
   },
-  headerText: {
+  headerTitle: {
     color: '#fff',
     fontSize: 22,
     fontWeight: '700',
-    marginLeft: 10,
+    // marginTop: 10,
   },
-
   card: {
-    marginTop: -60, // overlap on header
     backgroundColor: '#fff',
-    borderRadius: 20,
+    marginTop: -40,
+    borderRadius: 16,
     padding: 20,
-    maxWidth: 320,
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowOffset: { width: 0, height: 4 },
-    shadowRadius: 6,
-    elevation: 4,
-    marginLeft: 20,
+    elevation: 5,
   },
   imageWrapper: {
     alignSelf: 'center',
-    marginBottom: 20,
     width: 110,
     height: 110,
     borderRadius: 55,
     overflow: 'hidden',
+    marginBottom: 20,
+    backgroundColor: '#f9f9f9',
   },
-  image: { width: '100%', height: '100%', borderRadius: 55 },
-  imagePlaceholder: {
+  image: { width: '100%', height: '100%' },
+  placeholder: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fafafa',
-    borderWidth: 2,
-    borderColor: '#ddd',
-    borderRadius: 55,
   },
   input: {
     borderWidth: 1,
     borderColor: '#ddd',
     borderRadius: 12,
     padding: 12,
-    marginBottom: 15,
-    fontSize: 16,
-    backgroundColor: '#fff',
+    marginBottom: 14,
+    fontSize: 15,
   },
   button: {
-    backgroundColor: '#40196C',
-    padding: 16,
+    backgroundColor: '#01823A',
+    paddingVertical: 14,
     borderRadius: 12,
     alignItems: 'center',
     marginTop: 10,
   },
-  buttonText: { color: '#fff', fontWeight: '700', fontSize: 16 },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '700',
+  },
 });
