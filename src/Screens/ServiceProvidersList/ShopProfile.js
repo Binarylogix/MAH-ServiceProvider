@@ -45,15 +45,16 @@ const ShopProfile = ({ route }) => {
       <HeaderLeft title="Shop Details" />
       <ScrollView contentContainerStyle={{ paddingBottom: 120 }}>
         {/* Cover Photo */}
-        <Image
-          source={
-            salon.businessCard
-              ? { uri: `https://www.makeahabit.com/api/v1/uploads/business/${salon.businessCard}` } 
-              : require('../../assets/images/noimage.jpg') // Local fallback image
-          }
-          style={styles.coverPhoto}
-          resizeMode="cover"
-        />
+       <Image
+  source={
+    salon.businessCard
+      ? { uri: `https://www.makeahabit.com/api/v1/uploads/business/${salon.businessCard}` }
+      : require('../../assets/images/noimage.jpg')
+  }
+  style={styles.coverPhoto}
+  resizeMode="cover"
+/>
+
 
         {/* Action Buttons */}
         {/* <View style={styles.actionButtonsRow}>
@@ -162,15 +163,17 @@ const ShopProfile = ({ route }) => {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  coverPhoto: {
-  width: '100%',          // make image span full width
+coverPhoto: {
+  width: '94%',
   height: 260,
+  marginTop: 10,
   marginHorizontal: 12,
-  borderBottomLeftRadius: 24,
-  borderBottomRightRadius: 24,
+  borderRadius: 12,
   marginBottom: 18,
-  overflow: 'hidden',     // important to apply border radius on Image
+  overflow: 'hidden', // required for rounded corners to apply
+  backgroundColor: '#e3f7d7ff', // fallback background while image loads
 },
+
   actionButtonsRow: {
     flexDirection: 'row',
     justifyContent: 'space-around',

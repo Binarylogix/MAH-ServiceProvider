@@ -1,8 +1,14 @@
 import React from 'react';
-import { TouchableOpacity, StyleSheet, Text, View, Dimensions, Platform } from 'react-native';
+import {
+  TouchableOpacity,
+  StyleSheet,
+  Text,
+  View,
+  Dimensions,
+  Platform,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
-
 
 const SIZES = {
   width: Dimensions.get('window').width,
@@ -15,13 +21,7 @@ const COLORS = {
   white: '#fff',
 };
 
-const HeaderLeft = ({
-  touchStyle,
-  onPress,
-  title,
-  mainStyle,
-  type,
-}) => {
+const HeaderLeft = ({ touchStyle, onPress, title, mainStyle, type }) => {
   const navigation = useNavigation();
 
   // ✅ Default to navigation.goBack() if no custom press is provided
@@ -35,13 +35,19 @@ const HeaderLeft = ({
         type === 'withoutHeader' && styles.withoutHeader,
       ]}
     >
+      <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#c5f9dcff', borderRadius: 24 }}>
       <TouchableOpacity
         style={[styles.btn, touchStyle, styles.elevatedBtn]}
         onPress={handlePress}
         activeOpacity={0.7}
       >
         <View style={styles.iconContainer}>
-<FontAwesome6 name="arrow-left-long" style={styles.iconStyle} size={20} color="#000" />
+          <FontAwesome6
+            name="arrow-left-long"
+            style={styles.iconStyle}
+            size={20}
+            color="#000"
+          />
           {/* <Text style={styles.iconStyle}>{icon || ''}</Text> */}
         </View>
       </TouchableOpacity>
@@ -51,6 +57,7 @@ const HeaderLeft = ({
           {title}
         </Text>
       ) : null}
+    </View>
     </View>
   );
 };
@@ -68,6 +75,10 @@ const styles = StyleSheet.create({
     paddingRight: 18,
     paddingLeft: 4,
     paddingVertical: 5,
+   
+    // borderBottomRightRadius: 24,
+    borderRadius: 24,
+    // borderRadius: 24,
   },
 
   withoutHeader: {

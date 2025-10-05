@@ -1,13 +1,15 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import noImage from '../../assets/images/noimage.jpg';
 
 // Async thunk for fetching salon list
 export const fetchSalonList = createAsyncThunk(
   'SalonList/fetchSalonList',
   async (_, thunkAPI) => {
-    const API_TOKEN = await AsyncStorage.getItem('userToken');
     try {
+      const API_TOKEN = await AsyncStorage.getItem('userToken');
+
       const response = await axios.get(
         'https://www.makeahabit.com/api/v1/vendor/all-sallon-list',
         {
@@ -15,32 +17,32 @@ export const fetchSalonList = createAsyncThunk(
             Authorization: `Bearer ${API_TOKEN}`,
             'Content-Type': 'application/json',
           },
-        },
+        }
       );
 
-      const data = response.data.data;
+      const data = response.data?.data || [];
 
-      // Map salons data
+      // Map salons data safely
       const mappedSalons = data.map(salon => ({
-        _id: salon._id,
-        name: salon.businessName,
+        _id: salon._id || Math.random().toString(),
+        name: salon.businessName || 'Unknown',
         description: salon.description || '',
-        city: salon.city,
-        state: salon.state,
-        rating: salon.avgRating,
+        city: salon.city || 'N/A',
+        state: salon.state || 'N/A',
+        rating: salon.avgRating || '0.0',
+        category: salon.category || '',
         image: salon.businessCard
-          ? {
-              uri: `https://www.makeahabit.com/api/v1/uploads/business/${salon.businessCard}`,
-            }
-          : FALLBACK_IMAGE,
+          ? { uri: `https://www.makeahabit.com/api/v1/uploads/business/${salon.businessCard}` }
+          : noImage,
         services: salon.services || [],
+        serviceCategory: salon.serviceCategory || null, 
       }));
 
       return mappedSalons;
     } catch (error) {
-      return thunkAPI.rejectWithValue(error.response || error.message);
+      return thunkAPI.rejectWithValue(error.response?.data || error.message);
     }
-  },
+  }
 );
 
 const initialState = {
@@ -52,9 +54,7 @@ const initialState = {
 const SalonListSlice = createSlice({
   name: 'SalonList',
   initialState,
-  reducers: {
-    // Add any synchronous reducers if needed
-  },
+  reducers: {},
   extraReducers: builder => {
     builder
       .addCase(fetchSalonList.pending, state => {

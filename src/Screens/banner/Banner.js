@@ -9,7 +9,6 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import { getBannerUri } from '../../constants/BASE_URl';
 
 const { width } = Dimensions.get('window');
 
@@ -27,16 +26,16 @@ const BannerCarousel = () => {
         if (!token) return;
 
         const response = await axios.get(
-          'https://www.mandlamart.co.in/api/applicationBanner/getAllApplicationBanners',
+          'https://www.makeahabit.com/api/v1/banner/get-all',
           {
             headers: {
               Authorization: `Bearer ${token}`,
             },
-          },
+          }
         );
 
-        if (response.data && Array.isArray(response.data)) {
-          setBanners(response.data);
+        if (response.data && Array.isArray(response.data.banners)) {
+          setBanners(response.data.banners);
         }
       } catch (error) {
         console.log('Banner API error:', error.message);
@@ -59,19 +58,23 @@ const BannerCarousel = () => {
         animated: true,
       });
       setActiveIndex(nextIndex);
-    }, 3000); // change every 3 seconds
+    }, 3000);
 
-    return () => {
-      clearInterval(intervalRef.current);
-    };
+    return () => clearInterval(intervalRef.current);
   }, [activeIndex, banners]);
 
-  const handleScroll = event => {
+  const handleScroll = (event) => {
     const index = Math.round(event.nativeEvent.contentOffset.x / width);
     setActiveIndex(index);
   };
 
- 
+  // if (loading) {
+  //   return (
+  //     <View style={styles.loader}>
+  //       <ActivityIndicator size="large" color="#40196C" />
+  //     </View>
+  //   );
+  // }
 
   return (
     <View style={styles.container}>
@@ -81,18 +84,17 @@ const BannerCarousel = () => {
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
-        keyExtractor={item => item._id}
+        keyExtractor={(item) => item._id}
         renderItem={({ item }) => (
-    <Image
-  source={{
-    uri: item.banner
-      ? `https://www.makeahabit.com/api/v1/uploads/banner/${item.banner}`
-      : 'https://cdn-icons-png.flaticon.com/512/1973/1973701.png', // fallback
-  }}
-  style={styles.bannerImage}
-  resizeMode="cover"
-/>
-
+          <Image
+            source={{
+              uri: item.img
+                ? `https://www.makeahabit.com/api/v1/uploads/banner/${item.img}`
+                : 'https://cdn-icons-png.flaticon.com/512/1973/1973701.png',
+            }}
+            style={styles.bannerImage}
+            resizeMode="cover"
+          />
         )}
         onScroll={handleScroll}
         scrollEventThrottle={16}
@@ -115,14 +117,14 @@ const styles = StyleSheet.create({
   container: {
     height: 200,
     marginBottom: 10,
-    paddingHorizontal:10,
+    paddingHorizontal: 10,
     marginHorizontal: 6,
   },
   bannerImage: {
-    width: 350,
-    height: 175,
-    marginHorizontal:6,
-    marginVertical:10,
+    width: width - 36,
+    height: 165,
+    marginHorizontal: 6,
+    marginVertical: 10,
     borderRadius: 10,
   },
   loader: {

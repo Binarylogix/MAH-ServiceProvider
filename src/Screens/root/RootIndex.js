@@ -11,6 +11,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import user from '../../assets/Icons/customer.png';
 import delivery from '../../assets/Icons/store.png';
+import AppPermissionHandler  from '../permissions/AppPermissionHandler' ;
 
 export default function RootIndex({ navigation }) {
   const [loading, setLoading] = useState(true);
@@ -42,13 +43,14 @@ export default function RootIndex({ navigation }) {
   if (loading) {
     return (
       <View style={styles.loaderContainer}>
-        <ActivityIndicator size="large" color="#000" />
+        <ActivityIndicator size="large" color="green" />
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
+      <AppPermissionHandler />
       <Text style={styles.welcome}>Welcome To Make a Habit</Text>
       <Text style={styles.title}>Create Account</Text>
 

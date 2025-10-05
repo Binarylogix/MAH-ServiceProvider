@@ -14,11 +14,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 
 import HomeScreen from '../Screens/HomeScreen';
-import Cart from '../Screens/cart/Cart';
-import Category from '../Screens/Category';
+
 import AllBooking from '../Screens/Booking/AllBooking';
 import ServiceProvidersList from '../Screens/ServiceProvidersList/ServiceProvidersList';
-import ShopProfile from '../Screens/ServiceProvidersList/ShopProfile';
+
 import Wallet from '../Screens/Wallet';
 import Profile from '../Screens/Profile';
 import ViewBasket from '../Component/ViewBasket';
@@ -27,6 +26,7 @@ import Icon from 'react-native-vector-icons/FontAwesome6';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+
 
 
 const { width } = Dimensions.get('window');
@@ -39,7 +39,7 @@ function CustomTabBar({ state, descriptors, navigation }) {
         const isFocused = state.index === index;
 
         // Center button (Cart)
-        if (route.name === 'Cart') {
+        if (route.name === 'Search') {
           return (
             <View key={route.key} style={{ flex: 1, alignItems: 'center' }}>
               <TouchableOpacity
@@ -78,7 +78,7 @@ function CustomTabBar({ state, descriptors, navigation }) {
               />
             );
             break;
-          case 'Category':
+          case 'Booking1':
             iconElement = (
               <MaterialCommunityIcons
                 name="view-grid"
@@ -166,40 +166,40 @@ export default function BottomTabScreen() {
   const [unit, setUnit] = useState('');
 
   // Fetch cart from API
-  const fetchCart = async () => {
-    try {
-      setLoading(true);
-      const userId = await AsyncStorage.getItem('userId');
-      const token = await AsyncStorage.getItem('userToken');
-      if (!userId || !token) return;
+  // const fetchCart = async () => {
+  //   try {
+  //     setLoading(true);
+  //     const userId = await AsyncStorage.getItem('userId');
+  //     const token = await AsyncStorage.getItem('userToken');
+  //     if (!userId || !token) return;
 
-      const res = await axios.get(
-        `https://www.mandlamart.co.in/api/cart/getAllCart/${userId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        },
-      );
+  //     const res = await axios.get(
+  //       `https://www.mandlamart.co.in/api/cart/getAllCart/${userId}`,
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`,
+  //           'Content-Type': 'application/json',
+  //         },
+  //       },
+  //     );
 
-      if (res.data) {
-        setCartData(res.data);
-        setQuantity(res.data.items.length || 0);
-      } else {
-        setCartData(null);
-        setQuantity(0);
-      }
-    } catch (err) {
-      console.log('❌ Axios error:', err.response?.data || err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  //     if (res.data) {
+  //       setCartData(res.data);
+  //       setQuantity(res.data.items.length || 0);
+  //     } else {
+  //       setCartData(null);
+  //       setQuantity(0);
+  //     }
+  //   } catch (err) {
+  //     console.log('❌ Axios error:', err.response?.data || err.message);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
-  useEffect(() => {
-    fetchCart();
-  }, []);
+  // useEffect(() => {
+  //   fetchCart();
+  // }, []);
 
   return (
     <View style={{ flex: 1 }}>
@@ -210,7 +210,7 @@ export default function BottomTabScreen() {
         <Tab.Screen name="Home" component={HomeScreen} />
         {/* <Tab.Screen name="Booking" component={Category} /> */}
         <Tab.Screen name="Booking1" component={AllBooking} />
-        <Tab.Screen name="Cart" component={Cart} />
+        <Tab.Screen name="Search" component={ServiceProvidersList} />
         <Tab.Screen name="Wallet" component={Wallet} />
         <Tab.Screen name="Profile" component={Profile} />
       </Tab.Navigator>

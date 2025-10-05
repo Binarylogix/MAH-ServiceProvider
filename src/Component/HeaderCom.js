@@ -71,14 +71,14 @@ const HeaderCom = ({ userName = 'Rohit', currentLatLong }) => {
 
   
       {/* Search Bar */}
-      <View style={styles.searchContainer}>
+      {/* <View style={styles.searchContainer}>
         <Icon name="search" size={20} color="#888" />
         <TextInput
           placeholder="Search Anything..."
           style={styles.searchInput}
           placeholderTextColor="#888"
         />
-      </View>
+      </View> */}
     </View>
   );
 };

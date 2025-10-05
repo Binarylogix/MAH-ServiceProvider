@@ -65,9 +65,9 @@ const Productcard = ({ listName }) => {
     </TouchableOpacity>
   );
 
-  if (loading) {
-    return <ActivityIndicator size="large" color="#01A449" />;
-  }
+  // if (loading) {
+  //   return <ActivityIndicator size="large" color="#01A449" />;
+  // }
 
   if (error) {
     return (

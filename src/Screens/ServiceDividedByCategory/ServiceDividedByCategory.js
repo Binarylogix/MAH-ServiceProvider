@@ -13,18 +13,21 @@ import { useNavigation } from '@react-navigation/native';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchSalonList } from '../../redux/slices/SalonListSlice';
 import { fetchCategoryList } from '../../redux/slices/CategoryListSlice';
+import { fetchServiceCategoryList } from '../../redux/slices/ServiceCategory';
 import HeaderLeft from '../../Component/Header/HeaderLeft';
 import noImage from '../../assets/images/noimage.jpg';
 
 const BASE_URL = 'https://www.makeahabit.com/api/v1/uploads';
 
-const ServiceProvidersList = ({ route }) => {
+const ServiceDividedByCategory = ({ route }) => {
+
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [search, setSearch] = useState('');
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const CategoryId = route.params?.CategoryId;
-
+  const CategoryId = route.params?.categoryId;
+  const ShopCategory = route.params?.ShopCategory;
+console.log("CategoryId",CategoryId)
   const {
     values: salons = [],
     loading: salonLoading,
@@ -36,10 +39,27 @@ const ServiceProvidersList = ({ route }) => {
     error: categoryError,
   } = useSelector(state => state.CategoryList || {});
 
+ const {
+  values: servicecategories = [],
+  loading: servicecategoryLoading,
+  error: servicecategoryError,
+} = useSelector(state => state.ServiceCategoryList || {});
+
+console.log("Service Categories from state:", servicecategories);
+
+
   useEffect(() => {
     dispatch(fetchSalonList());
     dispatch(fetchCategoryList());
   }, [dispatch]);
+
+ useEffect(() => {
+  if (CategoryId) {
+    console.log("Dispatching fetch for categoryId:", CategoryId);
+    dispatch(fetchServiceCategoryList(CategoryId));
+  }
+}, [dispatch, CategoryId]);
+
 
   //  useEffect(() => {
   //   if (categories.length > 0 && CategoryId) {
@@ -65,7 +85,6 @@ const ServiceProvidersList = ({ route }) => {
           salon.category === selectedCategory
         : true,
     )
-
     .filter(salon => salon.name?.toLowerCase().includes(search.toLowerCase()));
 
   const renderSalonCard = ({ item }) => (
@@ -102,7 +121,7 @@ const ServiceProvidersList = ({ route }) => {
 
   return (
     <View style={{ flex: 1, backgroundColor: '#fff' }}>
-      <HeaderLeft title="Shop List" />
+      <HeaderLeft title={`All ${ShopCategory}`} />
 
       <View style={styles.container}>
         {/* 🔍 Search Bar */}
@@ -118,9 +137,9 @@ const ServiceProvidersList = ({ route }) => {
             <Text style={{ fontSize: 18 }}>🔍</Text>
           </View>
         </View>
-
+{/* 
         <View style={{ flex: 0 }}>
-          {/* 🧾 Category Row */}
+         
           {categoryLoading ? (
             <ActivityIndicator size="small" color="#18A558" />
           ) : categoryError ? (
@@ -179,6 +198,71 @@ const ServiceProvidersList = ({ route }) => {
               }}
             />
           )}
+        </View> */}
+
+
+
+        
+        <View style={{ flex: 0 }}>
+         
+          {servicecategoryLoading ? (
+            <ActivityIndicator size="small" color="#18A558" />
+          ) : servicecategoryError ? (
+            <Text style={{ color: 'red', textAlign: 'center' }}>
+              Failed to load categories
+            </Text>
+          ) : (
+            <FlatList
+              horizontal
+              data={[{ _id: 'all', name: 'All' }, ...servicecategories]}
+              keyExtractor={item => item._id}
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ paddingVertical: 8 }}
+              renderItem={({ item }) => {
+                const isSelected =
+                  item._id === selectedCategory ||
+                  (item._id === 'all' && selectedCategory === null);
+
+                return (
+                  <TouchableOpacity
+                    style={[
+                      styles.categoryBtn,
+                      isSelected && styles.selectedCategoryBtn, // ✅ use isSelected
+                    ]}
+                    onPress={() =>
+                      item._id === 'all'
+                        ? setSelectedCategory(null)
+                        : setSelectedCategory(item._id)
+                    }
+                  >
+                    {item._id !== 'all' ? (
+                      <Image
+                        source={
+                          item.img && item.img.uri
+                            ? {
+                                uri: item.img.uri.startsWith('http')
+                                  ? item.img.uri
+                                  : `${BASE_URL}/${item.img.uri}`,
+                              }
+                            : noImage
+                        }
+                        style={styles.avatar}
+                      />
+                    ) : null}
+
+                    <Text
+                      style={[
+                        styles.categoryText,
+                        isSelected && styles.selectedCategoryText, // ✅ use isSelected
+                      ]}
+                    >
+                      {item.serviceCategory}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              }}
+            />
+          )}
         </View>
 
         {/* 🔸 Heading Row */}
@@ -210,7 +294,7 @@ const ServiceProvidersList = ({ route }) => {
   );
 };
 
-export default ServiceProvidersList;
+export default ServiceDividedByCategory;
 
 const styles = StyleSheet.create({
   container: {

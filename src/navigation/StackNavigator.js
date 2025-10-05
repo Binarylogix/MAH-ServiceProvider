@@ -20,6 +20,9 @@ import RootIndex from '../Screens/root/RootIndex';
 import ProductPage from '../Screens/ProductPage/ProductPage';
 import ShopProfile from '../Screens/ServiceProvidersList/ShopProfile';
 import ServiceProvidersList from '../Screens/ServiceProvidersList/ServiceProvidersList';
+import SearchScreen from '../Screens/SearchScreen/SearchScreen';
+import ServiceDividedByCategory from '../Screens/ServiceDividedByCategory/ServiceDividedByCategory';
+
 const Stack = createNativeStackNavigator();
 export default function StackNavigator() {
   return (
@@ -48,6 +51,14 @@ export default function StackNavigator() {
           headerTitleStyle: { fontSize: 18, fontWeight: 'bold' },
          }}/>
 
+           <Stack.Screen name="ServiceDividedByCategory" component={ServiceDividedByCategory} 
+         options={{
+          // headerShown: true,
+          title: 'List',
+          headerTitleAlign: 'center',
+          headerTitleStyle: { fontSize: 18, fontWeight: 'bold' },
+         }}/>
+
         <Stack.Screen name="ShopProfile" component={ShopProfile} 
          options={{
           // headerShown: true,
@@ -63,6 +74,11 @@ export default function StackNavigator() {
         <Stack.Screen name="OrderScreenIndex" component={OrderScreenIndex} />
         <Stack.Screen name="AdminControl" component={ContectAdminIndex} />
         <Stack.Screen name="ProductPage" component={ProductPage} />
+        <Stack.Screen
+  name="SearchScreen"
+  component={SearchScreen}
+  options={{ headerShown: false }}
+/>
       </Stack.Navigator>
     // </NavigationContainer>
   );

@@ -17,7 +17,7 @@ import { useNavigation } from '@react-navigation/native';
 const { width } = Dimensions.get('window');
 const scale = size => (width / 375) * size;
 
-const FALLBACK_IMAGE = require('../../assets/salt.png'); // fallback image
+const FALLBACK_IMAGE = require('../../assets/images/noimage.jpg'); // fallback image
 
 export default function CategoriesHomeIndex() {
   const [categories, setCategories] = useState([]);
@@ -66,11 +66,12 @@ export default function CategoriesHomeIndex() {
   }, []);
 
   const renderCategoryButton = ({ item }) => (
+    console.log("item",item.id),
     <TouchableOpacity
       activeOpacity={0.8}
       style={styles.categoryCard}
       onPress={() =>
-        navigation.navigate('ServiceProvidersList', { categoryId: item.id })
+        navigation.navigate('ServiceDividedByCategory', { categoryId: item.id, ShopCategory: item.name })
       }
     >
       <View style={styles.imageWrapper}>
@@ -82,13 +83,13 @@ export default function CategoriesHomeIndex() {
     </TouchableOpacity>
   );
 
-  if (loading) {
-    return (
-      <View style={styles.loader}>
-        <ActivityIndicator size="large" color="#2a9d8f" />
-      </View>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <View style={styles.loader}>
+  //       <ActivityIndicator size="large" color="#2a9d8f" />
+  //     </View>
+  //   );
+  // }
 
   return (
     <View style={styles.container}>
