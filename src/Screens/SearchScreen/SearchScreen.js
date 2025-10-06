@@ -11,7 +11,7 @@ import {
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchSalonList } from '../../redux/slices/SalonListSlice';
-import noImage from '../../assets/images/noimage.jpg';
+import noImage from '../../assets/images/noImage.jpg';
 import HeaderLeft from '../../Component/Header/HeaderLeft';
 
 const BASE_URL = 'https://www.makeahabit.com/api/v1/uploads';
@@ -38,7 +38,7 @@ export default function SearchScreen() {
   useEffect(() => {
     if (salons.length > 0) {
       const result = salons.filter(s =>
-        s.name?.toLowerCase().includes(searchQuery.toLowerCase())
+        s.name?.toLowerCase().includes(searchQuery.toLowerCase()),
       );
       setFiltered(result);
     }
@@ -57,13 +57,13 @@ export default function SearchScreen() {
         }
         style={styles.image}
       /> */}
-       <View style={styles.image}>
-               <Image
-                      source={item.image || noImage}
-                      style={styles.salonImage}
-                      resizeMode="cover"
-                    />
-            </View>
+      <View style={styles.image}>
+        <Image
+          source={item.image || noImage}
+          style={styles.salonImage}
+          resizeMode="cover"
+        />
+      </View>
       <View style={{ flex: 1 }}>
         <Text style={styles.name}>{item.name}</Text>
         <Text style={styles.city}>📍 {item.city || 'N/A'}</Text>
@@ -81,7 +81,11 @@ export default function SearchScreen() {
       <HeaderLeft title="Search Results" />
 
       {loading ? (
-        <ActivityIndicator size="large" color="#18A558" style={{ marginTop: 50 }} />
+        <ActivityIndicator
+          size="large"
+          color="#18A558"
+          style={{ marginTop: 50 }}
+        />
       ) : error ? (
         <Text style={{ textAlign: 'center', marginTop: 40, color: 'red' }}>
           Failed to load data.
@@ -124,7 +128,7 @@ const styles = StyleSheet.create({
     marginRight: 12,
     backgroundColor: '#eee',
   },
-  
+
   name: {
     fontSize: 15,
     fontWeight: '700',

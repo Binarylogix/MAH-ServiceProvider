@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import noImage from '../../assets/images/noimage.jpg';
+import noImage from '../../assets/images/noImage.jpg';
 
 // Async thunk for fetching salon list
 export const fetchSalonList = createAsyncThunk(
@@ -17,7 +17,7 @@ export const fetchSalonList = createAsyncThunk(
             Authorization: `Bearer ${API_TOKEN}`,
             'Content-Type': 'application/json',
           },
-        }
+        },
       );
 
       const data = response.data?.data || [];
@@ -32,17 +32,19 @@ export const fetchSalonList = createAsyncThunk(
         rating: salon.avgRating || '0.0',
         category: salon.category || '',
         image: salon.businessCard
-          ? { uri: `https://www.makeahabit.com/api/v1/uploads/business/${salon.businessCard}` }
+          ? {
+              uri: `https://www.makeahabit.com/api/v1/uploads/business/${salon.businessCard}`,
+            }
           : noImage,
         services: salon.services || [],
-        serviceCategory: salon.serviceCategory || null, 
+        serviceCategory: salon.serviceCategory || null,
       }));
 
       return mappedSalons;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response?.data || error.message);
     }
-  }
+  },
 );
 
 const initialState = {

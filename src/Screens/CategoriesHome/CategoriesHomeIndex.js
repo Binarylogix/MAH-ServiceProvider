@@ -17,7 +17,7 @@ import { useNavigation } from '@react-navigation/native';
 const { width } = Dimensions.get('window');
 const scale = size => (width / 375) * size;
 
-const FALLBACK_IMAGE = require('../../assets/images/noimage.jpg'); // fallback image
+const FALLBACK_IMAGE = require('../../assets/images/noImage.jpg'); // fallback image
 
 export default function CategoriesHomeIndex() {
   const [categories, setCategories] = useState([]);
@@ -45,16 +45,21 @@ export default function CategoriesHomeIndex() {
         id: cat._id,
         name: cat.name,
         image: cat.img
-          ? { uri: `https://www.makeahabit.com/api/v1/uploads/category/${cat.img}` }
+          ? {
+              uri: `https://www.makeahabit.com/api/v1/uploads/category/${cat.img}`,
+            }
           : FALLBACK_IMAGE,
       }));
 
       setCategories(mappedCategories);
     } catch (error) {
-      console.error('Error fetching categories:', error.response || error.message);
+      console.error(
+        'Error fetching categories:',
+        error.response || error.message,
+      );
       Alert.alert(
         'Error',
-        error.response?.data?.message || 'Data loading problem'
+        error.response?.data?.message || 'Data loading problem',
       );
     } finally {
       setLoading(false);
@@ -66,21 +71,26 @@ export default function CategoriesHomeIndex() {
   }, []);
 
   const renderCategoryButton = ({ item }) => (
-    console.log("item",item.id),
-    <TouchableOpacity
-      activeOpacity={0.8}
-      style={styles.categoryCard}
-      onPress={() =>
-        navigation.navigate('ServiceDividedByCategory', { categoryId: item.id, ShopCategory: item.name })
-      }
-    >
-      <View style={styles.imageWrapper}>
-        <Image source={item.image} style={styles.categoryIcon} />
-      </View>
-      <Text numberOfLines={2} style={styles.categoryText}>
-        {item.name}
-      </Text>
-    </TouchableOpacity>
+    console.log('item', item.id),
+    (
+      <TouchableOpacity
+        activeOpacity={0.8}
+        style={styles.categoryCard}
+        onPress={() =>
+          navigation.navigate('ServiceDividedByCategory', {
+            categoryId: item.id,
+            ShopCategory: item.name,
+          })
+        }
+      >
+        <View style={styles.imageWrapper}>
+          <Image source={item.image} style={styles.categoryIcon} />
+        </View>
+        <Text numberOfLines={2} style={styles.categoryText}>
+          {item.name}
+        </Text>
+      </TouchableOpacity>
+    )
   );
 
   // if (loading) {

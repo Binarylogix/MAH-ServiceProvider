@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
-import noImage from '../../assets/images/noimage.jpg';
+import noImage from '../../assets/images/noImage.jpg';
 
 // Async thunk to fetch categories
 export const fetchCategoryList = createAsyncThunk(
@@ -8,7 +8,7 @@ export const fetchCategoryList = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       const response = await axios.get(
-        'https://www.makeahabit.com/api/v1/category/get-all'
+        'https://www.makeahabit.com/api/v1/category/get-all',
       );
 
       const data = response.data;
@@ -18,7 +18,9 @@ export const fetchCategoryList = createAsyncThunk(
           _id: cat._id || Math.random().toString(),
           name: cat.name || 'Unknown',
           img: cat.img
-            ? { uri: `https://www.makeahabit.com/api/v1/uploads/category/${cat.img}` }
+            ? {
+                uri: `https://www.makeahabit.com/api/v1/uploads/category/${cat.img}`,
+              }
             : noImage,
         }));
       } else {
@@ -27,7 +29,7 @@ export const fetchCategoryList = createAsyncThunk(
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response?.data || error.message);
     }
-  }
+  },
 );
 
 const initialState = {

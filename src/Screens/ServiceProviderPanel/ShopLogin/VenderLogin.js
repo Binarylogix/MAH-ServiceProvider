@@ -11,7 +11,7 @@ import {
   ScrollView,
 } from 'react-native';
 import GradientButton from '../../../Component/GradientButton';
-import AwesomeAlert from 'react-native-awesome-alerts';
+// import AwesomeAlert from 'react-native-awesome-alerts';
 
 const { width } = Dimensions.get('window');
 
@@ -32,7 +32,7 @@ export default function VenderLogin({ navigation }) {
     setLoading(true);
     try {
       const response = await fetch(
-        'https://www.mandlamart.co.in/api/auth/send-otp',
+        'https://www.makeahabit.com/api/v1/newauth/send-otp',
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -104,7 +104,7 @@ export default function VenderLogin({ navigation }) {
       </ScrollView>
 
       {/* Sweet Alert */}
-      <AwesomeAlert
+      {/* <AwesomeAlert
         show={showAlert}
         showProgress={false}
         title="Notification"
@@ -115,14 +115,18 @@ export default function VenderLogin({ navigation }) {
         confirmText="OK"
         confirmButtonColor="#40196C"
         onConfirmPressed={() => setShowAlert(false)}
-      />
+      /> */}
     </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
-  scrollContainer: { flexGrow: 1, paddingHorizontal: 20, justifyContent: 'center' },
+  scrollContainer: {
+    flexGrow: 1,
+    paddingHorizontal: 20,
+    justifyContent: 'center',
+  },
   logoimage: { width: 250, height: 40, alignSelf: 'center' },
   image: { width: 250, height: 250, alignSelf: 'center', marginBottom: 20 },
   title: { fontSize: 22, fontWeight: '700', marginBottom: 10, color: '#000' },

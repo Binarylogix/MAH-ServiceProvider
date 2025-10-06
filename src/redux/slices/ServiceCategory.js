@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
-import noImage from '../../assets/images/noimage.jpg';
+import noImage from '../../assets/images/noImage.jpg';
 
 // ✅ Async thunk to fetch service categories from API response
 export const fetchServiceCategoryList = createAsyncThunk(
@@ -8,26 +8,24 @@ export const fetchServiceCategoryList = createAsyncThunk(
   async (categoryId, thunkAPI) => {
     try {
       const response = await axios.get(
-        `https://www.makeahabit.com/api/v1/servicecategory/getServiceCategoryByCategoryId/${categoryId}`
+        `https://www.makeahabit.com/api/v1/servicecategory/getServiceCategoryByCategoryId/${categoryId}`,
       );
 
-     const data = response.data;
-console.log("Service Categories API Response:", data);
-
-
+      const data = response.data;
+      console.log('Service Categories API Response:', data);
 
       if (data.success && Array.isArray(data)) {
         // Extract unique categories from nested "category"
         const categoriesMap = {};
         data.forEach(service => {
           const cat = service.category;
-            categoriesMap[cat._id] = {
-              _id: cat._id,
-              name: cat.name || 'Unknown',
-              img: cat.img
-                ? { uri: `https://www.makeahabit.com/api/v1/uploads/${cat.img}` }
-                : noImage,
-            };
+          categoriesMap[cat._id] = {
+            _id: cat._id,
+            name: cat.name || 'Unknown',
+            img: cat.img
+              ? { uri: `https://www.makeahabit.com/api/v1/uploads/${cat.img}` }
+              : noImage,
+          };
         });
         return Object.values(categoriesMap);
       } else {
@@ -36,7 +34,7 @@ console.log("Service Categories API Response:", data);
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response?.data || error.message);
     }
-  }
+  },
 );
 
 const initialState = {

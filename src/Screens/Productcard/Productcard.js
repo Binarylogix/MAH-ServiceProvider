@@ -18,7 +18,7 @@ const { width } = Dimensions.get('window');
 const CARD_WIDTH = width * 0.34;
 const IMAGE_HEIGHT = width * 0.2;
 
-const FALLBACK_IMAGE = require('../../assets/images/noimage.jpg');
+const FALLBACK_IMAGE = require('../../assets/images/noImage.jpg');
 
 const Productcard = ({ listName }) => {
   const navigation = useNavigation();

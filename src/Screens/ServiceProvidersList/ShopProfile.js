@@ -22,21 +22,21 @@ const ActionButton = ({ label, icon }) => (
 );
 
 const ShopProfile = ({ route }) => {
-  const { salon } = route.params;  // पूरा salon object यहाँ
+  const { salon } = route.params; // पूरा salon object यहाँ
 
   const [selectedTab, setSelectedTab] = useState('Services');
   const [selectedServices, setSelectedServices] = useState([]);
 
   const services = salon.services || [];
   const totalPrice = services
-    .filter((s) => selectedServices.includes(s._id))
+    .filter(s => selectedServices.includes(s._id))
     .reduce((acc, cur) => acc + cur.price, 0);
 
-  const toggleService = (serviceId) => {
-    setSelectedServices((prev) =>
+  const toggleService = serviceId => {
+    setSelectedServices(prev =>
       prev.includes(serviceId)
-        ? prev.filter((id) => id !== serviceId)
-        : [...prev, serviceId]
+        ? prev.filter(id => id !== serviceId)
+        : [...prev, serviceId],
     );
   };
 
@@ -45,16 +45,17 @@ const ShopProfile = ({ route }) => {
       <HeaderLeft title="Shop Details" />
       <ScrollView contentContainerStyle={{ paddingBottom: 120 }}>
         {/* Cover Photo */}
-       <Image
-  source={
-    salon.businessCard
-      ? { uri: `https://www.makeahabit.com/api/v1/uploads/business/${salon.businessCard}` }
-      : require('../../assets/images/noimage.jpg')
-  }
-  style={styles.coverPhoto}
-  resizeMode="cover"
-/>
-
+        <Image
+          source={
+            salon.businessCard
+              ? {
+                  uri: `https://www.makeahabit.com/api/v1/uploads/business/${salon.businessCard}`,
+                }
+              : require('../../assets/images/noImage.jpg')
+          }
+          style={styles.coverPhoto}
+          resizeMode="cover"
+        />
 
         {/* Action Buttons */}
         {/* <View style={styles.actionButtonsRow}>
@@ -81,11 +82,14 @@ const ShopProfile = ({ route }) => {
             <FlatList
               data={salon.specialists}
               horizontal
-              keyExtractor={(item) => item._id}
+              keyExtractor={item => item._id}
               showsHorizontalScrollIndicator={false}
               renderItem={({ item }) => (
                 <View style={styles.specialistCard}>
-                  <Image source={{ uri: item.image }} style={styles.specialistAvatar} />
+                  <Image
+                    source={{ uri: item.image }}
+                    style={styles.specialistAvatar}
+                  />
                   <Text style={styles.specialistName}>{item.name}</Text>
                   <Text style={styles.specialistRole}>{item.role}</Text>
                 </View>
@@ -96,13 +100,18 @@ const ShopProfile = ({ route }) => {
 
         {/* Tabs */}
         <View style={styles.tabsRow}>
-          {['Services', 'About', 'Gallery'].map((tab) => (
+          {['Services', 'About', 'Gallery'].map(tab => (
             <TouchableOpacity
               key={tab}
               style={[styles.tab, selectedTab === tab && styles.activeTab]}
               onPress={() => setSelectedTab(tab)}
             >
-              <Text style={[styles.tabLabel, selectedTab === tab && styles.activeTabLabel]}>
+              <Text
+                style={[
+                  styles.tabLabel,
+                  selectedTab === tab && styles.activeTabLabel,
+                ]}
+              >
                 {tab}
               </Text>
             </TouchableOpacity>
@@ -112,11 +121,13 @@ const ShopProfile = ({ route }) => {
         {/* Services */}
         {selectedTab === 'Services' && (
           <View style={styles.servicesSection}>
-            {services.map((service) => (
+            {services.map(service => (
               <View key={service._id} style={styles.serviceCard}>
                 <Image
                   source={{
-                    uri: service.icon?.img || 'https://cdn-icons-png.flaticon.com/512/1973/1973701.png',
+                    uri:
+                      service.icon?.img ||
+                      'https://cdn-icons-png.flaticon.com/512/1973/1973701.png',
                   }}
                   style={styles.serviceImage}
                 />
@@ -125,7 +136,13 @@ const ShopProfile = ({ route }) => {
                   <Text style={styles.servicePrice}>₹{service.price}</Text>
                 </View>
                 <TouchableOpacity onPress={() => toggleService(service._id)}>
-                  <Text style={selectedServices.includes(service._id) ? styles.checkedIcon : styles.plusIcon}>
+                  <Text
+                    style={
+                      selectedServices.includes(service._id)
+                        ? styles.checkedIcon
+                        : styles.plusIcon
+                    }
+                  >
                     {selectedServices.includes(service._id) ? '✔️' : '+'}
                   </Text>
                 </TouchableOpacity>
@@ -157,22 +174,19 @@ const ShopProfile = ({ route }) => {
   );
 };
 
-
-
-
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-coverPhoto: {
-  width: '94%',
-  height: 260,
-  marginTop: 10,
-  marginHorizontal: 12,
-  borderRadius: 12,
-  marginBottom: 18,
-  overflow: 'hidden', // required for rounded corners to apply
-  backgroundColor: '#e3f7d7ff', // fallback background while image loads
-},
+  coverPhoto: {
+    width: '94%',
+    height: 260,
+    marginTop: 10,
+    marginHorizontal: 12,
+    borderRadius: 12,
+    marginBottom: 18,
+    overflow: 'hidden', // required for rounded corners to apply
+    backgroundColor: '#e3f7d7ff', // fallback background while image loads
+  },
 
   actionButtonsRow: {
     flexDirection: 'row',
@@ -206,7 +220,12 @@ coverPhoto: {
     paddingVertical: 9,
     width: 90,
   },
-  specialistAvatar: { width: 40, height: 40, borderRadius: 20, marginBottom: 6 },
+  specialistAvatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginBottom: 6,
+  },
   specialistName: { fontWeight: '700', fontSize: 13 },
   specialistRole: { fontSize: 11, color: '#18A558', fontWeight: '600' },
 
@@ -286,8 +305,6 @@ coverPhoto: {
 });
 
 export default ShopProfile;
-
-
 
 // import React from 'react';
 // import { View, Text, Image, StyleSheet, ScrollView } from 'react-native';

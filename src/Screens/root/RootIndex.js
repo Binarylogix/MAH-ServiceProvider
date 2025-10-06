@@ -11,7 +11,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import user from '../../assets/Icons/customer.png';
 import delivery from '../../assets/Icons/store.png';
-import AppPermissionHandler  from '../permissions/AppPermissionHandler' ;
+import AppPermissionHandler from '../permissions/AppPermissionHandler';
 
 export default function RootIndex({ navigation }) {
   const [loading, setLoading] = useState(true);
@@ -19,13 +19,13 @@ export default function RootIndex({ navigation }) {
   useEffect(() => {
     const checkToken = async () => {
       try {
-        const token = await AsyncStorage.getItem('userToken');
-        const userId = await AsyncStorage.getItem('userId');
+        const token = await AsyncStorage.getItem('vendorToken');
+        const userId = await AsyncStorage.getItem('vendorId');
 
         if (token && userId) {
           navigation.reset({
             index: 0,
-            routes: [{ name: 'TabScreen' }],
+            routes: [{ name: 'VendorTab' }],
           });
         } else {
           setLoading(false); // only show Root UI if no token/userId
@@ -55,7 +55,7 @@ export default function RootIndex({ navigation }) {
       <Text style={styles.title}>Create Account</Text>
 
       {/* Customer Card */}
-      <LinearGradient colors={['#191D2B', '#090D14']} style={styles.card}>
+      {/* <LinearGradient colors={['#191D2B', '#090D14']} style={styles.card}>
         <TouchableOpacity
           style={styles.innerCard}
           onPress={() => navigation.navigate('Login')}
@@ -64,7 +64,7 @@ export default function RootIndex({ navigation }) {
           <Text style={styles.cardTitle}>Customer</Text>
           <Text style={styles.cardSubtitle}>Register as a Customer</Text>
         </TouchableOpacity>
-      </LinearGradient>
+      </LinearGradient> */}
 
       {/* Service Provider Card */}
       <LinearGradient
@@ -75,7 +75,7 @@ export default function RootIndex({ navigation }) {
       >
         <TouchableOpacity
           style={styles.innerCard}
-          onPress={() => navigation.navigate('VenderLogin')}
+          onPress={() => navigation.navigate('VendorLogin')}
         >
           <Image source={delivery} style={styles.icon} />
           <Text style={styles.cardTitle}>Service Provider</Text>

@@ -14,7 +14,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { fetchSalonList } from '../../redux/slices/SalonListSlice';
 import { fetchCategoryList } from '../../redux/slices/CategoryListSlice';
 import HeaderLeft from '../../Component/Header/HeaderLeft';
-import noImage from '../../assets/images/noimage.jpg';
+import noImage from '../../assets/images/noImage.jpg';
 
 const BASE_URL = 'https://www.makeahabit.com/api/v1/uploads';
 

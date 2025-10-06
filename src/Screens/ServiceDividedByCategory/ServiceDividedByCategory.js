@@ -15,19 +15,18 @@ import { fetchSalonList } from '../../redux/slices/SalonListSlice';
 import { fetchCategoryList } from '../../redux/slices/CategoryListSlice';
 import { fetchServiceCategoryList } from '../../redux/slices/ServiceCategory';
 import HeaderLeft from '../../Component/Header/HeaderLeft';
-import noImage from '../../assets/images/noimage.jpg';
+import noImage from '../../assets/images/noImage.jpg';
 
 const BASE_URL = 'https://www.makeahabit.com/api/v1/uploads';
 
 const ServiceDividedByCategory = ({ route }) => {
-
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [search, setSearch] = useState('');
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const CategoryId = route.params?.categoryId;
   const ShopCategory = route.params?.ShopCategory;
-console.log("CategoryId",CategoryId)
+  console.log('CategoryId', CategoryId);
   const {
     values: salons = [],
     loading: salonLoading,
@@ -39,27 +38,25 @@ console.log("CategoryId",CategoryId)
     error: categoryError,
   } = useSelector(state => state.CategoryList || {});
 
- const {
-  values: servicecategories = [],
-  loading: servicecategoryLoading,
-  error: servicecategoryError,
-} = useSelector(state => state.ServiceCategoryList || {});
+  const {
+    values: servicecategories = [],
+    loading: servicecategoryLoading,
+    error: servicecategoryError,
+  } = useSelector(state => state.ServiceCategoryList || {});
 
-console.log("Service Categories from state:", servicecategories);
-
+  console.log('Service Categories from state:', servicecategories);
 
   useEffect(() => {
     dispatch(fetchSalonList());
     dispatch(fetchCategoryList());
   }, [dispatch]);
 
- useEffect(() => {
-  if (CategoryId) {
-    console.log("Dispatching fetch for categoryId:", CategoryId);
-    dispatch(fetchServiceCategoryList(CategoryId));
-  }
-}, [dispatch, CategoryId]);
-
+  useEffect(() => {
+    if (CategoryId) {
+      console.log('Dispatching fetch for categoryId:', CategoryId);
+      dispatch(fetchServiceCategoryList(CategoryId));
+    }
+  }, [dispatch, CategoryId]);
 
   //  useEffect(() => {
   //   if (categories.length > 0 && CategoryId) {
@@ -137,7 +134,7 @@ console.log("Service Categories from state:", servicecategories);
             <Text style={{ fontSize: 18 }}>🔍</Text>
           </View>
         </View>
-{/* 
+        {/* 
         <View style={{ flex: 0 }}>
          
           {categoryLoading ? (
@@ -200,11 +197,7 @@ console.log("Service Categories from state:", servicecategories);
           )}
         </View> */}
 
-
-
-        
         <View style={{ flex: 0 }}>
-         
           {servicecategoryLoading ? (
             <ActivityIndicator size="small" color="#18A558" />
           ) : servicecategoryError ? (

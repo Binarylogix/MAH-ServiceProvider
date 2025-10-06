@@ -14,7 +14,7 @@ import ViewBasket from '../Component/ViewBasket';
 
 import VenderLogin from '../Screens/ServiceProviderPanel/ShopLogin/VenderLogin';
 import OwnerOtpIndex from '../Screens/ServiceProviderPanel/SPotp/OwnerOtpIndex';
-import OrderScreenIndex from '../Screens/ServiceProviderPanel/ShopHome/OrderScreenIndex';
+import OrderScreenIndex from '../Screens/ServiceProviderPanel/ShopHome/VendorHome';
 import ContectAdminIndex from '../Screens/DeliveryPanel/dbnotregister/ContectAdminIndex';
 import RootIndex from '../Screens/root/RootIndex';
 import ProductPage from '../Screens/ProductPage/ProductPage';
@@ -22,65 +22,75 @@ import ShopProfile from '../Screens/ServiceProvidersList/ShopProfile';
 import ServiceProvidersList from '../Screens/ServiceProvidersList/ServiceProvidersList';
 import SearchScreen from '../Screens/SearchScreen/SearchScreen';
 import ServiceDividedByCategory from '../Screens/ServiceDividedByCategory/ServiceDividedByCategory';
+import VendorNavigation from './VendorTab';
 
 const Stack = createNativeStackNavigator();
 export default function StackNavigator() {
   return (
     // <NavigationContainer>
-      <Stack.Navigator
-        screenOptions={{
-          headerShown: false,
-        }}
-        initialRouteName="SplaceScreen"
-      >
-        <Stack.Screen name="SplaceScreen" component={SplaceIndex} />
-        <Stack.Screen name="Rootindex" component={RootIndex} />
-        <Stack.Screen name="Login" component={Index} />
-        <Stack.Screen name="OtpScreen" component={OtpIndex} />
-        <Stack.Screen name="TabScreen" component={BottomTabScreen} />
-        <Stack.Screen name="productView" component={Card} />
-        <Stack.Screen name="ViewBasket" component={ViewBasket} />
-        <Stack.Screen name="AccountDetails" component={AccountDetails} />
-        <Stack.Screen name="CreateUserProfile" component={CreateUserProfile} />
-        
-         <Stack.Screen name="ServiceProvidersList" component={ServiceProvidersList} 
-         options={{
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+      }}
+      initialRouteName="SplaceScreen"
+    >
+      <Stack.Screen name="SplaceScreen" component={SplaceIndex} />
+      <Stack.Screen name="Rootindex" component={RootIndex} />
+      <Stack.Screen name="Login" component={Index} />
+      <Stack.Screen name="OtpScreen" component={OtpIndex} />
+      <Stack.Screen name="TabScreen" component={BottomTabScreen} />
+      <Stack.Screen name="VendorTabScreen" component={VendorNavigation} />
+      <Stack.Screen name="productView" component={Card} />
+      <Stack.Screen name="ViewBasket" component={ViewBasket} />
+      <Stack.Screen name="AccountDetails" component={AccountDetails} />
+      <Stack.Screen name="CreateUserProfile" component={CreateUserProfile} />
+
+      <Stack.Screen
+        name="ServiceProvidersList"
+        component={ServiceProvidersList}
+        options={{
           // headerShown: true,
           title: 'Shops List',
           headerTitleAlign: 'center',
           headerTitleStyle: { fontSize: 18, fontWeight: 'bold' },
-         }}/>
+        }}
+      />
 
-           <Stack.Screen name="ServiceDividedByCategory" component={ServiceDividedByCategory} 
-         options={{
+      <Stack.Screen
+        name="ServiceDividedByCategory"
+        component={ServiceDividedByCategory}
+        options={{
           // headerShown: true,
           title: 'List',
           headerTitleAlign: 'center',
           headerTitleStyle: { fontSize: 18, fontWeight: 'bold' },
-         }}/>
+        }}
+      />
 
-        <Stack.Screen name="ShopProfile" component={ShopProfile} 
-         options={{
+      <Stack.Screen
+        name="ShopProfile"
+        component={ShopProfile}
+        options={{
           // headerShown: true,
-           title: 'Shops Details',
+          title: 'Shops Details',
           headerTitleAlign: 'center',
           headerTitleStyle: { fontSize: 18, fontWeight: 'bold' },
-         }}/>
+        }}
+      />
 
-        {/* deliveryscr */}
-        <Stack.Screen name="VenderLogin" component={VenderLogin} />
-        <Stack.Screen name="RootScreen" component={RootIndex} />
-        <Stack.Screen name="OwnerOtpIndex" component={OwnerOtpIndex} />
-        <Stack.Screen name="OrderScreenIndex" component={OrderScreenIndex} />
-        <Stack.Screen name="AdminControl" component={ContectAdminIndex} />
-        <Stack.Screen name="ProductPage" component={ProductPage} />
-        <Stack.Screen
-  name="SearchScreen"
-  component={SearchScreen}
-  options={{ headerShown: false }}
-/>
-      </Stack.Navigator>
+      {/* deliveryscr */}
+      <Stack.Screen name="VenderLogin" component={VenderLogin} />
+      <Stack.Screen name="RootScreen" component={RootIndex} />
+      <Stack.Screen name="OwnerOtpIndex" component={OwnerOtpIndex} />
+      <Stack.Screen name="OrderScreenIndex" component={OrderScreenIndex} />
+      <Stack.Screen name="AdminControl" component={ContectAdminIndex} />
+      <Stack.Screen name="ProductPage" component={ProductPage} />
+      <Stack.Screen
+        name="SearchScreen"
+        component={SearchScreen}
+        options={{ headerShown: false }}
+      />
+    </Stack.Navigator>
     // </NavigationContainer>
   );
 }
-
