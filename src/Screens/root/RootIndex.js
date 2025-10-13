@@ -54,18 +54,6 @@ export default function RootIndex({ navigation }) {
       <Text style={styles.welcome}>Welcome To Make a Habit</Text>
       <Text style={styles.title}>Create Account</Text>
 
-      {/* Customer Card */}
-      {/* <LinearGradient colors={['#191D2B', '#090D14']} style={styles.card}>
-        <TouchableOpacity
-          style={styles.innerCard}
-          onPress={() => navigation.navigate('Login')}
-        >
-          <Image source={user} style={styles.icon} />
-          <Text style={styles.cardTitle}>Customer</Text>
-          <Text style={styles.cardSubtitle}>Register as a Customer</Text>
-        </TouchableOpacity>
-      </LinearGradient> */}
-
       {/* Service Provider Card */}
       <LinearGradient
         colors={['#00D65F', '#01823A']}
@@ -78,10 +66,8 @@ export default function RootIndex({ navigation }) {
           onPress={() => navigation.navigate('VendorLogin')}
         >
           <Image source={delivery} style={styles.icon} />
-          <Text style={styles.cardTitle}>Service Provider</Text>
-          <Text style={styles.cardSubtitle}>
-            Register as a Service Provider
-          </Text>
+          <Text style={styles.cardTitle}>Service Partner</Text>
+          <Text style={styles.cardSubtitle}>Register as a Service Partner</Text>
         </TouchableOpacity>
       </LinearGradient>
     </View>

@@ -60,7 +60,7 @@ function CustomTabBar({ state, descriptors, navigation }) {
             );
             break;
 
-          case 'Account':
+          case 'Profile':
             iconElement = (
               <FontAwesome
                 name="user"
@@ -122,7 +122,7 @@ export default function VendorTab() {
         <Tab.Screen name="Home" component={VendorHome} />
         <Tab.Screen name="Transaction" component={TransactionScreen} />
         <Tab.Screen name="Booking" component={ServiceProvidersList} />
-        <Tab.Screen name="Account" component={Profile} />
+        <Tab.Screen name="Profile" component={Profile} />
       </Tab.Navigator>
     </View>
   );

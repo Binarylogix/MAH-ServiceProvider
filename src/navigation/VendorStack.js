@@ -17,7 +17,19 @@ import RootIndex from '../Screens/root/RootIndex';
 import ShopProfile from '../Screens/ServiceProvidersList/ShopProfile';
 import VendorRegistration from '../Screens/ServiceProviderPanel/BusinessRegister/VendorRegistration';
 import VendorTab from './VendorTab';
-
+import AddService from '../Screens/addservice/AddService';
+import AddProduct from '../Screens/AddProduct/AddProduct';
+import AddPhotos from '../Screens/AddPhotos/AddPhotos';
+import AddStaff from '../Screens/AddStaff/AddStaff';
+import AllServices from '../Screens/addservice/AllServices';
+import AllStaff from '../Screens/AddStaff/AllStaff';
+import AllPhoto from '../Screens/AddPhotos/AllPhoto';
+import AllProduct from '../Screens/AddProduct/AllProduct';
+import EditProfile from '../Screens/editprofile/EditProfile';
+import AllServices1 from '../Screens/addservice/AllServices1';
+import FAQScreen from '../Screens/Faqscreen/FAQScreen';
+import RateUsScreen from '../Screens/RateUs/RateUsScreen';
+import HelpAndSupportScreen from '../Screens/helpSupport/HelpAndSupportScreen';
 const Stack = createNativeStackNavigator();
 export default function VendorStack() {
   return (
@@ -50,6 +62,22 @@ export default function VendorStack() {
       <Stack.Screen name="VendorRegistration" component={VendorRegistration} />
       <Stack.Screen name="OwnerOtpIndex" component={OwnerOtpIndex} />
       <Stack.Screen name="OrderScreenIndex" component={OrderScreenIndex} />
+      <Stack.Screen name="AddService" component={AddService} />
+      <Stack.Screen name="AddProduct" component={AddProduct} />
+      <Stack.Screen name="AddPhotos" component={AddPhotos} />
+      <Stack.Screen name="AddStaff" component={AddStaff} />
+      <Stack.Screen name="AllServices" component={AllServices} />
+      <Stack.Screen name="AllStaff" component={AllStaff} />
+      <Stack.Screen name="AllPhoto" component={AllPhoto} />
+      <Stack.Screen name="AllProduct" component={AllProduct} />
+      <Stack.Screen name="EditProfile" component={EditProfile} />
+      <Stack.Screen name="AllServices1" component={AllServices1} />
+      <Stack.Screen name="FAQScreen" component={FAQScreen} />
+      <Stack.Screen name="RateUsScreen" component={RateUsScreen} />
+      <Stack.Screen
+        name="HelpAndSupportScreen"
+        component={HelpAndSupportScreen}
+      />
     </Stack.Navigator>
     // </NavigationContainer>
   );

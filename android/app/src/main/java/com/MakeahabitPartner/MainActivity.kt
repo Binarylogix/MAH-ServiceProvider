@@ -1,4 +1,4 @@
-package com.makeahabit
+package com.MakeahabitPartner
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate

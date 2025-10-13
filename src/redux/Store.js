@@ -1,18 +1,23 @@
 import { configureStore } from '@reduxjs/toolkit';
-import UserReducer from './slices/UserSlice';
+// import UserReducer from './slices/UserSlice';
 // import counterReducer from './slices/counterSlice';
-import SalonListReducer from './slices/SalonListSlice';
-import CategoryListReducer from './slices/CategoryListSlice';
-import ServiceCategoryReducer from './slices/ServiceCategory';
+// import SalonListReducer from './slices/SalonListSlice';
+// import CategoryListReducer from './slices/CategoryListSlice';
+// import ServiceCategoryReducer from './slices/ServiceCategory';
+import vendorAuthReducer from './Vendor/VendorAuthSlice';
+import vendorReducer from './Vendor/CreateVendorSlice';
+import vendorDetailsReducer from './Vendor/vendorDetailsSlice';
 
 const store = configureStore({
   reducer: {
-    user: UserReducer,
-    salonList: SalonListReducer,
-    CategoryList: CategoryListReducer,
-    serviceCategories: ServiceCategoryReducer,
-
+    // user: UserReducer,
+    // salonList: SalonListReducer,
+    // CategoryList: CategoryListReducer,
+    // serviceCategories: ServiceCategoryReducer,
     // counter: counterReducer,
+    vendorAuth: vendorAuthReducer,
+    vendor: vendorReducer,
+    vendorDetails: vendorDetailsReducer,
   },
 });
 

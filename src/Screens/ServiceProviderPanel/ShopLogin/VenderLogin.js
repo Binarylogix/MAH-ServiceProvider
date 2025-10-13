@@ -83,7 +83,7 @@ export default function VenderLogin({ navigation }) {
           resizeMode="contain"
         />
 
-        <Text style={styles.title}>Hi, Shop Owner</Text>
+        <Text style={styles.title}>Hi, Service Partner</Text>
         <Text style={styles.subTitle}>
           Enter your business email to receive a secure OTP.
         </Text>

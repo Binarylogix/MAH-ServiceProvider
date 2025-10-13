@@ -1,80 +1,234 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   Image,
-  TouchableOpacity,
   ScrollView,
+  Alert,
+  TouchableOpacity,
+  Linking,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
-const dummyProfile = { uri: 'https://randomuser.me/api/portraits/men/1.jpg' };
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import QuickCard from '../../Quickcard/Quickcard';
+import AmountCard from '../../Amountcard/AmountCard';
+import { useNavigation } from '@react-navigation/native';
+import LinearGradient from 'react-native-linear-gradient';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import HeaderCom from '../../../Component/HeaderCom';
+import CurrentLocation from '../../../Component/currentlocation/CurrentLocation';
+
+const defaultProfile = { uri: 'https://randomuser.me/api/portraits/men/1.jpg' };
 
 export default function VendorHome() {
+  const [vendor, setVendor] = useState(null);
+  const [locationName, setLocationName] = useState('Location');
+  const [coordinates, setCoordinates] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const navigation = useNavigation();
+
+  const goToAddService = () => {
+    navigation.navigate('AllServices');
+  };
+
+  const goToCreateProduct = () => {
+    navigation.navigate('AllProduct');
+  };
+
+  const goToAddPhotos = () => {
+    navigation.navigate('AllPhoto');
+  };
+  const goToAddStaff = () => {
+    navigation.navigate('AllStaff');
+  };
+
+  useEffect(() => {
+    const fetchVendorProfile = async () => {
+      try {
+        const token = await AsyncStorage.getItem('vendorToken');
+        const id = await AsyncStorage.getItem('vendorId');
+
+        if (!token) {
+          Alert.alert('Error', 'No token found, please log in again');
+          setLoading(false);
+          return;
+        }
+
+        const response = await fetch(
+          `https://www.makeahabit.com/api/v1/vendor/details/${id}`,
+          {
+            method: 'GET',
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          },
+        );
+
+        const data = await response.json();
+
+        if (response.ok) {
+          setVendor(data);
+
+          if (data?.location?.coordinates) {
+            const [lng, lat] = data.location.coordinates;
+            setCoordinates({ lat, lng });
+
+            const geoRes = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`,
+            );
+            const geoData = await geoRes.json();
+
+            if (geoData?.address) {
+              const city =
+                geoData.address.city ||
+                geoData.address.town ||
+                geoData.address.village ||
+                '';
+              const state = geoData.address.state || '';
+              setLocationName(`${city}, ${state}`);
+            }
+          }
+        } else {
+          Alert.alert(
+            'Error',
+            data.message || 'Failed to fetch vendor details',
+          );
+        }
+      } catch (error) {
+        console.error(error);
+        Alert.alert('Error', 'Something went wrong while fetching data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchVendorProfile();
+  }, []);
+
+  // const openMaps = () => {
+  //   if (coordinates) {
+  //     const url = `https://www.google.com/maps/search/?api=1&query=${coordinates.lat},${coordinates.lng}`;
+  //     Linking.openURL(url);
+  //   } else {
+  //     Alert.alert('Location not available');
+  //   }
+  // };
+
+  if (loading) {
+    return (
+      <View
+        style={[
+          styles.container,
+          { justifyContent: 'center', alignItems: 'center' },
+        ]}
+      >
+        <Text style={{ color: '#14AD5F', fontSize: 18 }}>Loading...</Text>
+      </View>
+    );
+  }
+
   return (
-    <ScrollView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Icon name="menu" size={24} color="#fff" />
-        <View style={{ flex: 1, marginLeft: 16 }}>
-          <Text style={styles.headerTitle}>Salon Name</Text>
-          <Text style={styles.headerSub}>Bhopal, MP</Text>
-        </View>
-        <Image source={dummyProfile} style={styles.profileImg} />
-      </View>
-      {/* Amount and Stats */}
-      <View style={styles.amountCard}>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-          <View>
-            <Text style={styles.amountLabel}>Amount</Text>
-            <Text style={styles.amountSubLabel}>Total</Text>
-          </View>
-          <Text style={styles.amountValue}>Rs 2000</Text>
-        </View>
-        <View style={styles.statsRow}>
-          <StatCard heading="Complete" value="10" icon="check-all" />
-          <StatCard heading="Upcoming" value="02" icon="clock-outline" />
-        </View>
-      </View>
-      {/* Quick Cards */}
-      <View style={styles.quickRow}>
-        <QuickCard label="Staff" icon="account-group" />
-        <QuickCard label="Services" icon="briefcase-outline" />
-      </View>
-      <View style={styles.quickRow}>
-        <QuickCard label="Photos" icon="image-multiple-outline" />
-        <QuickCard label="Products" icon="cube-outline" />
-      </View>
-      {/* Booking */}
-      <Text style={styles.sectionTitle}>Recent Booking</Text>
-      <View style={styles.bookingCard}>
-        <View style={styles.bookingHeader}>
-          <Text>Dec 22, 2024 10:00 AM</Text>
-          <View style={styles.statusBox}>
-            <Text style={styles.statusText}>pending</Text>
-          </View>
-        </View>
-        <View style={styles.bookingUserRow}>
-          <Image source={dummyProfile} style={styles.bookingImg} />
-          <View style={{ flex: 1, marginLeft: 10 }}>
-            <Text style={styles.bookingName}>Customer name</Text>
-            <Text style={styles.bookingService}>
-              Services: Undercut Haircut, Regular Shaving,
+    <LinearGradient
+      colors={['#e6f0c1ff', '#fbfffdff']} // adjust colors to your brand or preference
+      style={{ flex: 1 }}
+    >
+      <ScrollView style={styles.container}>
+        <HeaderCom data={vendor} />
+        {/* Header */}
+        <View style={styles.header}>
+          <Image
+            source={
+              vendor?.profileImage
+                ? { uri: vendor.profileImage }
+                : defaultProfile
+            }
+            style={styles.profileImg}
+          />
+          <View style={{ flex: 1, marginLeft: 8, justifyContent: 'center' }}>
+            <Text style={styles.headerTitle}>
+              Hi, {vendor?.data?.fullName || 'Salon Name'}
             </Text>
-            <Text style={styles.bookingService}>Price : 250</Text>
+            <CurrentLocation />
+            {/* <TouchableOpacity
+              onPress={openMaps}
+              style={{ flexDirection: 'row', alignItems: 'center' }}
+            >
+              <MaterialIcons name="location-on" size={16} color="#696968ff" />
+              <Text
+                style={[
+                  styles.headerSub,
+                  {
+                    color: '#696968ff',
+                    marginLeft: 1,
+                  },
+                ]}
+              >
+                {locationName}
+              </Text>
+            </TouchableOpacity> */}
+          </View>
+
+          <TouchableOpacity
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              backgroundColor: '#ffffffff',
+              padding: 8,
+              borderRadius: 50,
+            }}
+          >
+            <Ionicons name="notifications-outline" size={20} color="#000" />
+          </TouchableOpacity>
+        </View>
+
+        {/* Amount and Stats (extracted) */}
+        <AmountCard
+          totalAmount={vendor?.totalAmount || 0}
+          completed={vendor?.completedBookings || 0}
+          upcoming={vendor?.upcomingBookings || 0}
+        />
+
+        {/* Quick Cards Row (example usage) */}
+        <View style={styles.quickRow}>
+          <QuickCard label="Add Service" icon="tags" onPress={goToAddService} />
+          <QuickCard label="Add Staff" icon="users" onPress={goToAddStaff} />
+        </View>
+        <View style={styles.quickRow}>
+          <QuickCard label="Add Photos" icon="photo" onPress={goToAddPhotos} />
+          <QuickCard
+            label="Add Offer"
+            icon="shopping-basket"
+            onPress={goToCreateProduct}
+          />
+        </View>
+
+        <View style={{ paddingHorizontal: 6 }}>
+          <Text style={styles.sectionTitle}>Recent Booking</Text>
+          <View style={styles.bookingCard}>
+            <View style={styles.bookingHeader}>
+              <Text>Dec 22, 2024 10:00 AM</Text>
+              <View style={styles.statusBox}>
+                <Text style={styles.statusText}>pending</Text>
+              </View>
+            </View>
+            <View style={styles.bookingUserRow}>
+              <Image source={defaultProfile} style={styles.bookingImg} />
+              <View style={{ flex: 1, marginLeft: 10 }}>
+                <Text style={styles.bookingName}>Customer name</Text>
+                <Text style={styles.bookingService}>
+                  Services: Undercut Haircut, Regular Shaving,
+                </Text>
+                <Text style={styles.bookingService}>Price : 250</Text>
+              </View>
+            </View>
           </View>
         </View>
-        <View style={styles.buttonRow}>
-          <TouchableOpacity style={styles.rejectBtn}>
-            <Text style={{ color: '#14AD5F', fontWeight: 'bold' }}>Reject</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.confirmBtn}>
-            <Text style={{ color: '#fff', fontWeight: 'bold' }}>Confirm</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </LinearGradient>
   );
 }
 
@@ -88,32 +242,35 @@ function StatCard({ heading, value, icon }) {
   );
 }
 
-function QuickCard({ label, icon }) {
-  return (
-    <View style={styles.quickCard}>
-      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-        <Text style={styles.quickLabel}>{label}</Text>
-        <Text style={styles.quickPlus}> + </Text>
-      </View>
-      <View style={styles.quickIcon}>
-        <Icon name={icon} size={26} color="#fff" />
-      </View>
-    </View>
-  );
-}
-
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff', padding: 14 },
+  container: { flex: 1, padding: 10 },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#111',
     borderRadius: 13,
-    padding: 12,
+
+    paddingTop: 4,
     marginBottom: 18,
   },
-  headerTitle: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
-  headerSub: { color: '#aaa', fontSize: 13, marginTop: 2 },
+
+  headerTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    // color: '#FFFFFF',
+  },
+  headerSub: {
+    fontSize: 14,
+    // color: '#FFFFFF',
+  },
+  profileImg: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    borderWidth: 2,
+    borderColor: '#FFD700', // golden border as accent
+    marginLeft: 12,
+  },
+
   profileImg: {
     width: 44,
     height: 44,
@@ -122,15 +279,6 @@ const styles = StyleSheet.create({
     borderColor: '#14AD5F',
     borderWidth: 2,
   },
-  amountCard: {
-    backgroundColor: '#14AD5F',
-    borderRadius: 20,
-    padding: 20,
-    marginBottom: 18,
-  },
-  amountLabel: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
-  amountSubLabel: { color: '#fff', fontSize: 13 },
-  amountValue: { color: '#fff', fontSize: 26, fontWeight: 'bold' },
   statsRow: { flexDirection: 'row', marginTop: 13 },
   statCard: {
     backgroundColor: '#fff',
@@ -153,26 +301,6 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   quickRow: { flexDirection: 'row', marginVertical: 8 },
-  quickCard: {
-    backgroundColor: '#fff',
-    borderRadius: 13,
-    flex: 1,
-    marginRight: 10,
-    paddingVertical: 16,
-    paddingHorizontal: 16,
-    alignItems: 'center',
-  },
-  quickLabel: { color: '#333', fontWeight: '600', fontSize: 14 },
-  quickPlus: { color: '#bbb', fontSize: 19, fontWeight: 'bold', marginLeft: 9 },
-  quickIcon: {
-    backgroundColor: '#14AD5F',
-    borderRadius: 50,
-    width: 34,
-    height: 34,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 10,
-  },
   sectionTitle: {
     fontWeight: 'bold',
     fontSize: 18,
@@ -210,23 +338,4 @@ const styles = StyleSheet.create({
   bookingImg: { width: 43, height: 43, borderRadius: 21.5 },
   bookingName: { fontWeight: 'bold', fontSize: 15 },
   bookingService: { fontSize: 13, color: '#444' },
-  buttonRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 10,
-  },
-  rejectBtn: {
-    borderColor: '#14AD5F',
-    borderWidth: 1.5,
-    borderRadius: 11,
-    paddingVertical: 7,
-    paddingHorizontal: 30,
-    marginRight: 8,
-  },
-  confirmBtn: {
-    backgroundColor: '#14AD5F',
-    borderRadius: 11,
-    paddingVertical: 7,
-    paddingHorizontal: 30,
-  },
 });

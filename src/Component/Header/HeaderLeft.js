@@ -35,29 +35,36 @@ const HeaderLeft = ({ touchStyle, onPress, title, mainStyle, type }) => {
         type === 'withoutHeader' && styles.withoutHeader,
       ]}
     >
-      <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#c5f9dcff', borderRadius: 24 }}>
-      <TouchableOpacity
-        style={[styles.btn, touchStyle, styles.elevatedBtn]}
-        onPress={handlePress}
-        activeOpacity={0.7}
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          backgroundColor: 'white',
+          borderRadius: 24,
+        }}
       >
-        <View style={styles.iconContainer}>
-          <FontAwesome6
-            name="arrow-left-long"
-            style={styles.iconStyle}
-            size={20}
-            color="#000"
-          />
-          {/* <Text style={styles.iconStyle}>{icon || ''}</Text> */}
-        </View>
-      </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.btn, touchStyle, styles.elevatedBtn]}
+          onPress={handlePress}
+          activeOpacity={0.7}
+        >
+          <View style={styles.iconContainer}>
+            <FontAwesome6
+              name="arrow-left-long"
+              style={styles.iconStyle}
+              size={18}
+              color="#000"
+            />
+            {/* <Text style={styles.iconStyle}>{icon || ''}</Text> */}
+          </View>
+        </TouchableOpacity>
 
-      {title ? (
-        <Text style={styles.title} numberOfLines={1}>
-          {title}
-        </Text>
-      ) : null}
-    </View>
+        {title ? (
+          <Text style={styles.title} numberOfLines={1}>
+            {title}
+          </Text>
+        ) : null}
+      </View>
     </View>
   );
 };
@@ -71,11 +78,11 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginLeft: 12,
+    // marginLeft: 0,
     paddingRight: 18,
     paddingLeft: 4,
     paddingVertical: 5,
-   
+
     // borderBottomRightRadius: 24,
     borderRadius: 24,
     // borderRadius: 24,
@@ -94,7 +101,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: 50,
     backgroundColor: COLORS.white,
-    marginRight: 4,
+    // marginRight: 4,
   },
 
   elevatedBtn: {
@@ -121,16 +128,16 @@ const styles = StyleSheet.create({
   iconStyle: {
     // fontSize: SIZES.width * 0.06,
     color: COLORS.primary,
-    fontWeight: '600',
+    fontWeight: '400',
     paddingTop: Platform.OS === 'android' ? 0 : 0,
   },
 
   title: {
-    fontSize: SIZES.width * 0.045,
+    fontSize: SIZES.width * 0.044,
     color: COLORS.primary,
-    paddingHorizontal: 14,
+    paddingHorizontal: 8,
     fontWeight: 'bold',
-    letterSpacing: 0.2,
+    // letterSpacing: 0.2,
     flexShrink: 1,
   },
 });

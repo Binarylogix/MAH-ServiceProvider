@@ -1,5 +1,14 @@
+import { StyleSheet, Text, View } from 'react-native';
 import React from 'react';
 
-export const BusinessRegistration = () => {
-  return <div>BusinessRegistration</div>;
+const BusinessRegistration = () => {
+  return (
+    <View>
+      <Text>BusinessRegistration</Text>
+    </View>
+  );
 };
+
+export default BusinessRegistration;
+
+const styles = StyleSheet.create({});

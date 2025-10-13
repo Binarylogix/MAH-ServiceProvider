@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   tabBtnActive: {
-    backgroundColor: '#14AD5F',
+    backgroundColor: '#00D65F',
   },
   tabText: {
     color: '#111',

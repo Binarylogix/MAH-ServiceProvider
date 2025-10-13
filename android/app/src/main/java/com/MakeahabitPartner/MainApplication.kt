@@ -1,4 +1,4 @@
-package com.makeahabit
+package com.MakeahabitPartner
 
 import android.app.Application
 import com.facebook.react.PackageList
