@@ -98,7 +98,7 @@ export default function EditProfile() {
         style={{ marginTop: 30 }}
       >
         <LinearGradient
-          colors={['#FF4584', '#FF7A59']}
+          colors={['#00D65F', '#01823A']}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
           style={styles.saveBtn}
@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 20,
     right: 20,
-    backgroundColor: '#FF4584',
+    backgroundColor: '#00D65F',
     width: 40,
     height: 40,
     borderRadius: 20,

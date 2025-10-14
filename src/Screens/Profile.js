@@ -358,7 +358,7 @@ export default function Profile() {
             style={{ borderRadius: 25, overflow: 'hidden' }}
           >
             <LinearGradient
-              colors={['#FF4584', '#FF7A59']}
+              colors={['#00D65F', '#01823A']}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
               style={styles.editButton}
@@ -374,22 +374,22 @@ export default function Profile() {
           <MenuCard
             icon="car-wash"
             label="Service"
-            onPress={() => navigation.navigate('AddService')}
+            onPress={() => navigation.navigate('AllServices')}
           />
           <MenuCard
             icon="account-outline"
             label="Staff"
-            onPress={() => navigation.navigate('AddStaff')}
+            onPress={() => navigation.navigate('AllStaff')}
           />
           <MenuCard
             icon="cube-outline"
             label="Products"
-            onPress={() => navigation.navigate('AddProduct')}
+            onPress={() => navigation.navigate('AllProduct')}
           />
           <MenuCard
             icon="image-multiple-outline"
             label="Gallery"
-            onPress={() => navigation.navigate('AddPhotos')}
+            onPress={() => navigation.navigate('AllPhoto')}
           />
           <MenuCard
             icon="help-circle"
@@ -409,7 +409,7 @@ export default function Profile() {
           <MenuCard
             icon="shield-account-outline"
             label="Privacy and Policy"
-            onPress={() => {}}
+            onPress={() => navigation.navigate('PrivacyPolicyScreen')}
           />
           <MenuCard
             icon="star"

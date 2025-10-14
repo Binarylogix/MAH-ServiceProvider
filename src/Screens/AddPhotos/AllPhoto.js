@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -7,10 +7,11 @@ import {
   Image,
   ActivityIndicator,
   Pressable,
-  Dimensions,
   TouchableOpacity,
   Modal,
   Alert,
+  Animated,
+  Dimensions,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import HeaderLeft from '../../Component/Header/HeaderLeft';
@@ -18,6 +19,7 @@ import axios from 'axios';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { launchImageLibrary } from 'react-native-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import ImageViewer from 'react-native-image-zoom-viewer';
 
 const { width } = Dimensions.get('window');
 
@@ -27,14 +29,24 @@ export default function AllPhoto() {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [uploading, setUploading] = useState(false);
-  console.log(gallery);
+  const [zoomVisible, setZoomVisible] = useState(false);
+  const [zoomIndex, setZoomIndex] = useState(0);
 
-  // ✅ Fetch Gallery
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 700,
+      useNativeDriver: true,
+    }).start();
+  }, []);
+
   const fetchGallery = async () => {
     try {
+      const id = await AsyncStorage.getItem('vendorId');
       setLoading(true);
       const response = await axios.get(
-        'https://www.makeahabit.com/api/v1/galary/get-all',
+        `https://www.makeahabit.com/api/v1/galary/get-by-vendor/${id}`,
       );
       if (response.data && response.data.galleryItems) {
         setGallery(response.data.galleryItems);
@@ -53,38 +65,31 @@ export default function AllPhoto() {
     fetchGallery();
   }, []);
 
-  // ✅ Pick Image
   const pickImage = async () => {
     const result = await launchImageLibrary({
       mediaType: 'photo',
       quality: 0.8,
     });
-
     if (result.didCancel) return;
     if (result.errorCode) {
       Alert.alert('Error', 'Something went wrong while selecting the image.');
       return;
     }
-
     setSelectedImage(result.assets[0]);
   };
 
-  // ✅ Upload Image (Create)
   const uploadImage = async () => {
     if (!selectedImage)
       return Alert.alert('No Image', 'Please select an image.');
-
     try {
       setUploading(true);
       const token = await AsyncStorage.getItem('vendorToken');
-
       const formData = new FormData();
       formData.append('img', {
         uri: selectedImage.uri,
         type: selectedImage.type,
         name: selectedImage.fileName || 'photo.jpg',
       });
-
       const response = await axios.post(
         'https://www.makeahabit.com/api/v1/galary/create',
         formData,
@@ -95,7 +100,6 @@ export default function AllPhoto() {
           },
         },
       );
-
       if (response.data.success) {
         Alert.alert('Success', 'Photo uploaded successfully!');
         setModalVisible(false);
@@ -112,7 +116,6 @@ export default function AllPhoto() {
     }
   };
 
-  // ✅ Delete Photo
   const deletePhoto = async imgId => {
     try {
       const token = await AsyncStorage.getItem('vendorToken');
@@ -126,14 +129,13 @@ export default function AllPhoto() {
             style: 'destructive',
             onPress: async () => {
               const response = await axios.delete(
-                `http://www.makeahabit.com/api/v1/galary/delete/${imgId}`,
+                `https://www.makeahabit.com/api/v1/galary/delete/${imgId}`,
                 {
                   headers: {
                     Authorization: `Bearer ${token}`,
                   },
                 },
               );
-
               if (response.data.success) {
                 Alert.alert('Deleted', 'Photo deleted successfully');
                 fetchGallery();
@@ -150,33 +152,29 @@ export default function AllPhoto() {
     }
   };
 
-  // ✅ Update Photo
   const updatePhoto = async imgId => {
     const result = await launchImageLibrary({
       mediaType: 'photo',
       quality: 0.8,
     });
-
     if (result.didCancel) return;
     if (result.errorCode) {
       Alert.alert('Error', 'Something went wrong while selecting image.');
       return;
     }
-
     const newImage = result.assets[0];
     const token = await AsyncStorage.getItem('vendorToken');
-
     const formData = new FormData();
     formData.append('img', {
       uri: newImage.uri,
       type: newImage.type,
       name: newImage.fileName || 'updated-photo.jpg',
     });
-
     try {
+      console.log(imgId);
       setUploading(true);
       const response = await axios.put(
-        `http://www.makeahabit.com/api/v1/galary/update/${imgId}`,
+        `https://www.makeahabit.com/api/v1/galary/update/${imgId}`,
         formData,
         {
           headers: {
@@ -185,7 +183,6 @@ export default function AllPhoto() {
           },
         },
       );
-
       if (response.data.success) {
         Alert.alert('Updated', 'Photo updated successfully!');
         fetchGallery();
@@ -200,37 +197,47 @@ export default function AllPhoto() {
     }
   };
 
-  // ✅ Render Each Card
-  const renderItem = ({ item }) => {
+  const openZoom = idx => {
+    setZoomIndex(idx);
+    setZoomVisible(true);
+  };
+
+  const renderItem = ({ item, index }) => {
     const imageUrl = `http://www.makeahabit.com/api/v1/uploads/galary/${item.img}`;
     return (
-      <View style={styles.card}>
-        <Image
-          source={{ uri: imageUrl }}
-          style={styles.image}
-          resizeMode="cover"
-        />
-        <View style={styles.overlay}>
-          <Text numberOfLines={1} style={styles.imageName}>
-            {item?.img?.split('-')[1] || 'Photo'}
-          </Text>
-
-          {/* Edit / Delete Buttons */}
-          <View style={styles.actions}>
-            <TouchableOpacity onPress={() => updatePhoto(item._id)}>
-              <Icon name="pencil" size={22} color="#00D65F" />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => deletePhoto(item._id)}>
-              <Icon name="delete" size={22} color="#ff4444" />
-            </TouchableOpacity>
+      <Pressable onPress={() => openZoom(index)} style={styles.cardWrapper}>
+        <Animated.View style={[styles.card, { opacity: fadeAnim }]}>
+          <Image
+            source={{ uri: imageUrl }}
+            style={styles.image}
+            resizeMode="cover"
+          />
+          <View style={styles.overlay}>
+            <Text numberOfLines={1} style={styles.imageName}>
+              {item?.img?.split('-')[1] || 'Photo'}
+            </Text>
+            <View style={styles.actions}>
+              <TouchableOpacity
+                onPress={() => updatePhoto(item._id)}
+                style={styles.editBtn}
+              >
+                <Icon name="pencil" size={22} color="#fff" />
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => deletePhoto(item._id)}
+                style={styles.deleteBtn}
+              >
+                <Icon name="delete" size={22} color="#fff" />
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      </View>
+        </Animated.View>
+      </Pressable>
     );
   };
 
   return (
-    <LinearGradient colors={['#e6f0c1ff', '#fbfffdff']} style={{ flex: 1 }}>
+    <LinearGradient colors={['#e6f0c1', '#fbfffd']} style={{ flex: 1 }}>
       <View style={styles.container}>
         {/* Header */}
         <View style={styles.header}>
@@ -247,7 +254,6 @@ export default function AllPhoto() {
             </LinearGradient>
           </TouchableOpacity>
         </View>
-
         {/* Gallery */}
         {loading ? (
           <View style={styles.loaderContainer}>
@@ -263,15 +269,42 @@ export default function AllPhoto() {
             <Text style={styles.emptyText}>No photos available</Text>
           </View>
         ) : (
-          <FlatList
-            data={gallery}
-            keyExtractor={item => item._id}
-            renderItem={renderItem}
-            numColumns={2}
-            showsVerticalScrollIndicator={false}
-            columnWrapperStyle={{ justifyContent: 'space-between' }}
-            contentContainerStyle={{ paddingBottom: 20 }}
-          />
+          <>
+            <FlatList
+              data={gallery}
+              keyExtractor={item => item._id}
+              renderItem={renderItem}
+              numColumns={2}
+              showsVerticalScrollIndicator={false}
+              columnWrapperStyle={{ justifyContent: 'space-between' }}
+              contentContainerStyle={{ paddingBottom: 20 }}
+            />
+
+            <Modal
+              visible={zoomVisible}
+              transparent={true}
+              onRequestClose={() => setZoomVisible(false)}
+            >
+              <ImageViewer
+                imageUrls={gallery.map(item => ({
+                  url: `http://www.makeahabit.com/api/v1/uploads/galary/${item.img}`,
+                }))}
+                index={zoomIndex}
+                enableSwipeDown
+                onSwipeDown={() => setZoomVisible(false)}
+                backgroundColor="#000"
+                onCancel={() => setZoomVisible(false)}
+                enablePreload
+                renderIndicator={(currentIndex, allSize) => (
+                  <View style={styles.indicator}>
+                    <Text style={styles.indicatorText}>
+                      {currentIndex} / {allSize}
+                    </Text>
+                  </View>
+                )}
+              />
+            </Modal>
+          </>
         )}
 
         {/* Upload Modal */}
@@ -289,7 +322,6 @@ export default function AllPhoto() {
                   <Icon name="close" size={28} color="#000" />
                 </TouchableOpacity>
               </View>
-
               <TouchableOpacity
                 style={styles.uploadBox}
                 onPress={pickImage}
@@ -309,7 +341,6 @@ export default function AllPhoto() {
                   </View>
                 )}
               </TouchableOpacity>
-
               <TouchableOpacity
                 style={{ marginTop: 30 }}
                 onPress={uploadImage}
@@ -335,8 +366,6 @@ export default function AllPhoto() {
   );
 }
 
-// ========================= STYLES =========================
-
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 16 },
   header: {
@@ -357,33 +386,66 @@ const styles = StyleSheet.create({
   loaderContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   emptyContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   emptyText: { color: '#777', fontSize: 16 },
+  cardWrapper: {
+    flex: 1,
+  },
   card: {
     backgroundColor: '#fff',
-    borderRadius: 16,
+    borderRadius: 20,
     marginBottom: 14,
     overflow: 'hidden',
     width: width / 2 - 24,
-    height: 200,
+    height: 210,
     shadowColor: '#000',
     shadowOpacity: 0.15,
-    shadowRadius: 5,
-    elevation: 4,
+    shadowRadius: 8,
+    elevation: 6,
+    transform: [{ scale: 1 }],
   },
-  image: { width: '100%', height: '100%' },
+  image: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 13,
+    borderWidth: 2,
+    borderColor: '#fff',
+    shadowColor: '#00D65F',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+    transform: [{ scale: 0.98 }],
+  },
   overlay: {
     position: 'absolute',
     bottom: 0,
     width: '100%',
-    backgroundColor: 'rgba(0,0,0,0.6)',
-    paddingVertical: 6,
-    paddingHorizontal: 8,
+    backgroundColor: 'rgba(0,0,0,0.62)',
+    paddingVertical: 7,
+    paddingHorizontal: 10,
   },
-  imageName: { color: '#fff', fontWeight: '600', fontSize: 14 },
+  imageName: { color: '#fff', fontWeight: 'bold', fontSize: 15 },
   actions: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     marginTop: 5,
-    paddingHorizontal: 10,
+    paddingHorizontal: 6,
+  },
+  editBtn: {
+    backgroundColor: '#00D65F',
+    borderRadius: 8,
+    padding: 7,
+    marginRight: 7,
+    elevation: 3,
+    shadowColor: '#00D65F',
+    shadowRadius: 2,
+  },
+  deleteBtn: {
+    backgroundColor: '#ff4444',
+    borderRadius: 8,
+    padding: 7,
+    elevation: 3,
+    shadowColor: '#ff4444',
+    shadowRadius: 2,
   },
   modalOverlay: {
     flex: 1,
@@ -425,4 +487,14 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   uploadText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+  indicator: {
+    position: 'absolute',
+    top: 40,
+    right: 15,
+    backgroundColor: 'rgba(0,0,0,0.55)',
+    paddingVertical: 3,
+    paddingHorizontal: 10,
+    borderRadius: 7,
+  },
+  indicatorText: { color: '#fff', fontSize: 14, fontWeight: '600' },
 });

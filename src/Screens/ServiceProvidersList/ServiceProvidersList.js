@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -8,108 +8,211 @@ import {
   StyleSheet,
   TextInput,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+
 import { useNavigation } from '@react-navigation/native';
-import { useSelector, useDispatch } from 'react-redux';
-import { fetchSalonList } from '../../redux/slices/SalonListSlice';
-import { fetchCategoryList } from '../../redux/slices/CategoryListSlice';
 import HeaderLeft from '../../Component/Header/HeaderLeft';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import noImage from '../../assets/images/noImage.jpg';
 
 const BASE_URL = 'https://www.makeahabit.com/api/v1/uploads';
+const BOOKINGS_API = 'https://www.makeahabit.com/api/v1/booking/getAllBookings';
 
-const ServiceProvidersList = ({ route }) => {
-  const [selectedCategory, setSelectedCategory] = useState(null);
+const BookingsList = () => {
+  const [bookings, setBookings] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState('');
+  const [filtered, setFiltered] = useState([]);
   const navigation = useNavigation();
-  const dispatch = useDispatch();
-  const CategoryId = route.params?.CategoryId;
-
-  const {
-    values: salons = [],
-    loading: salonLoading,
-    error: salonError,
-  } = useSelector(state => state.salonList || {});
-  const {
-    values: categories = [],
-    loading: categoryLoading,
-    error: categoryError,
-  } = useSelector(state => state.CategoryList || {});
 
   useEffect(() => {
-    dispatch(fetchSalonList());
-    dispatch(fetchCategoryList());
-  }, [dispatch]);
+    // Sample data for preview
+    setBookings([
+      {
+        _id: '1',
+        serviceName: 'Haircut & Styling',
+        customerName: 'Amit Sharma',
+        bookingDate: '2025-10-15T11:30:00',
+        status: 'confirmed',
+        image: '',
+      },
+      {
+        _id: '2',
+        serviceName: 'Facial Treatment',
+        customerName: 'Riya Mehta',
+        bookingDate: '2025-10-16T14:00:00',
+        status: 'pending',
+        image: '',
+      },
+      {
+        _id: '3',
+        serviceName: 'Beard Trim',
+        customerName: 'Karan Singh',
+        bookingDate: '2025-10-17T10:00:00',
+        status: 'cancelled',
+        image: '',
+      },
+      {
+        _id: '4',
+        serviceName: 'Full Body Massage',
+        customerName: 'Sneha Patel',
+        bookingDate: '2025-10-18T16:30:00',
+        status: 'confirmed',
+        image: '',
+      },
+    ]);
+    // fetchBookings();
+  }, []);
 
-  //  useEffect(() => {
-  //   if (categories.length > 0 && CategoryId) {
-  //     setSelectedCategory(CategoryId);
-  //   }
-  // }, [categories, CategoryId]);
-
-  useEffect(() => {
-    if (categories.length > 0 && selectedCategory === null) {
-      // Set initial selected category only once
-      if (CategoryId && categories.some(cat => cat._id === CategoryId)) {
-        setSelectedCategory(CategoryId);
-      } else {
-        setSelectedCategory(null); // default to 'All'
+  const fetchBookings = async () => {
+    try {
+      setLoading(true);
+      const token = await AsyncStorage.getItem('vendorToken');
+      const res = await axios.get(BOOKINGS_API, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.data?.data) {
+        setBookings(res.data.data);
+        setFiltered(res.data.data);
       }
+    } catch (error) {
+      console.log('Error fetching bookings:', error);
+      Alert.alert('Error', 'Failed to load bookings');
+    } finally {
+      setLoading(false);
     }
-  }, [categories, CategoryId]);
+  };
 
-  const filteredSalons = salons
-    .filter(salon =>
-      selectedCategory
-        ? salon.category?._id === selectedCategory ||
-          salon.category === selectedCategory
-        : true,
-    )
+  const handleCancel = id => {
+    Alert.alert(
+      'Cancel Booking',
+      'Are you sure you want to cancel this booking?',
+      [
+        { text: 'No' },
+        {
+          text: 'Yes, Cancel',
+          onPress: async () => {
+            try {
+              await axios.put(
+                `https://www.makeahabit.com/api/v1/booking/cancel/${id}`,
+              );
+              Alert.alert('Success', 'Booking cancelled');
+              fetchBookings();
+            } catch (e) {
+              Alert.alert('Error', 'Failed to cancel booking');
+            }
+          },
+        },
+      ],
+    );
+  };
 
-    .filter(salon => salon.name?.toLowerCase().includes(search.toLowerCase()));
+  const handleReschedule = id => {
+    Alert.alert('Reschedule Booking', 'Feature coming soon!');
+  };
 
-  const renderSalonCard = ({ item }) => (
-    <TouchableOpacity
-      style={styles.salonCard}
-      activeOpacity={0.9}
-      onPress={() => navigation.navigate('ShopProfile', { salon: item })}
-    >
+  useEffect(() => {
+    if (search.trim() === '') {
+      setFiltered(bookings);
+    } else {
+      const lower = search.toLowerCase();
+      const filter = bookings.filter(
+        b =>
+          b.customerName?.toLowerCase().includes(lower) ||
+          b.serviceName?.toLowerCase().includes(lower),
+      );
+      setFiltered(filter);
+    }
+  }, [search, bookings]);
+
+  const renderBookingCard = ({ item }) => (
+    <View style={styles.salonCard}>
+      {/* 🔹 Status Badge on Top Right */}
+      <View
+        style={[
+          styles.statusBadge,
+          {
+            backgroundColor:
+              item.status === 'cancelled'
+                ? '#ffcccc'
+                : item.status === 'pending'
+                ? '#fff3cd'
+                : '#d4edda',
+          },
+        ]}
+      >
+        <Text
+          style={[
+            styles.statusText,
+            {
+              color:
+                item.status === 'cancelled'
+                  ? 'red'
+                  : item.status === 'pending'
+                  ? '#856404'
+                  : '#155724',
+            },
+          ]}
+        >
+          {item.status?.toUpperCase() || 'PENDING'}
+        </Text>
+      </View>
+
+      {/* 🔹 Image */}
       <Image
-        source={item.image || noImage}
+        source={
+          item.image
+            ? {
+                uri: item.image.startsWith('http')
+                  ? item.image
+                  : `${BASE_URL}/${item.image}`,
+              }
+            : noImage
+        }
         style={styles.salonImage}
         resizeMode="cover"
       />
 
+      {/* 🔹 Details */}
       <View style={styles.salonDetails}>
-        <Text style={styles.salonName} numberOfLines={1}>
-          {item.name}
+        <Text style={styles.salonName}>
+          {item.serviceName || 'Service Name'}
         </Text>
-        <Text style={styles.salonLocation}>📍 {item.city || 'N/A'}</Text>
-        <Text style={styles.salonServices} numberOfLines={1}>
-          <Text style={{ fontWeight: '600' }}>Services:</Text>{' '}
-          {item.services?.length > 0
-            ? item.services.map(s => s.name).join(', ')
-            : 'Not provided'}
-        </Text>
-        <Text style={styles.salonRating}>⭐ {item.rating || '0.0'}</Text>
-      </View>
 
-      <TouchableOpacity style={styles.heartIcon}>
-        <Text style={{ fontSize: 20, color: '#18A558' }}>♡</Text>
-      </TouchableOpacity>
-    </TouchableOpacity>
+        <View
+          style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2 }}
+        >
+          <MaterialCommunityIcons name="account" size={14} color="#18A558" />
+          <Text style={[styles.salonLocation, { marginLeft: 4 }]}>
+            {item.customerName || 'Customer'}
+          </Text>
+        </View>
+
+        <View
+          style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2 }}
+        >
+          <MaterialCommunityIcons name="calendar" size={14} color="#666" />
+          <Text style={[styles.salonServices, { marginLeft: 4 }]}>
+            {new Date(item.bookingDate).toLocaleString()}
+          </Text>
+        </View>
+      </View>
+    </View>
   );
 
   return (
     <View style={{ flex: 1, backgroundColor: '#fff' }}>
-      <HeaderLeft title="Shop List" />
+      <HeaderLeft title="My Bookings" />
 
       <View style={styles.container}>
         {/* 🔍 Search Bar */}
         <View style={styles.searchBar}>
           <TextInput
             style={styles.searchInput}
-            placeholder="Search salons..."
+            placeholder="Search by customer or service..."
             placeholderTextColor="#aaa"
             value={search}
             onChangeText={setSearch}
@@ -119,89 +222,21 @@ const ServiceProvidersList = ({ route }) => {
           </View>
         </View>
 
-        <View style={{ flex: 0 }}>
-          {/* 🧾 Category Row */}
-          {categoryLoading ? (
-            <ActivityIndicator size="small" color="#18A558" />
-          ) : categoryError ? (
-            <Text style={{ color: 'red', textAlign: 'center' }}>
-              Failed to load categories
-            </Text>
-          ) : (
-            <FlatList
-              horizontal
-              data={[{ _id: 'all', name: 'All' }, ...categories]}
-              keyExtractor={item => item._id}
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{ paddingVertical: 8 }}
-              renderItem={({ item }) => {
-                const isSelected =
-                  item._id === selectedCategory ||
-                  (item._id === 'all' && selectedCategory === null);
-
-                return (
-                  <TouchableOpacity
-                    style={[
-                      styles.categoryBtn,
-                      isSelected && styles.selectedCategoryBtn, // ✅ use isSelected
-                    ]}
-                    onPress={() =>
-                      item._id === 'all'
-                        ? setSelectedCategory(null)
-                        : setSelectedCategory(item._id)
-                    }
-                  >
-                    {item._id !== 'all' ? (
-                      <Image
-                        source={
-                          item.img && item.img.uri
-                            ? {
-                                uri: item.img.uri.startsWith('http')
-                                  ? item.img.uri
-                                  : `${BASE_URL}/${item.img.uri}`,
-                              }
-                            : noImage
-                        }
-                        style={styles.avatar}
-                      />
-                    ) : null}
-
-                    <Text
-                      style={[
-                        styles.categoryText,
-                        isSelected && styles.selectedCategoryText, // ✅ use isSelected
-                      ]}
-                    >
-                      {item.name}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              }}
-            />
-          )}
-        </View>
-
-        {/* 🔸 Heading Row */}
-        <View style={styles.nearestRow}>
-          <Text style={styles.nearestText}>Nearest Salons</Text>
-          <TouchableOpacity>
-            <Text style={styles.allSalonText}>All Salons</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* 🏪 Salon List */}
-        {salonLoading ? (
+        {loading ? (
           <ActivityIndicator size="large" color="#18A558" />
-        ) : salonError ? (
-          <Text style={{ color: 'red', textAlign: 'center' }}>
-            Failed to load salons
-          </Text>
         ) : (
           <FlatList
-            data={filteredSalons}
+            data={filtered}
             keyExtractor={item => item._id}
-            renderItem={renderSalonCard}
+            renderItem={renderBookingCard}
             showsVerticalScrollIndicator={false}
+            ListEmptyComponent={
+              <Text
+                style={{ textAlign: 'center', color: '#999', marginTop: 20 }}
+              >
+                No bookings found
+              </Text>
+            }
             contentContainerStyle={{ paddingBottom: 80 }}
           />
         )}
@@ -210,7 +245,7 @@ const ServiceProvidersList = ({ route }) => {
   );
 };
 
-export default ServiceProvidersList;
+export default BookingsList;
 
 const styles = StyleSheet.create({
   container: {
@@ -237,54 +272,6 @@ const styles = StyleSheet.create({
   searchIcon: {
     marginLeft: 6,
   },
-  categoryBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderRadius: 12,
-    borderWidth: 1,
-    height: 44,
-    borderColor: '#ccc',
-    paddingHorizontal: 10,
-    backgroundColor: '#fff',
-    marginRight: 10,
-    elevation: 1,
-  },
-  selectedCategoryBtn: {
-    backgroundColor: '#18A558',
-    borderColor: '#18A558',
-    elevation: 3,
-  },
-  categoryText: {
-    fontSize: 14,
-    color: '#222',
-    fontWeight: '600',
-  },
-  selectedCategoryText: {
-    color: '#fff',
-  },
-  avatar: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    marginRight: 6,
-    backgroundColor: '#eee',
-  },
-  nearestRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 6,
-    marginTop: 0,
-  },
-  nearestText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#222',
-  },
-  allSalonText: {
-    fontSize: 14,
-    color: '#18A558',
-    fontWeight: '600',
-  },
   salonCard: {
     backgroundColor: '#fff',
     borderRadius: 12,
@@ -297,6 +284,20 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 3,
+    position: 'relative', // ✅ For badge positioning
+  },
+  statusBadge: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    borderRadius: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    zIndex: 10,
+  },
+  statusText: {
+    fontSize: 11,
+    fontWeight: '700',
   },
   salonImage: {
     width: 68,
@@ -322,12 +323,20 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#666',
   },
-  salonRating: {
-    fontSize: 12,
-    color: '#18A558',
-    fontWeight: '700',
+  buttonRow: {
+    flexDirection: 'row',
+    marginTop: 8,
+    gap: 10,
   },
-  heartIcon: {
-    marginLeft: 8,
+  actionBtn: {
+    flex: 1,
+    paddingVertical: 6,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  actionText: {
+    color: '#fff',
+    fontWeight: '700',
+    fontSize: 13,
   },
 });

@@ -346,7 +346,7 @@
 //   cancelText: { textAlign: 'center', color: '#555', marginTop: 10 },
 // });
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -367,6 +367,7 @@ import axios from 'axios';
 import { fetchVendorDetails } from '../../redux/Vendor/vendorDetailsSlice';
 import { useNavigation } from '@react-navigation/native';
 import HeaderLeft from '../../Component/Header/HeaderLeft';
+import { useFocusEffect } from '@react-navigation/native';
 
 const CategoryManager = () => {
   const dispatch = useDispatch();
@@ -421,9 +422,11 @@ const CategoryManager = () => {
     dispatch(fetchVendorDetails());
   }, []);
 
-  useEffect(() => {
-    fetchCategories();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fetchCategories();
+    }, []),
+  );
 
   // ✅ Pick Image
   const pickImage = async () => {
@@ -682,9 +685,9 @@ const styles = StyleSheet.create({
   },
   imagePicker: {
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#44d884ff',
     borderRadius: 10,
-    height: 130,
+    height: 90,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 12,
@@ -696,7 +699,14 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   cancelBtn: { marginRight: 12 },
-  cancelText: { color: '#555', fontSize: 15 },
+  cancelText: {
+    backgroundColor: '#ff8383ff',
+    color: '#fff',
+
+    borderRadius: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 18,
+  },
   saveBtn: {
     backgroundColor: '#14ad5f',
     borderRadius: 10,

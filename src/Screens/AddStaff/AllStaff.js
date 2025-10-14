@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -6,10 +6,15 @@ import {
   StyleSheet,
   Pressable,
   TouchableOpacity,
+  Modal,
+  ScrollView,
+  TextInput,
+  Image,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import HeaderLeft from '../../Component/Header/HeaderLeft';
+import { launchImageLibrary } from 'react-native-image-picker';
 
 const demoServices = [
   {
@@ -42,10 +47,44 @@ const demoServices = [
   },
 ];
 
-export default function AllStaff({ navigation }) {
-  const handleAdd = () => {
-    navigation.navigate('AddStaff');
+export default function AllStaff() {
+  const [modalVisible, setModalVisible] = useState(false);
+  const [staffName, setStaffName] = useState('');
+  const [staffEmail, setStaffEmail] = useState('');
+  const [staffPhone, setStaffPhone] = useState('');
+  const [staffRole, setStaffRole] = useState('');
+  const [staffImage, setStaffImage] = useState(null);
+
+  // Pick staff image
+  const pickImage = () => {
+    launchImageLibrary({ mediaType: 'photo' }, res => {
+      if (!res.didCancel && res.assets && res.assets.length > 0) {
+        setStaffImage(res.assets[0]);
+      }
+    });
   };
+
+  const handleAddStaff = () => {
+    if (!staffName || !staffEmail || !staffPhone || !staffRole) {
+      alert('Please fill all required fields');
+      return;
+    }
+
+    // TODO: call API to add staff
+    console.log({ staffName, staffEmail, staffPhone, staffRole, staffImage });
+
+    alert('Staff added successfully!');
+    setModalVisible(false);
+
+    // Reset form
+    setStaffName('');
+    setStaffEmail('');
+    setStaffPhone('');
+    setStaffRole('');
+    setStaffImage(null);
+  };
+
+  const handleOpenModal = () => setModalVisible(true);
 
   const renderItem = ({ item }) => (
     <Pressable style={styles.card}>
@@ -70,7 +109,7 @@ export default function AllStaff({ navigation }) {
       <View style={styles.container}>
         <View style={styles.header}>
           <HeaderLeft title={'All Staff'} />
-          <TouchableOpacity onPress={handleAdd} activeOpacity={0.8}>
+          <TouchableOpacity onPress={handleOpenModal} activeOpacity={0.8}>
             <LinearGradient
               colors={['#00D65F', '#01823A']}
               start={{ x: 0, y: 0 }}
@@ -82,7 +121,7 @@ export default function AllStaff({ navigation }) {
           </TouchableOpacity>
         </View>
 
-        {/* Service List */}
+        {/* Staff List */}
         <FlatList
           data={demoServices}
           keyExtractor={item => item.id}
@@ -90,6 +129,86 @@ export default function AllStaff({ navigation }) {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 20 }}
         />
+
+        {/* ✅ Add Staff Modal */}
+        <Modal visible={modalVisible} animationType="slide" transparent>
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <ScrollView>
+                <Text style={styles.modalTitle}>Add New Staff</Text>
+
+                <Text style={styles.label}>Name</Text>
+                <TextInput
+                  style={styles.input}
+                  value={staffName}
+                  onChangeText={setStaffName}
+                  placeholder="Enter staff name"
+                />
+
+                <Text style={styles.label}>Email</Text>
+                <TextInput
+                  style={styles.input}
+                  value={staffEmail}
+                  onChangeText={setStaffEmail}
+                  placeholder="Enter email"
+                  keyboardType="email-address"
+                />
+
+                <Text style={styles.label}>Phone</Text>
+                <TextInput
+                  style={styles.input}
+                  value={staffPhone}
+                  onChangeText={setStaffPhone}
+                  placeholder="Enter phone number"
+                  keyboardType="phone-pad"
+                />
+
+                <Text style={styles.label}>Role</Text>
+                <TextInput
+                  style={styles.input}
+                  value={staffRole}
+                  onChangeText={setStaffRole}
+                  placeholder="Enter role (e.g., Manager)"
+                />
+
+                <Text style={styles.label}>Staff Image</Text>
+                <TouchableOpacity
+                  style={styles.imagePickerBtn}
+                  onPress={pickImage}
+                >
+                  <Text style={styles.imagePickerBtnText}>
+                    {staffImage ? 'Change Image' : 'Pick Image'}
+                  </Text>
+                </TouchableOpacity>
+
+                {staffImage && (
+                  <View style={styles.imagePreviewWrapper}>
+                    <Image
+                      source={{ uri: staffImage.uri }}
+                      style={styles.imagePreview}
+                    />
+                  </View>
+                )}
+
+                <View style={styles.modalButtons}>
+                  <TouchableOpacity
+                    style={[styles.modalBtn, { backgroundColor: '#14ad5f' }]}
+                    onPress={handleAddStaff}
+                  >
+                    <Text style={styles.modalBtnText}>Add Staff</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={[styles.modalBtn, { backgroundColor: '#fa7272ff' }]}
+                    onPress={() => setModalVisible(false)}
+                  >
+                    <Text style={styles.modalBtnText}>Cancel</Text>
+                  </TouchableOpacity>
+                </View>
+              </ScrollView>
+            </View>
+          </View>
+        </Modal>
       </View>
     </LinearGradient>
   );
@@ -112,7 +231,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   Addservice: {
-    color: '#000',
+    color: '#fff',
     fontWeight: 'bold',
     fontSize: 14,
   },
@@ -136,24 +255,70 @@ const styles = StyleSheet.create({
     padding: 10,
     marginRight: 14,
   },
-  serviceName: {
-    fontSize: 16,
+  serviceName: { fontSize: 16, fontWeight: '600', color: '#222' },
+  categoryText: { fontSize: 13, color: '#666', marginTop: 2 },
+  priceContainer: { flexDirection: 'row', alignItems: 'center' },
+  price: { fontSize: 16, fontWeight: '700', color: 'black', marginRight: 4 },
+
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.6)',
+  },
+  modalContent: {
+    width: '90%',
+    backgroundColor: '#fff',
+    borderRadius: 14,
+    padding: 16,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  label: {
+    fontSize: 15,
     fontWeight: '600',
-    color: '#222',
+    color: '#333',
+    marginBottom: 5,
+    marginTop: 10,
   },
-  categoryText: {
-    fontSize: 13,
-    color: '#666',
-    marginTop: 2,
+  input: {
+    borderWidth: 1,
+    borderColor: '#bbb',
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 12,
   },
-  priceContainer: {
+  imagePickerBtn: {
+    backgroundColor: '#14ad5f',
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  imagePickerBtnText: { color: '#fff', fontWeight: '600', fontSize: 16 },
+  imagePreviewWrapper: { alignItems: 'center', marginBottom: 15 },
+  imagePreview: {
+    width: 120,
+    height: 120,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#00D65F',
+  },
+  modalButtons: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 10,
+  },
+  modalBtn: {
+    flex: 1,
+    marginHorizontal: 5,
+    paddingVertical: 12,
+    borderRadius: 8,
     alignItems: 'center',
   },
-  price: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: 'black',
-    marginRight: 4,
-  },
+  modalBtnText: { color: '#fff', fontWeight: '600' },
 });

@@ -30,6 +30,7 @@ import AllServices1 from '../Screens/addservice/AllServices1';
 import FAQScreen from '../Screens/Faqscreen/FAQScreen';
 import RateUsScreen from '../Screens/RateUs/RateUsScreen';
 import HelpAndSupportScreen from '../Screens/helpSupport/HelpAndSupportScreen';
+import PrivacyPolicyScreen from '../Screens/privacyPolicy/PrivacyPolicyScreen';
 const Stack = createNativeStackNavigator();
 export default function VendorStack() {
   return (
@@ -74,6 +75,10 @@ export default function VendorStack() {
       <Stack.Screen name="AllServices1" component={AllServices1} />
       <Stack.Screen name="FAQScreen" component={FAQScreen} />
       <Stack.Screen name="RateUsScreen" component={RateUsScreen} />
+      <Stack.Screen
+        name="PrivacyPolicyScreen"
+        component={PrivacyPolicyScreen}
+      />
       <Stack.Screen
         name="HelpAndSupportScreen"
         component={HelpAndSupportScreen}
