@@ -152,50 +152,50 @@ export default function AllPhoto() {
     }
   };
 
-  const updatePhoto = async imgId => {
-    const result = await launchImageLibrary({
-      mediaType: 'photo',
-      quality: 0.8,
-    });
-    if (result.didCancel) return;
-    if (result.errorCode) {
-      Alert.alert('Error', 'Something went wrong while selecting image.');
-      return;
-    }
-    const newImage = result.assets[0];
-    const token = await AsyncStorage.getItem('vendorToken');
-    const formData = new FormData();
-    formData.append('img', {
-      uri: newImage.uri,
-      type: newImage.type,
-      name: newImage.fileName || 'updated-photo.jpg',
-    });
-    try {
-      console.log(imgId);
-      setUploading(true);
-      const response = await axios.put(
-        `https://www.makeahabit.com/api/v1/galary/update/${imgId}`,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-      if (response.data.success) {
-        Alert.alert('Updated', 'Photo updated successfully!');
-        fetchGallery();
-      } else {
-        Alert.alert('Update Failed', response.data.message || 'Try again.');
-      }
-    } catch (error) {
-      console.error('Update error:', error);
-      Alert.alert('Error', 'Something went wrong while updating photo.');
-    } finally {
-      setUploading(false);
-    }
-  };
+  // const updatePhoto = async imgId => {
+  //   const result = await launchImageLibrary({
+  //     mediaType: 'photo',
+  //     quality: 0.8,
+  //   });
+  //   if (result.didCancel) return;
+  //   if (result.errorCode) {
+  //     Alert.alert('Error', 'Something went wrong while selecting image.');
+  //     return;
+  //   }
+  //   const newImage = result.assets[0];
+  //   const token = await AsyncStorage.getItem('vendorToken');
+  //   const formData = new FormData();
+  //   formData.append('img', {
+  //     uri: newImage.uri,
+  //     type: newImage.type,
+  //     name: newImage.fileName || 'updated-photo.jpg',
+  //   });
+  //   try {
+  //     console.log(imgId);
+  //     setUploading(true);
+  //     const response = await axios.put(
+  //       `https://www.makeahabit.com/api/v1/galary/update/${imgId}`,
+  //       formData,
+  //       {
+  //         headers: {
+  //           'Content-Type': 'multipart/form-data',
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       },
+  //     );
+  //     if (response.data.success) {
+  //       Alert.alert('Updated', 'Photo updated successfully!');
+  //       fetchGallery();
+  //     } else {
+  //       Alert.alert('Update Failed', response.data.message || 'Try again.');
+  //     }
+  //   } catch (error) {
+  //     console.error('Update error:', error);
+  //     Alert.alert('Error', 'Something went wrong while updating photo.');
+  //   } finally {
+  //     setUploading(false);
+  //   }
+  // };
 
   const openZoom = idx => {
     setZoomIndex(idx);
@@ -203,7 +203,7 @@ export default function AllPhoto() {
   };
 
   const renderItem = ({ item, index }) => {
-    const imageUrl = `http://www.makeahabit.com/api/v1/uploads/galary/${item.img}`;
+    const imageUrl = `https://www.makeahabit.com/api/v1/uploads/galary/${item.img}`;
     return (
       <Pressable onPress={() => openZoom(index)} style={styles.cardWrapper}>
         <Animated.View style={[styles.card, { opacity: fadeAnim }]}>
@@ -212,25 +212,16 @@ export default function AllPhoto() {
             style={styles.image}
             resizeMode="cover"
           />
-          <View style={styles.overlay}>
-            <Text numberOfLines={1} style={styles.imageName}>
-              {item?.img?.split('-')[1] || 'Photo'}
-            </Text>
-            <View style={styles.actions}>
-              <TouchableOpacity
-                onPress={() => updatePhoto(item._id)}
-                style={styles.editBtn}
-              >
-                <Icon name="pencil" size={22} color="#fff" />
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => deletePhoto(item._id)}
-                style={styles.deleteBtn}
-              >
-                <Icon name="delete" size={22} color="#fff" />
-              </TouchableOpacity>
-            </View>
-          </View>
+
+          {/* Delete Button at Top-Right */}
+          <TouchableOpacity
+            onPress={() => deletePhoto(item._id)}
+            style={styles.deleteBtnTopRight}
+          >
+            <Icon name="delete" size={22} color="#fff" />
+          </TouchableOpacity>
+
+          {/* Overlay removed as image name is not needed */}
         </Animated.View>
       </Pressable>
     );
@@ -287,7 +278,7 @@ export default function AllPhoto() {
             >
               <ImageViewer
                 imageUrls={gallery.map(item => ({
-                  url: `http://www.makeahabit.com/api/v1/uploads/galary/${item.img}`,
+                  url: `https://www.makeahabit.com/api/v1/uploads/galary/${item.img}`,
                 }))}
                 index={zoomIndex}
                 enableSwipeDown
@@ -439,7 +430,10 @@ const styles = StyleSheet.create({
     shadowColor: '#00D65F',
     shadowRadius: 2,
   },
-  deleteBtn: {
+  deleteBtnTopRight: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
     backgroundColor: '#ff4444',
     borderRadius: 8,
     padding: 7,
@@ -447,6 +441,15 @@ const styles = StyleSheet.create({
     shadowColor: '#ff4444',
     shadowRadius: 2,
   },
+
+  // deleteBtn: {
+  //   backgroundColor: '#ff4444',
+  //   borderRadius: 8,
+  //   padding: 7,
+  //   elevation: 3,
+  //   shadowColor: '#ff4444',
+  //   shadowRadius: 2,
+  // },
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.4)',

@@ -383,7 +383,7 @@ export default function Profile() {
           />
           <MenuCard
             icon="cube-outline"
-            label="Products"
+            label="Offers"
             onPress={() => navigation.navigate('AllProduct')}
           />
           <MenuCard
