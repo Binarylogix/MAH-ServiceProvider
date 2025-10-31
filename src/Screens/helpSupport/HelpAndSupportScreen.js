@@ -16,11 +16,11 @@ const { width } = Dimensions.get('window');
 
 const HelpAndSupportScreen = () => {
   const handleEmail = () => {
-    Linking.openURL('mailto:support@yourapp.com');
+    Linking.openURL('mailto:support@makeahabit.com');
   };
 
   const handleCall = () => {
-    Linking.openURL('tel:+1234567890');
+    Linking.openURL('tel:+917701076001');
   };
 
   const handleFAQ = () => {
@@ -51,7 +51,7 @@ const HelpAndSupportScreen = () => {
         <Icon name="phone" size={28} color="#01823A" />
         <View style={styles.cardText}>
           <Text style={styles.cardTitle}>Call Us</Text>
-          <Text style={styles.cardSubtitle}>+91 9898998989</Text>
+          <Text style={styles.cardSubtitle}>+91 7701076001</Text>
         </View>
         <MaterialIcons name="keyboard-arrow-right" size={28} color="#A0A0A0" />
       </TouchableOpacity>

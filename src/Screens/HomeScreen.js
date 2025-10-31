@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     height: 44,
     elevation: 2,
-    marginHorizontal:14,
+    marginHorizontal: 14,
   },
   searchInput: {
     flex: 1,

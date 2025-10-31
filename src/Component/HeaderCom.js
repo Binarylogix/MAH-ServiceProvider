@@ -1,26 +1,55 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  Dimensions,
-  TextInput,
   TouchableOpacity,
   Image,
   Linking,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import Icon from 'react-native-vector-icons/Feather';
 import { useNavigation } from '@react-navigation/native';
-import BorderCom from './BorderCom';
-import { useTranslation } from 'react-i18next';
+// import { useTranslation } from 'react-i18next';
 import { images } from '../constants';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
-const { width, height } = Dimensions.get('window');
-
-const HeaderCom = ({ userName = 'Rohit', currentLatLong }) => {
+const HeaderCom = ({ currentLatLong }) => {
   const navigation = useNavigation();
-  const { t } = useTranslation();
+  // const { t } = useTranslation();
+
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  console.log('profile data', userData);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const API_TOKEN = await AsyncStorage.getItem('userToken');
+      const userId = await AsyncStorage.getItem('userId');
+      // console.log('Fetched token:', userId);
+      try {
+        const response = await axios.get(
+          `https://www.makeahabit.com/api/v1/customer/getCustomerById/${userId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${API_TOKEN}`,
+            },
+          },
+        );
+        if (response.data) {
+          setUserData(response.data.data); // assumes username is at response.data.data.name or similar
+        }
+      } catch (error) {
+        console.log('API Error:', error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUserData();
+  }, []);
+
+  // Determine display name
+  const displayName = userData?.name || 'Rohit';
 
   return (
     <View style={styles.container}>
@@ -33,22 +62,49 @@ const HeaderCom = ({ userName = 'Rohit', currentLatLong }) => {
       >
         <Image
           source={images.logo}
-          style={{ width: 92, height: 50, resizeMode: 'cover' }}
+          style={{ width: 92, height: 60, resizeMode: 'contain' }}
         />
         <Image
           source={images.logo2}
-          style={{ width: 150, height: 25, resizeMode: 'cover' }}
+          style={{ width: 150, height: 25, resizeMode: 'contain' }}
         />
       </View>
-      {/* Search Bar */}
-      {/* <View style={styles.searchContainer}>
-        <Icon name="search" size={20} color="#888" />
-        <TextInput
-          placeholder="Search Anything..."
-          style={styles.searchInput}
-          placeholderTextColor="#888"
-        />
-      </View> */}
+
+      {/* Greeting + Location + Notification */}
+      <View style={styles.topRow}>
+        <View style={styles.greetingContainer}>
+          <Text style={styles.name}>Hi, {displayName}</Text>
+          <TouchableOpacity
+            style={styles.locationRow}
+            onPress={() => {
+              if (currentLatLong?.lat && currentLatLong?.lng) {
+                const url = `https://www.google.com/maps?q=${currentLatLong.lat},${currentLatLong.lng}`;
+                Linking.openURL(url).catch(err =>
+                  console.error('An error occurred', err),
+                );
+              }
+            }}
+          >
+            <View style={styles.locationContainer}>
+              <Image
+                source={require('../assets/Icons/location.png')}
+                style={styles.locationIcon}
+              />
+              <Text style={styles.locationText}>Bhopal, MP</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+        <TouchableOpacity
+          style={styles.notificationBtn}
+          onPress={() => navigation.navigate('Notification')}
+        >
+          <Image
+            source={require('../assets/Icons/notification.png')}
+            style={styles.locationIcon}
+          />
+        </TouchableOpacity>
+      </View>
+      {/* Search Bar (commented out) */}
     </View>
   );
 };
