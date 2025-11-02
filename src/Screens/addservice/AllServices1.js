@@ -986,12 +986,14 @@ const AllServices1 = ({ route }) => {
     }
   }, [iconSearch, icons, selectedIcon]);
 
+  console.log('Category ID:', categoryId);
+
   // Fetch services API
   const fetchServices = async () => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `https://www.makeahabit.com/api/v1/service/getAllByServiceCategory/${categoryId}`,
+        `https://www.makeahabit.com/api/v1/vendorservicedetail/getVendorServiceDetailsByUser/${categoryId}`,
       );
       if (response.data?.success) setServices(response.data.services);
       else Alert.alert('Error', 'Failed to load services');
@@ -1002,6 +1004,8 @@ const AllServices1 = ({ route }) => {
       setLoading(false);
     }
   };
+
+  console.log('Services:', services);
 
   // Fetch icons API
   const fetchIcons = async () => {

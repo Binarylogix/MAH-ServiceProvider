@@ -70,40 +70,6 @@ const HeaderCom = ({ currentLatLong }) => {
         />
       </View>
 
-      {/* Greeting + Location + Notification */}
-      <View style={styles.topRow}>
-        <View style={styles.greetingContainer}>
-          <Text style={styles.name}>Hi, {displayName}</Text>
-          <TouchableOpacity
-            style={styles.locationRow}
-            onPress={() => {
-              if (currentLatLong?.lat && currentLatLong?.lng) {
-                const url = `https://www.google.com/maps?q=${currentLatLong.lat},${currentLatLong.lng}`;
-                Linking.openURL(url).catch(err =>
-                  console.error('An error occurred', err),
-                );
-              }
-            }}
-          >
-            <View style={styles.locationContainer}>
-              <Image
-                source={require('../assets/Icons/location.png')}
-                style={styles.locationIcon}
-              />
-              <Text style={styles.locationText}>Bhopal, MP</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
-        <TouchableOpacity
-          style={styles.notificationBtn}
-          onPress={() => navigation.navigate('Notification')}
-        >
-          <Image
-            source={require('../assets/Icons/notification.png')}
-            style={styles.locationIcon}
-          />
-        </TouchableOpacity>
-      </View>
       {/* Search Bar (commented out) */}
     </View>
   );
@@ -127,4 +93,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#000',
   },
+  locationIcon:{
+    width: 16,
+    height: 16,
+    resizeMode: 'contain',
+  }
 });

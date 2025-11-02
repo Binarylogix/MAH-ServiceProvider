@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginTop: 4,
   },
-  quickRow: { flexDirection: 'row', marginVertical: 8 },
+  quickRow: { flexDirection: 'row', marginVertical: 8},
   sectionTitle: {
     fontWeight: 'bold',
     fontSize: 18,
