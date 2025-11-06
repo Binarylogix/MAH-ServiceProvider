@@ -137,7 +137,7 @@ export default function VendorHome() {
       style={{ flex: 1 }}
     >
       <ScrollView style={styles.container}>
-        <HeaderCom data={vendor} />
+        {/* <HeaderCom data={vendor} /> */}
         {/* Header */}
         <View style={styles.header}>
           <Image

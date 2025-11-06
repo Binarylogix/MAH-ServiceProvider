@@ -1,12 +1,13 @@
-// src/components/AppPermissionHandler.js
 import React, { useEffect } from 'react';
 import { Alert, PermissionsAndroid, Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
-  request,
+  openSettings,
+  checkNotifications,
+  requestNotifications,
   PERMISSIONS,
   RESULTS,
-  openSettings,
+  request,
 } from 'react-native-permissions';
 
 export default function AppPermissionHandler() {
@@ -14,7 +15,7 @@ export default function AppPermissionHandler() {
     requestAppPermissionsOnce();
   }, []);
 
-  // ✅ Ask permissions only first time
+  // ✅ Ask permissions only the first time
   const requestAppPermissionsOnce = async () => {
     try {
       const permissionAsked = await AsyncStorage.getItem('permissionAsked');
@@ -26,30 +27,57 @@ export default function AppPermissionHandler() {
         await requestIOSPermissions();
       }
 
-      // Mark as done
       await AsyncStorage.setItem('permissionAsked', 'true');
     } catch (error) {
       console.warn('Permission check failed:', error);
     }
   };
 
-  // 📱 Android Permissions
+  // 📱 Android — request only Location + Notification permissions
   const requestAndroidPermissions = async () => {
     try {
-      const granted = await PermissionsAndroid.requestMultiple([
-        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-      ]);
+      const permissions = [PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION];
+      const granted = await PermissionsAndroid.requestMultiple(permissions);
 
       const allGranted = Object.values(granted).every(
         status => status === PermissionsAndroid.RESULTS.GRANTED,
       );
 
+      // ✅ Request notification permission
+      if (Platform.Version >= 33) {
+        const { status: notifStatus } = await requestNotifications([
+          'alert',
+          'badge',
+          'sound',
+        ]);
+        if (notifStatus !== 'granted') {
+          Alert.alert(
+            'Notification Permission',
+            'Please enable notifications to stay updated.',
+            [
+              { text: 'Cancel', style: 'cancel' },
+              { text: 'Open Settings', onPress: () => openSettings() },
+            ],
+          );
+        }
+      } else {
+        const { status } = await checkNotifications();
+        if (status !== 'granted') {
+          Alert.alert(
+            'Notifications Disabled',
+            'Please enable notifications from settings.',
+            [
+              { text: 'Cancel', style: 'cancel' },
+              { text: 'Open Settings', onPress: () => openSettings() },
+            ],
+          );
+        }
+      }
+
       if (!allGranted) {
         Alert.alert(
-          'Permissions Required',
-          'Some permissions were denied. Please allow access from app settings for full functionality.',
+          'Location Required',
+          'Please allow location access for better experience.',
           [
             { text: 'Cancel', style: 'cancel' },
             { text: 'Open Settings', onPress: () => openSettings() },
@@ -61,22 +89,27 @@ export default function AppPermissionHandler() {
     }
   };
 
-  // 🍎 iOS Permissions
+  // 🍎 iOS — request only Location + Notification permissions
   const requestIOSPermissions = async () => {
     try {
-      const results = await Promise.all([
-        request(PERMISSIONS.IOS.PHOTO_LIBRARY),
-        request(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE),
-      ]);
-
-      const denied = results.some(
-        result => result !== RESULTS.GRANTED && result !== RESULTS.LIMITED,
+      const locationResult = await request(
+        PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,
       );
 
-      if (denied) {
+      const { status: notifStatus } = await requestNotifications([
+        'alert',
+        'badge',
+        'sound',
+      ]);
+
+      if (
+        (locationResult !== RESULTS.GRANTED &&
+          locationResult !== RESULTS.LIMITED) ||
+        notifStatus !== 'granted'
+      ) {
         Alert.alert(
-          'Permissions Required',
-          'Please enable photo and location permissions from Settings.',
+          'Permissions Needed',
+          'Please enable Location and Notifications from Settings.',
           [
             { text: 'Cancel', style: 'cancel' },
             { text: 'Open Settings', onPress: () => openSettings() },

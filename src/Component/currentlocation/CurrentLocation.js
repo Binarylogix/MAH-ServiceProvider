@@ -54,5 +54,5 @@ export default function CurrentLocation() {
 
   if (!locationName) return <Text>Fetching location...</Text>;
 
-  return <Text style={{ color: '#696968', fontSize: 14 }}>{locationName}</Text>;
+  return <Text style={{ color: '#696968', fontSize: 12 }}>{locationName}</Text>;
 }
