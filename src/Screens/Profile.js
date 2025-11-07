@@ -24,6 +24,7 @@ export default function Profile() {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const { vendor, loading, error } = useSelector(state => state.vendorDetails);
+  console.log('Vendor Details:', vendor);
 
   useEffect(() => {
     dispatch(fetchVendorDetails());
@@ -83,8 +84,8 @@ export default function Profile() {
           <View style={styles.profileCard}>
             <Image
               source={
-                vendor?.data?.profileImage
-                  ? { uri: vendor.data.profileImage }
+                vendor?.data?.businessCard
+                  ? { uri: `https://www.makeahabit.com/api/v1/uploads/business/${vendor?.data?.businessCard}` }
                   : defaultProfileImg
               }
               style={styles.avatar}
@@ -117,17 +118,16 @@ export default function Profile() {
 
         {/* Menu Section */}
         <View style={styles.menucard}>
-          <MenuCard icon="translate" label="Language" onPress={() => {}} />
-          <MenuCard icon="car-wash" label="Service" onPress={() => navigation.navigate('AllServices')} />
-          <MenuCard icon="account-outline" label="Staff" onPress={() => navigation.navigate('AllStaff')} />
-          <MenuCard icon="cube-outline" label="Offers" onPress={() => navigation.navigate('AllProduct')} />
-          <MenuCard icon="image-multiple-outline" label="Gallery" onPress={() => navigation.navigate('AllPhoto')} />
+          
+          <MenuCard icon="layers" label="Service" onPress={() => navigation.navigate('AllServices')} />
+          <MenuCard icon="users" label="Staff" onPress={() => navigation.navigate('AllStaff')} />
+          <MenuCard icon="gift" label="Offers" onPress={() => navigation.navigate('AllProduct')} />
+          <MenuCard icon="image" label="Photos" onPress={() => navigation.navigate('AllPhoto')} />
           <MenuCard icon="help-circle" label="FAQ" onPress={() => navigation.navigate('FAQScreen')} />
-          <MenuCard icon="information-outline" label="Help and Support" onPress={() => navigation.navigate('HelpAndSupportScreen')} />
-          <MenuCard icon="clipboard-text-outline" label="Terms & Conditions" onPress={() => {}} />
-          <MenuCard icon="shield-account-outline" label="Privacy and Policy" onPress={() => navigation.navigate('PrivacyPolicyScreen')} />
-          <MenuCard icon="star" label="Rate Us" onPress={() => navigation.navigate('RateUsScreen')} />
-          <MenuCard icon="logout" label="Log out" highlight={true} onPress={handleLogout} />
+          <MenuCard icon="headphones" label="Help and Support" onPress={() => navigation.navigate('HelpAndSupportScreen')} />
+          <MenuCard icon="file" label="Terms & Conditions" onPress={() => {}} />
+          <MenuCard icon="shield" label="Privacy and Policy" onPress={() => navigation.navigate('PrivacyPolicyScreen')} />
+          <MenuCard icon="log-out" label="Log out" highlight={true} onPress={handleLogout} />
         </View>
 
       </ScrollView>
@@ -136,7 +136,7 @@ export default function Profile() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f3f7f5' },
+  container: { flex: 1,  backgroundColor: '#fff' },
 
   center: { justifyContent: 'center', alignItems: 'center' },
 
@@ -154,9 +154,7 @@ const styles = StyleSheet.create({
   },
 
   profileCard: {
-    backgroundColor: '#fff',
     borderRadius: 22,
-    paddingVertical: 30,
     paddingHorizontal: 25,
     alignItems: 'center',
     elevation: 10,
@@ -172,7 +170,9 @@ const styles = StyleSheet.create({
     borderRadius: 55,
     marginBottom: 15,
     borderWidth: 3,
-    borderColor: '#00c45a',
+    borderColor: '#fff',
+    objectFit: 'contain ',
+    resizeMode: 'contain ',
   },
 
   profileName: {
@@ -209,6 +209,6 @@ const styles = StyleSheet.create({
 
   menucard: {
     paddingHorizontal: 18,
-    paddingTop: 10,
+    marginTop: 20,
   },
 });

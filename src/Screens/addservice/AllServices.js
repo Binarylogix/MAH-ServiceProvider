@@ -177,13 +177,13 @@ const CategoryManager = () => {
     <View style={styles.container}>
       <HeaderLeft title={'Manage Categories'} />
 
-      <TouchableOpacity
+      {/* <TouchableOpacity
         style={styles.addButton}
         onPress={() => setShowModal(true)}
       >
         <MaterialCommunityIcons name="plus" color="#fff" size={22} />
         <Text style={styles.addButtonText}>Add Category</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
 
       {loading ? (
         <ActivityIndicator size="large" color="#14ad5f" />
@@ -355,6 +355,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#fafafa',
     padding: 10,
+    marginTop: 10,
     borderRadius: 12,
     marginBottom: 10,
     shadowColor: '#000',

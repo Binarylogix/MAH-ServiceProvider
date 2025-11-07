@@ -142,8 +142,8 @@ export default function VendorHome() {
         <View style={styles.header}>
           <Image
             source={
-              vendor?.profileImage
-                ? { uri: vendor.profileImage }
+              vendor?.data?.businessCard
+                ? { uri: `https://www.makeahabit.com/api/v1/uploads/business/${vendor?.data?.businessCard}` }
                 : defaultProfile
             }
             style={styles.profileImg}
