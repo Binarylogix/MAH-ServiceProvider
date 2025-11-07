@@ -89,13 +89,13 @@ export default function VendorRegistration({ navigation }) {
   useEffect(() => {
     if (success && data) {
       Alert.alert('Success', 'Business registered successfully!');
-      console.log('data of ctt redux : ', data);
+      // console.log('data of ctt redux : ', data);
       if (data?.data?.role === 1) {
         const token = data?.token;
         const userId = data?.data?._id;
         AsyncStorage.getItem('vendorToken', token);
         AsyncStorage.getItem('vendorId', userId);
-        console.log('token id saved');
+        // console.log('token id saved');
         navigation.navigate('VendorTab');
       }
       dispatch(resetVendorState());
@@ -205,9 +205,8 @@ export default function VendorRegistration({ navigation }) {
 
   return (
     <ScrollView style={styles.container} keyboardShouldPersistTaps="handled">
-            <Text style={styles.title}>Business Registration</Text>     {' '}
-      {/* Owner Details */}     {' '}
-      <Text style={styles.sectionLabel}>Owner Details</Text>     
+      <Text style={styles.title}>Registration</Text> {/* Owner Details */}{' '}
+      <Text style={styles.sectionLabel}>Owner Details</Text>{' '}
       <ImageUpload
         label="Upload Profile Image"
         icon="account-circle-outline"
@@ -216,8 +215,7 @@ export default function VendorRegistration({ navigation }) {
         onRemove={() => removeImage('profileImage')}
         onPreview={setImagePreviewUri}
         error={errors.profileImage}
-      />
-           {' '}
+      />{' '}
       <FormInput
         label="Full Name"
         icon="account-outline"
@@ -225,8 +223,7 @@ export default function VendorRegistration({ navigation }) {
         onChangeText={text => updateField('fullName', text)}
         placeholder="Enter full name"
         error={errors.fullName}
-      />
-           {' '}
+      />{' '}
       <FormInput
         label="Mobile Number"
         icon="phone"
@@ -235,8 +232,7 @@ export default function VendorRegistration({ navigation }) {
         keyboardType="phone-pad"
         placeholder="10-digit mobile number"
         error={errors.mobileNumber}
-      />
-           {' '}
+      />{' '}
       <FormInput
         label="Email"
         icon="email"
@@ -246,7 +242,7 @@ export default function VendorRegistration({ navigation }) {
         placeholder="you@example.com"
         error={errors.email}
       />
-            {/* Gender */}     {' '}
+      {/* Gender */}{' '}
       <CustomDropdown
         label="Gender"
         icon="gender-male-female"
@@ -259,48 +255,43 @@ export default function VendorRegistration({ navigation }) {
         ]}
         error={errors.gender}
       />
-            {/* Business Info */}     {' '}
-      <Text style={styles.sectionLabel}>Business Info</Text>     {' '}
+      {/* Business Info */}{' '}
+      <Text style={styles.sectionLabel}>Business Info</Text> {' '}
       <FormInput
         label="Business Name"
         icon="store-outline"
         value={form.businessName}
         onChangeText={text => updateField('businessName', text)}
         placeholder="Enter Business Name"
-      />
-           {' '}
+      />{' '}
       <FormInput
         label="Business Type"
         icon="briefcase-outline"
         value={form.businessType}
         onChangeText={text => updateField('businessType', text)}
         placeholder="Enter Business Type"
-      />
-           {' '}
+      />{' '}
       <FormInput
         label="Website Link"
         icon="web"
         value={form.websiteLink}
         onChangeText={text => updateField('websiteLink', text)}
         placeholder="Enter Website URL"
-      />
-           {' '}
+      />{' '}
       <FormInput
         label="Google Business Link"
         icon="google"
         value={form.googleBusinessLink}
         onChangeText={text => updateField('googleBusinessLink', text)}
         placeholder="Enter Google Business URL"
-      />
-           {' '}
+      />{' '}
       <FormInput
         label="Aadhar Number"
         icon="card-account-details-outline"
         value={form.aadharNumber}
         onChangeText={text => updateField('aadharNumber', text)}
         placeholder="Enter Aadhar number"
-      />
-           {' '}
+      />{' '}
       <FormInput
         label="GST Number"
         icon="file-document"
@@ -308,13 +299,12 @@ export default function VendorRegistration({ navigation }) {
         onChangeText={text => updateField('gstNumber', text)}
         placeholder="Enter GST number"
       />
-            {/* Categories */}     {' '}
+      {/* Categories */}{' '}
       <Text style={[styles.sectionLabel, { marginVertical: 10 }]}>
-                Category      {' '}
-      </Text>
-           {' '}
+        Category{' '}
+      </Text>{' '}
       <View style={styles.daysRow}>
-               {' '}
+        {' '}
         {categoryList.map(cat => (
           <TouchableOpacity
             key={cat._id}
@@ -325,7 +315,7 @@ export default function VendorRegistration({ navigation }) {
             ]}
             onPress={() => updateField('category', cat._id)}
           >
-                       {' '}
+            {' '}
             <Image
               source={{ uri: IMAGE_BASE_URL + (cat.img || cat.image) }}
               style={{
@@ -334,8 +324,7 @@ export default function VendorRegistration({ navigation }) {
                 borderRadius: 5,
                 marginBottom: 5,
               }}
-            />
-                       {' '}
+            />{' '}
             <Text
               style={[
                 styles.dayText,
@@ -343,16 +332,12 @@ export default function VendorRegistration({ navigation }) {
                 { textAlign: 'center' },
               ]}
             >
-                            {cat.name || cat.category_name}           {' '}
-            </Text>
-                     {' '}
+              {cat.name || cat.category_name}{' '}
+            </Text>{' '}
           </TouchableOpacity>
-        ))}
-             {' '}
-      </View>
-           {' '}
-      {errors.category && <Text style={styles.error}>{errors.category}</Text>} 
-         {' '}
+        ))}{' '}
+      </View>{' '}
+      {errors.category && <Text style={styles.error}>{errors.category}</Text>}{' '}
       <FormInput
         label="Description"
         icon="comment-outline"
@@ -360,8 +345,7 @@ export default function VendorRegistration({ navigation }) {
         onChangeText={text => updateField('description', text)}
         placeholder="Short business description"
         multiline
-      />
-           {' '}
+      />{' '}
       <ImageUpload
         label="Upload Pan Card"
         icon="card-account-details-outline"
@@ -370,8 +354,7 @@ export default function VendorRegistration({ navigation }) {
         onRemove={() => removeImage('panImage')}
         onPreview={setImagePreviewUri}
         error={errors.panImage}
-      />
-           {' '}
+      />{' '}
       <ImageUpload
         label="Upload Business Card"
         icon="credit-card-outline"
@@ -381,32 +364,29 @@ export default function VendorRegistration({ navigation }) {
         onPreview={setImagePreviewUri}
         error={errors.businessCardImage}
       />
-            {/* Address & Location */}     {' '}
-      <Text style={styles.sectionLabel}>Address & Location</Text>     {' '}
+      {/* Address & Location */}{' '}
+      <Text style={styles.sectionLabel}>Address & Location</Text>{' '}
       <FormInput
         label="Address"
         icon="home-map-marker"
         value={form.addressName}
         onChangeText={v => updateField('addressName', v)}
         placeholder="Shop/building address"
-      />
-           {' '}
+      />{' '}
       <FormInput
         label="State"
         icon="map-marker"
         value={form.state}
         onChangeText={v => updateField('state', v)}
         placeholder="e.g. Maharashtra"
-      />
-           {' '}
+      />{' '}
       <FormInput
         label="City"
         icon="city"
         value={form.city}
         onChangeText={v => updateField('city', v)}
         placeholder="e.g. Mumbai"
-      />
-           {' '}
+      />{' '}
       <FormInput
         label="Pin code"
         icon="google-maps"
@@ -414,22 +394,19 @@ export default function VendorRegistration({ navigation }) {
         onChangeText={v => updateField('pincode', v)}
         keyboardType="number-pad"
         placeholder="6-digit area code"
-      />
-           {' '}
+      />{' '}
       <TouchableOpacity
         style={[styles.button, { backgroundColor: '#14ad5f' }]}
         onPress={getCurrentLocation}
       >
-               {' '}
+        {' '}
         <Text style={[styles.buttonText, { color: '#fff' }]}>
-                    Autofill with Current Location        {' '}
-        </Text>
-             {' '}
+          Autofill with Current Location{' '}
+        </Text>{' '}
       </TouchableOpacity>
-            {/* Timings */}     {' '}
-      <Text style={styles.sectionLabel}>Timings</Text>     {' '}
+      {/* Timings */} <Text style={styles.sectionLabel}>Timings</Text>{' '}
       <View style={styles.daysRow}>
-               {' '}
+        {' '}
         {daysList.map(day => (
           <TouchableOpacity
             key={day}
@@ -439,95 +416,86 @@ export default function VendorRegistration({ navigation }) {
             ]}
             onPress={() => toggleDay(day)}
           >
-                       {' '}
+            {' '}
             <Text
               style={[
                 styles.dayText,
                 form.openingDays.includes(day) && styles.dayTextActive,
               ]}
             >
-                            {day}           {' '}
-            </Text>
-                     {' '}
+              {day}{' '}
+            </Text>{' '}
           </TouchableOpacity>
-        ))}
-             {' '}
-      </View>
-           {' '}
+        ))}{' '}
+      </View>{' '}
       <View style={styles.timeRowContainer}>
-               {' '}
+        {' '}
         <TouchableOpacity
           style={styles.timeBox}
           onPress={() => setShowTimePicker({ type: 'opening', visible: true })}
         >
-                   {' '}
+          {' '}
           <MaterialCommunityIcons
             name="clock-outline"
             size={20}
             color="#14ad5f"
-          />
-                   {' '}
+          />{' '}
           <Text style={styles.timeText}>
-                        {form.openingTime ? form.openingTime : 'Opening Time'} 
-                   {' '}
-          </Text>
-                 {' '}
-        </TouchableOpacity>
-               {' '}
+            {form.openingTime ? form.openingTime : 'Opening Time'}{' '}
+          </Text>{' '}
+        </TouchableOpacity>{' '}
         <TouchableOpacity
           style={styles.timeBox}
           onPress={() => setShowTimePicker({ type: 'closing', visible: true })}
         >
-                   {' '}
-          <MaterialCommunityIcons name="clock-end" size={20} color="#14ad5f" /> 
-                 {' '}
+          {' '}
+          <MaterialCommunityIcons
+            name="clock-outline"
+            size={20}
+            color="#14ad5f"
+          />{' '}
           <Text style={styles.timeText}>
-                        {form.closingTime ? form.closingTime : 'Closing Time'} 
-                   {' '}
-          </Text>
-                 {' '}
-        </TouchableOpacity>
-             {' '}
+            {form.closingTime ? form.closingTime : 'Closing Time'}{' '}
+          </Text>{' '}
+        </TouchableOpacity>{' '}
       </View>
-            {/* Loader */}     {' '}
-      {loading && <ActivityIndicator size="large" color="#14ad5f" />}     {' '}
-      {/* Submit */}     {' '}
+      {/* Loader */}{' '}
+      {loading && <ActivityIndicator size="large" color="#14ad5f" />}{' '}
+      {/* Submit */}{' '}
       <TouchableOpacity style={styles.button} onPress={validateForm}>
-                <Text style={styles.buttonText}>Register Business</Text>     {' '}
+        <Text style={styles.buttonText}>Register Business</Text>{' '}
       </TouchableOpacity>
-            {/* Category modal for list selection by name if preferred */}     {' '}
+      {/* Category modal for list selection by name if preferred */}{' '}
       <Modal visible={false} transparent animationType="fade">
-                {/* Custom category modal if desired */}     {' '}
+        {/* Custom category modal if desired */}{' '}
       </Modal>
-            {/* Full Image Preview Modal */}     {' '}
+      {/* Full Image Preview Modal */}{' '}
       <Modal
         visible={!!imagePreviewUri}
         transparent
         animationType="fade"
         onRequestClose={() => setImagePreviewUri(null)}
       >
-               {' '}
+        {' '}
         <View style={styles.modalOverlay}>
-                   {' '}
+          {' '}
           <Image
             source={{ uri: imagePreviewUri }}
             style={styles.fullImage}
             resizeMode="contain"
-          />
-                   {' '}
+          />{' '}
           <TouchableOpacity
             style={styles.closeModalBtn}
             onPress={() => setImagePreviewUri(null)}
           >
-                       {' '}
-            <Text style={{ fontWeight: 'bold', color: '#fff' }}>CLOSE</Text>   
-                 {' '}
-          </TouchableOpacity>
-                 {' '}
-        </View>
-             {' '}
+            {' '}
+            <Text style={{ fontWeight: 'bold', color: '#fff' }}>
+              CLOSE
+            </Text>{' '}
+          </TouchableOpacity>{' '}
+        </View>{' '}
       </Modal>
-            {/* Time Picker */}     {' '}
+      {/* Time Picker */}{' '}
       {showTimePicker.visible && (
         <DateTimePicker
           value={new Date()}
@@ -536,8 +504,7 @@ export default function VendorRegistration({ navigation }) {
           display="default"
           onChange={handleTimeChange}
         />
-      )}
-         {' '}
+      )}{' '}
     </ScrollView>
   );
 }
@@ -554,47 +521,43 @@ function CustomDropdown({
   const selectedLabel = options.find(opt => opt.value === selectedValue)?.label;
   return (
     <View style={{ marginBottom: 12 }}>
-            <Text style={styles.inputLabel}>{label}</Text>     {' '}
+      <Text style={styles.inputLabel}>{label}</Text>     {' '}
       <TouchableOpacity
         style={[styles.dropdownToggle, error && { borderColor: 'crimson' }]}
         onPress={() => setVisible(!visible)}
         accessible
         accessibilityLabel={`${label} dropdown`}
       >
-               {' '}
+        {' '}
         <MaterialCommunityIcons
           name={icon}
           size={22}
           color="#14ad5f"
           style={{ marginRight: 8 }}
-        />
-               {' '}
+        />{' '}
         <Text
           style={[
             styles.dropdownToggleText,
             !selectedValue ? { color: '#999' } : { color: '#222' },
           ]}
         >
-                    {selectedLabel || `Select ${label}`}       {' '}
-        </Text>
-               {' '}
+          {selectedLabel || `Select ${label}`}{' '}
+        </Text>{' '}
         <MaterialCommunityIcons
           name={visible ? 'chevron-up' : 'chevron-down'}
           size={24}
           color="#14ad5f"
-        />
-             {' '}
-      </TouchableOpacity>
-           {' '}
+        />{' '}
+      </TouchableOpacity>{' '}
       <Modal visible={visible} transparent animationType="fade">
-               {' '}
+        {' '}
         <TouchableOpacity
           style={styles.modalOverlay}
           onPress={() => setVisible(false)}
         >
-                   {' '}
+          {' '}
           <View style={styles.dropdownList}>
-                       {' '}
+            {' '}
             <FlatList
               data={options}
               keyExtractor={item => item.value}
@@ -606,26 +569,20 @@ function CustomDropdown({
                     setVisible(false);
                   }}
                 >
-                                   {' '}
-                  <Text style={styles.dropdownItemText}>{item.label}</Text>     
-                           {' '}
+                  {' '}
+                  <Text style={styles.dropdownItemText}>{item.label}</Text>{' '}
                 </TouchableOpacity>
               )}
               nestedScrollEnabled
-            />
-                     {' '}
-          </View>
-                 {' '}
-        </TouchableOpacity>
-             {' '}
-      </Modal>
-           {' '}
+            />{' '}
+          </View>{' '}
+        </TouchableOpacity>{' '}
+      </Modal>{' '}
       {error && (
         <Text style={{ color: 'crimson', marginTop: 2, fontSize: 12 }}>
-                    {error}       {' '}
+          {error}{' '}
         </Text>
-      )}
-         {' '}
+      )}{' '}
     </View>
   );
 }
@@ -633,25 +590,23 @@ function CustomDropdown({
 function FormInput({ label, icon, style, error, ...props }) {
   return (
     <View style={[styles.inputRow, style]}>
-           {' '}
+      {' '}
       <MaterialCommunityIcons
         name={icon}
         size={22}
         color="#14ad5f"
         style={{ marginRight: 8 }}
-      />
-           {' '}
+      />{' '}
       <View style={{ flex: 1 }}>
-                <Text style={styles.inputLabel}>{label}</Text>       {' '}
+        <Text style={styles.inputLabel}>{label}</Text>{' '}
         <TextInput
           style={styles.input}
           placeholder={props.placeholder || `Enter ${label}`}
           placeholderTextColor="#bbb"
           {...props}
         />
-                {error && <Text style={styles.error}>{error}</Text>}     {' '}
-      </View>
-         {' '}
+        {error && <Text style={styles.error}>{error}</Text>} {' '}
+      </View>{' '}
     </View>
   );
 }
@@ -667,7 +622,7 @@ function ImageUpload({
 }) {
   return (
     <View style={{ marginBottom: 10 }}>
-           {' '}
+      {' '}
       <TouchableOpacity
         style={styles.uploadBox}
         onPress={onPress}
@@ -679,21 +634,17 @@ function ImageUpload({
         {image && (
           <TouchableOpacity onPress={() => onPreview(image)}>
             {' '}
-            <Image source={{ uri: image }} style={styles.previewImage} />       
-             {' '}
+            <Image source={{ uri: image }} style={styles.previewImage} />{' '}
           </TouchableOpacity>
-        )}
-             {' '}
-      </TouchableOpacity>
-           {' '}
+        )}{' '}
+      </TouchableOpacity>{' '}
       {image && (
         <TouchableOpacity style={styles.removeBtn} onPress={onRemove}>
-                   {' '}
-          <Text style={{ color: '#c00', fontWeight: 'bold' }}>Remove</Text>     
-           {' '}
+          {' '}
+          <Text style={{ color: '#c00', fontWeight: 'bold' }}>Remove</Text>{' '}
         </TouchableOpacity>
       )}
-            {error && <Text style={styles.error}>{error}</Text>}   {' '}
+      {error && <Text style={styles.error}>{error}</Text>}   {' '}
     </View>
   );
 }
@@ -778,7 +729,7 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   dayBtnSelected: { backgroundColor: '#14ad5f33' },
-  dayText: { color: '#222', fontWeight: '600', fontSize: 13 },
+  dayText: { color: '#222', padding: 6, fontWeight: '600', fontSize: 13 },
   dayTextActive: { color: '#14ad5f' },
   timeRowContainer: {
     flexDirection: 'row',

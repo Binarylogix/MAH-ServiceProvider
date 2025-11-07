@@ -566,9 +566,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   gradientButton: {
-    paddingVertical: width * 0.045,
-    borderRadius: 30,
+    // paddingVertical: width * 0.045,
+    height: 50,
+    borderRadius: 20,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   buttonText: { color: '#fff', fontSize: width * 0.045, fontWeight: 'bold' },
 });

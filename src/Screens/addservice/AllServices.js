@@ -35,6 +35,7 @@ const CategoryManager = () => {
   const [loading, setLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  console.log('categories', categories);
 
   // ✅ Fetch categories
   const fetchCategories = async () => {
@@ -43,12 +44,14 @@ const CategoryManager = () => {
       const token = await AsyncStorage.getItem('vendorToken');
       if (!vendorId || !token) return;
 
+      console.log('Fetching categories for vendorId:', vendorId);
+
       setLoading(true);
       const res = await axios.get(
-        `https://www.makeahabit.com/api/v1/servicecategory/getServiceCategoryByVendorId/${vendorId}`,
+        `https://www.makeahabit.com/api/v1/newservicecategories/listByCategory/${vendor?.data?.category}`,
         { headers: { Authorization: `Bearer ${token}` } },
       );
-      console.log(res.data.data);
+      console.log('new data', res.data.categories);
       setCategories(res?.data?.data || []);
     } catch (err) {
       console.log(
@@ -174,13 +177,13 @@ const CategoryManager = () => {
     <View style={styles.container}>
       <HeaderLeft title={'Manage Categories'} />
 
-      <TouchableOpacity
+      {/* <TouchableOpacity
         style={styles.addButton}
         onPress={() => setShowModal(true)}
       >
         <MaterialCommunityIcons name="plus" color="#fff" size={22} />
         <Text style={styles.addButtonText}>Add Category</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
 
       {loading ? (
         <ActivityIndicator size="large" color="#14ad5f" />
@@ -194,7 +197,7 @@ const CategoryManager = () => {
               onPress={() =>
                 navigation.navigate('AllServices1', {
                   categoryId: item._id,
-                  categoryName: item.serviceCategory,
+                  categoryName: item.serviceCategoryName,
                   categoryImage: item.icon?.img,
                 })
               }
@@ -216,7 +219,7 @@ const CategoryManager = () => {
                   />
                 </View>
               )}
-              <Text style={styles.cardText}>{item.serviceCategory}</Text>
+              <Text style={styles.cardText}>{item.serviceCategoryName}</Text>
               <MaterialCommunityIcons
                 name="chevron-right"
                 size={26}
@@ -352,6 +355,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#fafafa',
     padding: 10,
+    marginTop: 10,
     borderRadius: 12,
     marginBottom: 10,
     shadowColor: '#000',

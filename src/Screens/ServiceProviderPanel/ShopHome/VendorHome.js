@@ -142,8 +142,8 @@ export default function VendorHome() {
         <View style={styles.header}>
           <Image
             source={
-              vendor?.profileImage
-                ? { uri: vendor.profileImage }
+              vendor?.data?.businessCard
+                ? { uri: `https://www.makeahabit.com/api/v1/uploads/business/${vendor?.data?.businessCard}` }
                 : defaultProfile
             }
             style={styles.profileImg}
@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginTop: 4,
   },
-  quickRow: { flexDirection: 'row', marginVertical: 8 },
+  quickRow: { flexDirection: 'row', marginVertical: 8},
   sectionTitle: {
     fontWeight: 'bold',
     fontSize: 18,

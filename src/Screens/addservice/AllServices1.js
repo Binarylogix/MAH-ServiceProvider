@@ -922,6 +922,7 @@ import { useNavigation } from '@react-navigation/native';
 
 const AllServices1 = ({ route }) => {
   const { categoryId, categoryName, categoryImage } = route.params;
+  // console.log('kdkbbvbvd', route.params);
 
   const navigation = useNavigation();
 
@@ -986,14 +987,20 @@ const AllServices1 = ({ route }) => {
     }
   }, [iconSearch, icons, selectedIcon]);
 
+  // console.log('Category ID:', categoryId);
+
   // Fetch services API
   const fetchServices = async () => {
     try {
+      const vendorId = await AsyncStorage.getItem('vendorId');
+      console.log('catid', vendorId);
       setLoading(true);
       const response = await axios.get(
-        `https://www.makeahabit.com/api/v1/service/getAllByServiceCategory/${categoryId}`,
+        `https://www.makeahabit.com/api/v1/vendorservices/getVendorServicesByVendorAndCatId/${vendorId}/${categoryId}`,
       );
-      if (response.data?.success) setServices(response.data.services);
+      console.log('bfhjb', response.data);
+
+      if (response?.data?.data) setServices(response?.data?.data);
       else Alert.alert('Error', 'Failed to load services');
     } catch (error) {
       console.error('Error fetching services:', error);
@@ -1002,6 +1009,8 @@ const AllServices1 = ({ route }) => {
       setLoading(false);
     }
   };
+
+  console.log('Services:', services);
 
   // Fetch icons API
   const fetchIcons = async () => {
@@ -1222,10 +1231,10 @@ const AllServices1 = ({ route }) => {
   // Render single service item
   const renderService = ({ item }) => (
     <View style={styles.serviceCard}>
-      {item.icon && item.icon.img ? (
+      {item?.service?.icon && item?.service?.icon?.img ? (
         <Image
           source={{
-            uri: `https://www.makeahabit.com/api/v1/uploads/icon/${item.icon.img}`,
+            uri: `https://www.makeahabit.com/api/v1/uploads/icon/${item?.service?.icon?.img}`,
           }}
           style={styles.serviceImage}
         />
@@ -1235,7 +1244,7 @@ const AllServices1 = ({ route }) => {
         </View>
       )}
       <View style={{ flex: 1, marginLeft: 10 }}>
-        <Text style={styles.serviceName}>{item.name}</Text>
+        <Text style={styles.serviceName}>{item?.service?.serviceName}</Text>
         <Text style={styles.servicePrice}>₹{item.price}</Text>
       </View>
       <TouchableOpacity
@@ -1245,7 +1254,7 @@ const AllServices1 = ({ route }) => {
         <MaterialCommunityIcons name="pencil" size={22} color="#00D65F" />
       </TouchableOpacity>
       <TouchableOpacity
-        onPress={() => deleteService(item._id)}
+        onPress={() => deleteService(item?.service?._id)}
         style={styles.iconButton}
       >
         <MaterialCommunityIcons name="delete" size={22} color="#ff4444" />
@@ -1262,7 +1271,7 @@ const AllServices1 = ({ route }) => {
             {updatedCategoryImage ? (
               <Image
                 source={{
-                  uri: `https://www.makeahabit.com/api/v1/uploads/ServiceCategory/${updatedCategoryImage}`,
+                  uri: `https://www.makeahabit.com/api/v1/uploads/icon/${updatedCategoryImage}`,
                 }}
                 style={styles.categoryImage}
               />
@@ -1278,12 +1287,12 @@ const AllServices1 = ({ route }) => {
             <Text style={styles.categoryName}>{categoryNameInput}</Text>
           </View>
           <View style={styles.rightSide}>
-            <TouchableOpacity
+            {/* <TouchableOpacity
               style={[styles.categoryButton, { backgroundColor: '#0E86D4' }]}
               onPress={() => setUpdateCategoryModalVisible(true)}
             >
               <Text style={styles.addServiceButtonText}>Edit</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
             <TouchableOpacity
               style={[styles.addServiceButton, { marginTop: 10 }]}
               onPress={addService}
@@ -1293,7 +1302,7 @@ const AllServices1 = ({ route }) => {
           </View>
         </View>
 
-        <Text style={styles.servicesHeader}>Services</Text>
+        <Text style={styles.servicesHeader}>All Services</Text>
 
         {loading ? (
           <ActivityIndicator
@@ -1537,10 +1546,15 @@ const styles = StyleSheet.create({
     width: '100%',
     marginBottom: 20,
     justifyContent: 'space-between',
+    gap: 10,
   },
   leftSide: {
     flexDirection: 'column',
     alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    elevation: 3,
+    padding: 10,
     flex: 1,
   },
   rightSide: {
@@ -1558,7 +1572,7 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 12,
-    marginBottom: 10,
+    // marginBottom: 6,
   },
   imagePlaceholder: {
     backgroundColor: '#e6e6e6',
@@ -1566,7 +1580,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   categoryName: {
-    fontSize: 22,
+    fontSize: 18,
     fontWeight: '700',
     color: '#333',
     textAlign: 'center',
@@ -1576,6 +1590,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 8,
+    elevation: 3,
   },
   addServiceButtonText: {
     color: '#fff',

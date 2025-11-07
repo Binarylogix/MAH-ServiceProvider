@@ -41,8 +41,9 @@ export default function GradientButton({
 
 const styles = StyleSheet.create({
   gradientButton: {
-    padding: 16,
-    borderRadius: 15,
+    // padding: 16,
+    height: 50,
+    borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
   },

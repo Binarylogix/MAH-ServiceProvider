@@ -80,7 +80,6 @@ const AddOfferScreen = () => {
     <View style={styles.card}>
       {/* Decorative stripe on left */}
       <View style={styles.cardStripe} />
-
       <View style={{ flex: 1, paddingLeft: 12 }}>
         <Text style={styles.cardTitle}>{item.title}</Text>
         <Text style={styles.cardDesc}>{item.description}</Text>
@@ -99,8 +98,9 @@ const AddOfferScreen = () => {
   return (
     <View style={styles.container}>
       {/* Header row: Offer Queries + Add Offer button */}
+
       <View style={styles.headerRow}>
-        <Text style={styles.headerText}>Offer Queries</Text>
+        <HeaderLeft title={'Offer'} />
         <TouchableOpacity
           style={styles.addBtn}
           onPress={() => setModalVisible(true)}
@@ -214,20 +214,7 @@ const AddOfferScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  card: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#ffffff',
-    borderRadius: 16,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 5,
-    padding: 16,
-    position: 'relative',
-  },
+  
   cardStripe: {
     width: 6,
     borderRadius: 4,
@@ -237,24 +224,12 @@ const styles = StyleSheet.create({
     top: 0,
     bottom: 0,
   },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#222',
-    marginBottom: 4,
-  },
-  cardDesc: {
-    fontSize: 14,
-    color: '#555',
-    marginBottom: 6,
-  },
-  cardInfo: {
-    fontSize: 12,
-    color: '#888',
-  },
+  
+ 
   discountBadge: {
     backgroundColor: '#00D65F',
     paddingVertical: 6,
+    marginTop: 10,
     paddingHorizontal: 12,
     borderRadius: 12,
     alignItems: 'center',
@@ -276,9 +251,13 @@ const styles = StyleSheet.create({
 
   addBtn: { alignSelf: 'flex-start' },
   addBtnGradient: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
+    height: 25,
+    // paddingVertical: 8,
+    // paddingHorizontal: 12,
     borderRadius: 10,
+    width: 100,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   addBtnText: { color: '#fff', fontWeight: '700', fontSize: 16 },
 

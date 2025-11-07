@@ -11,7 +11,7 @@ export default function AmountCard({
   return (
     <LinearGradient
       colors={['#00D65F', '#01823A']} // adjust colors to your brand or preference
-      style={{ flex: 1, borderRadius: 20 }}
+      style={{ flex: 1, borderRadius: 20 , marginBottom:12}}
     >
       <View style={styles.amountCard}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>

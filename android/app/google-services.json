@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "137283376475",
+    "project_id": "make-a-habit-12f1e",
+    "storage_bucket": "make-a-habit-12f1e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:137283376475:android:e3fcdb850954f59f65f67e",
+        "android_client_info": {
+          "package_name": "com.MakeahabitPartner"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA1E_lVCQUScTyeKcDJmdB-30ktlvmI-Sg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

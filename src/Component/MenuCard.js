@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Feather from 'react-native-vector-icons/Feather';
+
 
 export default function MenuCard({ icon, label, onPress, highlight }) {
   return (
@@ -10,12 +12,12 @@ export default function MenuCard({ icon, label, onPress, highlight }) {
       activeOpacity={0.7}
     >
       <View style={styles.leftGroup}>
-        <MaterialCommunityIcons
+        <Feather
           name={icon}
-          size={25}
-          color={highlight ? '#e04444' : 'green'}
+          size={22}
+          color={highlight ? '#e04444' : '#52bc79ff'}
         />
-        <Text style={[styles.label, highlight && { color: '#e04444' }]}>
+        <Text style={[styles.label, highlight && { color: '#e04444'  }]}>
           {label}
         </Text>
       </View>
@@ -38,7 +40,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#e7e8ec',
     justifyContent: 'space-between',
     paddingVertical: 17,
-    backgroundColor: '#fff',
+    backgroundColor: '#eeeeeeff',
     marginBottom: 10,
     borderRadius: 12,
     shadowColor: '#000',

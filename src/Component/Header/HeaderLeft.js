@@ -8,7 +8,8 @@ import {
   Platform,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
+import Feather from 'react-native-vector-icons/Feather';
+
 
 const SIZES = {
   width: Dimensions.get('window').width,
@@ -49,8 +50,8 @@ const HeaderLeft = ({ touchStyle, onPress, title, mainStyle, type }) => {
           activeOpacity={0.7}
         >
           <View style={styles.iconContainer}>
-            <FontAwesome6
-              name="arrow-left-long"
+            <Feather
+              name="arrow-left"
               style={styles.iconStyle}
               size={18}
               color="#000"

@@ -339,7 +339,9 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   AddBtn: {
-    padding: 6,
+    // padding: 6,
+    height: 30,
+    width: 80,
     borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
