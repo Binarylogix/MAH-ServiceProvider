@@ -207,7 +207,7 @@ export default function VendorRegistration({ navigation }) {
     <ScrollView style={styles.container} keyboardShouldPersistTaps="handled">
             <Text style={styles.title}>Business Registration</Text>     {' '}
       {/* Owner Details */}     {' '}
-      <Text style={styles.sectionLabel}>Owner Details</Text>     {' '}
+      <Text style={styles.sectionLabel}>Owner Details</Text>     
       <ImageUpload
         label="Upload Profile Image"
         icon="account-circle-outline"
