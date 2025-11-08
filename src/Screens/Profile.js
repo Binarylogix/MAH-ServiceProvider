@@ -14,7 +14,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import LinearGradient from 'react-native-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import MenuCard from '../Component/MenuCard';
-import { fetchVendorDetails, clearVendorDetails } from '../redux/Vendor/vendorDetailsSlice';
+import {
+  fetchVendorDetails,
+  clearVendorDetails,
+} from '../redux/Vendor/vendorDetailsSlice';
 
 const defaultProfileImg = {
   uri: 'https://randomuser.me/api/portraits/men/1.jpg',
@@ -24,7 +27,6 @@ export default function Profile() {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const { vendor, loading, error } = useSelector(state => state.vendorDetails);
-  console.log('Vendor Details:', vendor);
 
   useEffect(() => {
     dispatch(fetchVendorDetails());
@@ -72,7 +74,6 @@ export default function Profile() {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
-
         {/* Top Header Decorative Curve */}
         <LinearGradient
           colors={['#00D65F', '#009F4A']}
@@ -85,7 +86,9 @@ export default function Profile() {
             <Image
               source={
                 vendor?.data?.businessCard
-                  ? { uri: `https://www.makeahabit.com/api/v1/uploads/business/${vendor?.data?.businessCard}` }
+                  ? {
+                      uri: `https://www.makeahabit.com/api/v1/uploads/business/${vendor?.data?.businessCard}`,
+                    }
                   : defaultProfileImg
               }
               style={styles.avatar}
@@ -118,25 +121,61 @@ export default function Profile() {
 
         {/* Menu Section */}
         <View style={styles.menucard}>
-          
-          <MenuCard icon="layers" label="Service" onPress={() => navigation.navigate('AllServices')} />
-          <MenuCard icon="users" label="Staff" onPress={() => navigation.navigate('AllStaff')} />
-          <MenuCard icon="gift" label="Offers" onPress={() => navigation.navigate('AllProduct')} />
-          <MenuCard icon="image" label="Photos" onPress={() => navigation.navigate('AllPhoto')} />
-          <MenuCard icon="help-circle" label="FAQ" onPress={() => navigation.navigate('FAQScreen')} />
-          <MenuCard icon="headphones" label="Help and Support" onPress={() => navigation.navigate('HelpAndSupportScreen')} />
+          <MenuCard
+            icon="briefcase"
+            label="Business Profile"
+            onPress={() => navigation.navigate('Bprofile')}
+          />
+          <MenuCard
+            icon="layers"
+            label="Service"
+            onPress={() => navigation.navigate('AllServices')}
+          />
+          <MenuCard
+            icon="users"
+            label="Staff"
+            onPress={() => navigation.navigate('AllStaff')}
+          />
+          <MenuCard
+            icon="gift"
+            label="Offers"
+            onPress={() => navigation.navigate('AllProduct')}
+          />
+          <MenuCard
+            icon="image"
+            label="Photos"
+            onPress={() => navigation.navigate('AllPhoto')}
+          />
+          <MenuCard
+            icon="help-circle"
+            label="FAQ"
+            onPress={() => navigation.navigate('FAQScreen')}
+          />
+          <MenuCard
+            icon="headphones"
+            label="Help and Support"
+            onPress={() => navigation.navigate('HelpAndSupportScreen')}
+          />
           <MenuCard icon="file" label="Terms & Conditions" onPress={() => {}} />
-          <MenuCard icon="shield" label="Privacy and Policy" onPress={() => navigation.navigate('PrivacyPolicyScreen')} />
-          <MenuCard icon="log-out" label="Log out" highlight={true} onPress={handleLogout} />
+          <MenuCard
+            icon="shield"
+            label="Privacy and Policy"
+            onPress={() => navigation.navigate('PrivacyPolicyScreen')}
+          />
+          <MenuCard
+            icon="log-out"
+            label="Log out"
+            highlight={true}
+            onPress={handleLogout}
+          />
         </View>
-
       </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1,  backgroundColor: '#fff' },
+  container: { flex: 1, backgroundColor: '#fff' },
 
   center: { justifyContent: 'center', alignItems: 'center' },
 
@@ -157,7 +196,7 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     paddingHorizontal: 25,
     alignItems: 'center',
-    elevation: 10,
+    // elevation: 10,
     shadowColor: '#000',
     shadowOpacity: 0.15,
     shadowOffset: { width: 0, height: 3 },

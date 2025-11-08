@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -7,50 +7,10 @@ import {
   Image,
   Linking,
 } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import { useNavigation } from '@react-navigation/native';
-// import { useTranslation } from 'react-i18next';
+
 import { images } from '../constants';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
 
-const HeaderCom = ({ currentLatLong }) => {
-  const navigation = useNavigation();
-  // const { t } = useTranslation();
-
-  const [userData, setUserData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  console.log('profile data', userData);
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-      const API_TOKEN = await AsyncStorage.getItem('userToken');
-      const userId = await AsyncStorage.getItem('userId');
-      // console.log('Fetched token:', userId);
-      try {
-        const response = await axios.get(
-          `https://www.makeahabit.com/api/v1/customer/getCustomerById/${userId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${API_TOKEN}`,
-            },
-          },
-        );
-        if (response.data) {
-          setUserData(response.data.data); // assumes username is at response.data.data.name or similar
-        }
-      } catch (error) {
-        console.log('API Error:', error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchUserData();
-  }, []);
-
-  // Determine display name
-  const displayName = userData?.name || 'Rohit';
-
+const HeaderCom = () => {
   return (
     <View style={styles.container}>
       <View
@@ -93,9 +53,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#000',
   },
-  locationIcon:{
+  locationIcon: {
     width: 16,
     height: 16,
     resizeMode: 'contain',
-  }
+  },
 });

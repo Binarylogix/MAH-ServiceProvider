@@ -11,7 +11,6 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import QuickCard from '../../Quickcard/Quickcard';
 import AmountCard from '../../Amountcard/AmountCard';
@@ -20,14 +19,20 @@ import LinearGradient from 'react-native-linear-gradient';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import HeaderCom from '../../../Component/HeaderCom';
 import CurrentLocation from '../../../Component/currentlocation/CurrentLocation';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchVendorDetails } from '../../../redux/Vendor/vendorDetailsSlice';
 
 const defaultProfile = { uri: 'https://randomuser.me/api/portraits/men/1.jpg' };
 
 export default function VendorHome() {
-  const [vendor, setVendor] = useState(null);
-  const [locationName, setLocationName] = useState('Location');
-  const [coordinates, setCoordinates] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch();
+  const { vendor } = useSelector(state => state.vendorDetails);
+  console.log('vendordata', vendor);
+
+  // Fetch vendor details when component mounts
+  useEffect(() => {
+    dispatch(fetchVendorDetails());
+  }, [dispatch]);
   const navigation = useNavigation();
 
   const goToAddService = () => {
@@ -45,105 +50,21 @@ export default function VendorHome() {
     navigation.navigate('AllStaff');
   };
 
-  useEffect(() => {
-    const fetchVendorProfile = async () => {
-      try {
-        const token = await AsyncStorage.getItem('vendorToken');
-        const id = await AsyncStorage.getItem('vendorId');
-
-        if (!token) {
-          Alert.alert('Error', 'No token found, please log in again');
-          setLoading(false);
-          return;
-        }
-
-        const response = await fetch(
-          `https://www.makeahabit.com/api/v1/vendor/details/${id}`,
-          {
-            method: 'GET',
-            headers: {
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            },
-          },
-        );
-
-        const data = await response.json();
-
-        if (response.ok) {
-          setVendor(data);
-
-          if (data?.location?.coordinates) {
-            const [lng, lat] = data.location.coordinates;
-            setCoordinates({ lat, lng });
-
-            const geoRes = await fetch(
-              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`,
-            );
-            const geoData = await geoRes.json();
-
-            if (geoData?.address) {
-              const city =
-                geoData.address.city ||
-                geoData.address.town ||
-                geoData.address.village ||
-                '';
-              const state = geoData.address.state || '';
-              setLocationName(`${city}, ${state}`);
-            }
-          }
-        } else {
-          Alert.alert(
-            'Error',
-            data.message || 'Failed to fetch vendor details',
-          );
-        }
-      } catch (error) {
-        console.error(error);
-        Alert.alert('Error', 'Something went wrong while fetching data');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchVendorProfile();
-  }, []);
-
-  // const openMaps = () => {
-  //   if (coordinates) {
-  //     const url = `https://www.google.com/maps/search/?api=1&query=${coordinates.lat},${coordinates.lng}`;
-  //     Linking.openURL(url);
-  //   } else {
-  //     Alert.alert('Location not available');
-  //   }
-  // };
-
-  if (loading) {
-    return (
-      <View
-        style={[
-          styles.container,
-          { justifyContent: 'center', alignItems: 'center' },
-        ]}
-      >
-        <Text style={{ color: '#14AD5F', fontSize: 18 }}>Loading...</Text>
-      </View>
-    );
-  }
-
   return (
     <LinearGradient
       colors={['#e6f0c1ff', '#fbfffdff']} // adjust colors to your brand or preference
       style={{ flex: 1 }}
     >
       <ScrollView style={styles.container}>
-        {/* <HeaderCom data={vendor} /> */}
+        <HeaderCom />
         {/* Header */}
         <View style={styles.header}>
           <Image
             source={
               vendor?.data?.businessCard
-                ? { uri: `https://www.makeahabit.com/api/v1/uploads/business/${vendor?.data?.businessCard}` }
+                ? {
+                    uri: `https://www.makeahabit.com/api/v1/uploads/business/${vendor?.data?.businessCard}`,
+                  }
                 : defaultProfile
             }
             style={styles.profileImg}
@@ -153,23 +74,6 @@ export default function VendorHome() {
               Hi, {vendor?.data?.fullName || 'Salon Name'}
             </Text>
             <CurrentLocation />
-            {/* <TouchableOpacity
-              onPress={openMaps}
-              style={{ flexDirection: 'row', alignItems: 'center' }}
-            >
-              <MaterialIcons name="location-on" size={16} color="#696968ff" />
-              <Text
-                style={[
-                  styles.headerSub,
-                  {
-                    color: '#696968ff',
-                    marginLeft: 1,
-                  },
-                ]}
-              >
-                {locationName}
-              </Text>
-            </TouchableOpacity> */}
           </View>
 
           <TouchableOpacity
@@ -300,7 +204,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginTop: 4,
   },
-  quickRow: { flexDirection: 'row', marginVertical: 8},
+  quickRow: { flexDirection: 'row', marginVertical: 8 },
   sectionTitle: {
     fontWeight: 'bold',
     fontSize: 18,

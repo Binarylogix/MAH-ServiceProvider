@@ -373,7 +373,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#fff',
   },
-  addService: { color: '#000', fontWeight: 'bold', fontSize: 14 },
+  addService: { color: '#000', fontSize: 14 },
   loaderContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   emptyContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   emptyText: { color: '#777', fontSize: 16 },

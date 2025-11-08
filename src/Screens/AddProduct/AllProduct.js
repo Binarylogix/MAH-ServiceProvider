@@ -96,7 +96,10 @@ const AddOfferScreen = () => {
   );
 
   return (
-    <View style={styles.container}>
+    <LinearGradient
+      colors={['#e6f0c1ff', '#fbfffdff']} // adjust colors to your brand or preference
+      style={{ flex: 1, padding: 16 }}
+    >
       {/* Header row: Offer Queries + Add Offer button */}
 
       <View style={styles.headerRow}>
@@ -209,12 +212,11 @@ const AddOfferScreen = () => {
           </View>
         </View>
       </Modal>
-    </View>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
-  
   cardStripe: {
     width: 6,
     borderRadius: 4,
@@ -224,8 +226,7 @@ const styles = StyleSheet.create({
     top: 0,
     bottom: 0,
   },
-  
- 
+
   discountBadge: {
     backgroundColor: '#00D65F',
     paddingVertical: 6,

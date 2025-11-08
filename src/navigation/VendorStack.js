@@ -31,6 +31,7 @@ import FAQScreen from '../Screens/Faqscreen/FAQScreen';
 import RateUsScreen from '../Screens/RateUs/RateUsScreen';
 import HelpAndSupportScreen from '../Screens/helpSupport/HelpAndSupportScreen';
 import PrivacyPolicyScreen from '../Screens/privacyPolicy/PrivacyPolicyScreen';
+import BusinessProfile from '../Screens/editbProfile/BusinessProfile';
 const Stack = createNativeStackNavigator();
 export default function VendorStack() {
   return (
@@ -42,9 +43,7 @@ export default function VendorStack() {
       initialRouteName="SplaceScreen"
     >
       <Stack.Screen name="SplaceScreen" component={SplaceIndex} />
-
       <Stack.Screen name="CreateUserProfile" component={CreateUserProfile} />
-
       <Stack.Screen
         name="ShopProfile"
         component={ShopProfile}
@@ -55,8 +54,7 @@ export default function VendorStack() {
           headerTitleStyle: { fontSize: 18, fontWeight: 'bold' },
         }}
       />
-
-      {/* deliveryscr */}
+      {/* vendorscr */}
       <Stack.Screen name="VendorLogin" component={VenderLogin} />
       <Stack.Screen name="RootScreen" component={RootIndex} />
       <Stack.Screen name="VendorTab" component={VendorTab} />
@@ -71,6 +69,8 @@ export default function VendorStack() {
       <Stack.Screen name="AllStaff" component={AllStaff} />
       <Stack.Screen name="AllPhoto" component={AllPhoto} />
       <Stack.Screen name="AllProduct" component={AllProduct} />
+
+      <Stack.Screen name="Bprofile" component={BusinessProfile} />
       <Stack.Screen name="EditProfile" component={EditProfile} />
       <Stack.Screen name="AllServices1" component={AllServices1} />
       <Stack.Screen name="FAQScreen" component={FAQScreen} />
