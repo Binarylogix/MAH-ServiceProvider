@@ -27,7 +27,6 @@ const defaultProfile = { uri: 'https://randomuser.me/api/portraits/men/1.jpg' };
 export default function VendorHome() {
   const dispatch = useDispatch();
   const { vendor } = useSelector(state => state.vendorDetails);
-  console.log('vendordata', vendor);
 
   // Fetch vendor details when component mounts
   useEffect(() => {

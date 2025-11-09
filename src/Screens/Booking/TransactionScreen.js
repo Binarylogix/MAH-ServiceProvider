@@ -46,7 +46,7 @@ export default function TransactionScreen() {
               activeTab === 'today' && styles.tabTextActive,
             ]}
           >
-            TODAY TRANSACTION
+            Today's Transaction
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -62,14 +62,14 @@ export default function TransactionScreen() {
               activeTab === 'transaction' && styles.tabTextActive,
             ]}
           >
-            TRANSACTION
+            Transaction
           </Text>
         </TouchableOpacity>
       </View>
 
       {/* Transactions List */}
       <View style={styles.listWrapper}>
-        <Text style={styles.listTitle}>TRANSACTION</Text>
+        {/* <Text style={styles.listTitle}>TRANSACTION</Text> */}
         <FlatList
           data={transactions}
           keyExtractor={item => item.id}
@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
     color: '#14AD5F',
     fontWeight: 'bold',
     fontSize: 13,
-    borderBottomWidth: 1,
+    // borderBottomWidth: 1,
     borderBottomColor: '#14AD5F',
     padding: 10,
   },

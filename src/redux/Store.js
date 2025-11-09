@@ -7,6 +7,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import vendorAuthReducer from './Vendor/VendorAuthSlice';
 import vendorReducer from './Vendor/CreateVendorSlice';
 import vendorDetailsReducer from './Vendor/vendorDetailsSlice';
+import bookingReducer from './Vendor/BookingSlice';
 
 const store = configureStore({
   reducer: {
@@ -15,6 +16,7 @@ const store = configureStore({
     // CategoryList: CategoryListReducer,
     // serviceCategories: ServiceCategoryReducer,
     // counter: counterReducer,
+    booking: bookingReducer,
     vendorAuth: vendorAuthReducer,
     vendor: vendorReducer,
     vendorDetails: vendorDetailsReducer,

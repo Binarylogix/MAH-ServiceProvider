@@ -11,7 +11,7 @@ export default function AmountCard({
   return (
     <LinearGradient
       colors={['#00D65F', '#01823A']} // adjust colors to your brand or preference
-      style={{ flex: 1, borderRadius: 20 , marginBottom:12}}
+      style={{ flex: 1, borderRadius: 20, marginBottom: 12 }}
     >
       <View style={styles.amountCard}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -25,12 +25,12 @@ export default function AmountCard({
           <View style={styles.statCard}>
             <Icon name="check-all" size={20} color="#14AD5F" />
             <Text style={styles.statCardValue}>{completed}</Text>
-            <Text style={styles.statCardTitle}>Complete</Text>
+            <Text style={styles.statCardTitle}>Bookings Completed</Text>
           </View>
           <View style={[styles.statCard, { marginRight: 0 }]}>
             <Icon name="clock-outline" size={20} color="#14AD5F" />
             <Text style={styles.statCardValue}>{upcoming}</Text>
-            <Text style={styles.statCardTitle}>Upcoming</Text>
+            <Text style={styles.statCardTitle}>Upcoming Bookings</Text>
           </View>
         </View>
       </View>
@@ -64,9 +64,9 @@ const styles = StyleSheet.create({
   },
   statCardTitle: {
     color: '#2A2A2A',
-    fontWeight: '600',
+    fontWeight: '500',
     marginBottom: 2,
-    fontSize: 14,
+    fontSize: 12,
   },
   statCardValue: {
     color: '#14AD5F',

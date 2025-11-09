@@ -17,8 +17,7 @@ import RootIndex from '../Screens/root/RootIndex';
 import ShopProfile from '../Screens/ServiceProvidersList/ShopProfile';
 import VendorRegistration from '../Screens/ServiceProviderPanel/BusinessRegister/VendorRegistration';
 import VendorTab from './VendorTab';
-import AddService from '../Screens/addservice/AddService';
-import AddProduct from '../Screens/AddProduct/AddProduct';
+
 import AddPhotos from '../Screens/AddPhotos/AddPhotos';
 import AddStaff from '../Screens/AddStaff/AddStaff';
 import AllServices from '../Screens/addservice/AllServices';
@@ -61,8 +60,7 @@ export default function VendorStack() {
       <Stack.Screen name="VendorRegistration" component={VendorRegistration} />
       <Stack.Screen name="OwnerOtpIndex" component={OwnerOtpIndex} />
       <Stack.Screen name="OrderScreenIndex" component={OrderScreenIndex} />
-      <Stack.Screen name="AddService" component={AddService} />
-      <Stack.Screen name="AddProduct" component={AddProduct} />
+
       <Stack.Screen name="AddPhotos" component={AddPhotos} />
       <Stack.Screen name="AddStaff" component={AddStaff} />
       <Stack.Screen name="AllServices" component={AllServices} />

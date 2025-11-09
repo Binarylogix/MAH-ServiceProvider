@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 5,
   },
-  quickLabel: { color: '#333', fontWeight: '600', fontSize: 14 },
+  quickLabel: { color: '#2A2A2A', fontWeight: '500', fontSize: 13 },
   quickPlus: { color: '#bbb', fontSize: 19, fontWeight: 'bold', marginLeft: 9 },
   quickIcon: {
     // backgroundColor: '#00D65F',

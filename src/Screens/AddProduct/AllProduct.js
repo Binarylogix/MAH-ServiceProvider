@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -10,85 +10,90 @@ import {
   Image,
   Alert,
   FlatList,
+  ActivityIndicator,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { launchImageLibrary } from 'react-native-image-picker';
 import HeaderLeft from '../../Component/Header/HeaderLeft';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
-const demoQueries = [
-  {
-    id: '1',
-    title: 'Spring Discount Offer',
-    description: '20% off on all hair services.',
-    discount: 20,
-    startDate: '2025-04-01',
-    endDate: '2025-04-30',
-  },
-  {
-    id: '2',
-    title: 'Wellness Weekend',
-    description: '15% off on all spa services.',
-    discount: 15,
-    startDate: '2025-05-10',
-    endDate: '2025-05-12',
-  },
-];
+const API_GET = 'https://www.makeahabit.com/api/v1/requestOffer/my-requests';
+const API_POST = 'https://www.makeahabit.com/api/v1/requestOffer/create';
 
 const AddOfferScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
+  const [offers, setOffers] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
+  const [offerTitle, setOfferTitle] = useState('');
   const [discount, setDiscount] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  const [offerImage, setOfferImage] = useState(null);
+  const [description, setDescription] = useState('');
 
-  const pickImage = () => {
-    launchImageLibrary({ mediaType: 'photo' }, res => {
-      if (!res.didCancel && res.assets && res.assets.length > 0) {
-        setOfferImage(res.assets[0]);
-      }
-    });
+  useEffect(() => {
+    fetchOffers();
+  }, []);
+
+  const fetchOffers = async () => {
+    setLoading(true);
+    try {
+      const token = await AsyncStorage.getItem('vendorToken');
+      const response = await axios.get(API_GET, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      console.log('fetchoffer responder', response.data);
+      setOffers(response.data?.data || []);
+    } catch (error) {
+      Alert.alert('Error', 'Failed to fetch offers!');
+    }
+    setLoading(false);
   };
 
-  const handleSubmit = () => {
-    if (!title || !discount || !startDate || !endDate) {
+  const handleSubmit = async () => {
+    if (!offerTitle || !discount || !startDate || !endDate) {
       Alert.alert('Validation', 'Please fill all required fields!');
       return;
     }
-
-    console.log({
-      title,
-      description,
-      discount,
-      startDate,
-      endDate,
-      offerImage,
-    });
-    Alert.alert('Success', 'Offer submitted successfully!');
-    setTitle('');
-    setDescription('');
-    setDiscount('');
-    setStartDate('');
-    setEndDate('');
-    setOfferImage(null);
-    setModalVisible(false);
+    try {
+      const token = await AsyncStorage.getItem('vendorToken');
+      const payload = {
+        offerTitle,
+        discount,
+        startDate,
+        endDate,
+        description,
+      };
+      const response = await axios.post(API_POST, payload, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      Alert.alert('Success', 'Offer requested successfully!');
+      setOfferTitle('');
+      setDiscount('');
+      setStartDate('');
+      setEndDate('');
+      setDescription('');
+      setModalVisible(false);
+      fetchOffers();
+    } catch (error) {
+      Alert.alert(
+        'Error',
+        error?.response?.data?.message || 'Failed to submit offer request',
+      );
+    }
   };
 
-  const renderQueryCard = ({ item }) => (
+  const renderOfferCard = ({ item }) => (
     <View style={styles.card}>
-      {/* Decorative stripe on left */}
       <View style={styles.cardStripe} />
       <View style={{ flex: 1, paddingLeft: 12 }}>
-        <Text style={styles.cardTitle}>{item.title}</Text>
+        <Text style={styles.cardTitle}>{item.offerTitle}</Text>
         <Text style={styles.cardDesc}>{item.description}</Text>
         <Text style={styles.cardInfo}>
           Discount: {item.discount}% | {item.startDate} - {item.endDate}
         </Text>
       </View>
-
-      {/* Discount badge */}
       <View style={styles.discountBadge}>
         <Text style={styles.discountText}>{item.discount}%</Text>
       </View>
@@ -97,11 +102,9 @@ const AddOfferScreen = () => {
 
   return (
     <LinearGradient
-      colors={['#e6f0c1ff', '#fbfffdff']} // adjust colors to your brand or preference
+      colors={['#e6f0c1ff', '#fbfffdff']}
       style={{ flex: 1, padding: 16 }}
     >
-      {/* Header row: Offer Queries + Add Offer button */}
-
       <View style={styles.headerRow}>
         <HeaderLeft title={'Offer'} />
         <TouchableOpacity
@@ -114,42 +117,37 @@ const AddOfferScreen = () => {
             end={{ x: 1, y: 0 }}
             style={styles.addBtnGradient}
           >
-            <Text style={styles.addBtnText}>Add Offer</Text>
+            <Text style={styles.addBtnText}>Request Offer</Text>
           </LinearGradient>
         </TouchableOpacity>
       </View>
 
-      {/* Static Query Cards */}
-      <FlatList
-        data={demoQueries}
-        keyExtractor={item => item.id}
-        renderItem={renderQueryCard}
-        contentContainerStyle={{ paddingBottom: 20 }}
-        style={{ marginTop: 10 }}
-      />
+      {/* Offer Query Cards */}
+      {loading ? (
+        <ActivityIndicator size="large" color="#00D65F" />
+      ) : (
+        <FlatList
+          data={offers}
+          keyExtractor={item => item._id || item.id}
+          renderItem={renderOfferCard}
+          contentContainerStyle={{ paddingBottom: 20 }}
+          style={{ marginTop: 10 }}
+        />
+      )}
 
-      {/* Add Offer Modal */}
+      {/* Request Offer Modal */}
       <Modal visible={modalVisible} animationType="slide" transparent>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <ScrollView>
-              <Text style={styles.modalTitle}>Add Offer</Text>
+              <Text style={styles.modalTitle}>Request Offer</Text>
 
               <Text style={styles.label}>Offer Title *</Text>
               <TextInput
                 style={styles.input}
                 placeholder="Enter offer title"
-                value={title}
-                onChangeText={setTitle}
-              />
-
-              <Text style={styles.label}>Description</Text>
-              <TextInput
-                style={[styles.input, { height: 100 }]}
-                placeholder="Enter description"
-                value={description}
-                onChangeText={setDescription}
-                multiline
+                value={offerTitle}
+                onChangeText={setOfferTitle}
               />
 
               <Text style={styles.label}>Discount (%) *</Text>
@@ -177,22 +175,14 @@ const AddOfferScreen = () => {
                 onChangeText={setEndDate}
               />
 
-              <Text style={styles.label}>Offer Image</Text>
-              <TouchableOpacity
-                style={styles.imagePickerBtn}
-                onPress={pickImage}
-              >
-                <Text style={styles.imagePickerBtnText}>
-                  {offerImage ? 'Change Image' : 'Pick Image'}
-                </Text>
-              </TouchableOpacity>
-
-              {offerImage && (
-                <Image
-                  source={{ uri: offerImage.uri }}
-                  style={styles.imagePreview}
-                />
-              )}
+              <Text style={styles.label}>Description</Text>
+              <TextInput
+                style={[styles.input, { height: 100 }]}
+                placeholder="Enter description"
+                value={description}
+                onChangeText={setDescription}
+                multiline
+              />
 
               <View style={{ flexDirection: 'row', marginTop: 10 }}>
                 <TouchableOpacity
@@ -252,7 +242,7 @@ const styles = StyleSheet.create({
 
   addBtn: { alignSelf: 'flex-start' },
   addBtnGradient: {
-    height: 25,
+    height: 30,
     // paddingVertical: 8,
     // paddingHorizontal: 12,
     borderRadius: 10,
@@ -260,7 +250,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  addBtnText: { color: '#fff', fontWeight: '700', fontSize: 16 },
+  addBtnText: { color: '#fff', fontWeight: '700', fontSize: 12 },
 
   card: {
     backgroundColor: '#fff',

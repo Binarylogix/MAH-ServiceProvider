@@ -8,6 +8,7 @@ import {
   ScrollView,
   Alert,
   ActivityIndicator,
+  Modal,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -39,6 +40,57 @@ export default function BusinessProfile() {
   const [websiteLink, setWebsiteLink] = useState('');
   const [googleBusinessLink, setGoogleBusinessLink] = useState('');
   const [description, setDescription] = useState('');
+
+  const weekdays = [
+    'monday',
+    'tuesday',
+    'wednesday',
+    'thursday',
+    'friday',
+    'saturday',
+    'sunday',
+  ];
+
+  const [daysModalVisible, setDaysModalVisible] = useState(false);
+  const [selectedDays, setSelectedDays] = useState([]); // array of selected days
+
+  // Format selected days as string for display and submission
+  const formatSelectedDays = days => {
+    if (days.length === 0) return 'Select Opening Days';
+    if (days.length === 7) return 'Monday - Sunday';
+    if (days.length === 6 && !days.includes('Sunday'))
+      return 'Monday - Saturday';
+    return days.join(', ');
+  };
+
+  const toggleDay = day => {
+    if (selectedDays.includes(day)) {
+      setSelectedDays(selectedDays.filter(d => d !== day));
+    } else {
+      setSelectedDays([...selectedDays, day]);
+    }
+  };
+
+  // Initialize selectedDays from openingDays (string) on vendor load
+  useEffect(() => {
+    if (typeof openingDays === 'string' && openingDays.trim() !== '') {
+      // Try to parse common formats like "Monday - Saturday" or comma-separated
+      if (openingDays.includes('-')) {
+        const parts = openingDays.split('-').map(s => s.trim());
+        const startIndex = weekdays.indexOf(parts[0]);
+        const endIndex = weekdays.indexOf(parts[1]);
+        if (startIndex !== -1 && endIndex !== -1 && endIndex >= startIndex) {
+          setSelectedDays(weekdays.slice(startIndex, endIndex + 1));
+        }
+      } else {
+        const splitDays = openingDays.split(',').map(d => d.trim());
+        setSelectedDays(splitDays.filter(day => weekdays.includes(day)));
+      }
+    } else {
+      // If openingDays is undefined or empty, clear selection or set default
+      setSelectedDays([]);
+    }
+  }, [openingDays]);
 
   const [showTimePicker, setShowTimePicker] = useState({
     type: '',
@@ -148,19 +200,12 @@ export default function BusinessProfile() {
       formData.append('city', city);
       formData.append('pincode', pincode);
       formData.append('addressName', address);
-      //   formData.append('openingDays', openingDays);
+      // formData.append('openingDays', formatSelectedDays(selectedDays));
       formData.append('openingTime', openingTime);
       formData.append('closingTime', closingTime);
       formData.append('websiteLink', websiteLink);
       formData.append('googleBusinessLink', googleBusinessLink);
       formData.append('description', description);
-
-      // ✅ If you’re uploading an image, add like this:
-      // formData.append('image', {
-      //   uri: imageUri,
-      //   type: 'image/jpeg',
-      //   name: 'photo.jpg',
-      // });
 
       console.log('Sending FormData...');
       const res = await axios.put(
@@ -298,12 +343,19 @@ export default function BusinessProfile() {
         </TouchableOpacity>
 
         <Text style={styles.label}>Opening Days</Text>
-        <TextInput
-          style={styles.input}
-          value={openingDays}
-          onChangeText={setOpeningDays}
-          placeholder="e.g. Monday - Saturday"
-        />
+        <TouchableOpacity
+          style={[styles.input, { justifyContent: 'center', height: 48 }]}
+          onPress={() => setDaysModalVisible(true)}
+        >
+          <Text
+            style={{
+              color: selectedDays.length ? '#000' : '#777',
+              fontSize: 15,
+            }}
+          >
+            {formatSelectedDays(selectedDays)}
+          </Text>
+        </TouchableOpacity>
 
         <Text style={[styles.label, { marginTop: 14 }]}>Business Timings</Text>
         <View style={styles.timeRow}>
@@ -376,6 +428,75 @@ export default function BusinessProfile() {
           )}
         </LinearGradient>
       </TouchableOpacity>
+
+      <Modal
+        visible={daysModalVisible}
+        animationType="slide"
+        transparent
+        onRequestClose={() => setDaysModalVisible(false)}
+      >
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: 'rgba(0,0,0,0.4)',
+            justifyContent: 'center',
+            padding: 20,
+          }}
+        >
+          <View
+            style={{ backgroundColor: '#fff', borderRadius: 10, padding: 20 }}
+          >
+            <Text style={{ fontSize: 18, fontWeight: '700', marginBottom: 15 }}>
+              Select Opening Days
+            </Text>
+            {weekdays.map(day => {
+              const selected = selectedDays.includes(day);
+              return (
+                <TouchableOpacity
+                  key={day}
+                  onPress={() => toggleDay(day)}
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    paddingVertical: 8,
+                  }}
+                >
+                  <MaterialCommunityIcons
+                    name={
+                      selected ? 'checkbox-marked' : 'checkbox-blank-outline'
+                    }
+                    size={22}
+                    color={selected ? '#00D65F' : '#777'}
+                  />
+                  <Text
+                    style={{
+                      marginLeft: 12,
+                      fontSize: 16,
+                      color: selected ? '#000' : '#444',
+                    }}
+                  >
+                    {day}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+            <TouchableOpacity
+              style={{
+                marginTop: 20,
+                backgroundColor: '#00D65F',
+                borderRadius: 8,
+                paddingVertical: 12,
+                alignItems: 'center',
+              }}
+              onPress={() => setDaysModalVisible(false)}
+            >
+              <Text style={{ color: '#fff', fontWeight: '700', fontSize: 16 }}>
+                Done
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
 
       {showTimePicker.visible && (
         <DateTimePicker
