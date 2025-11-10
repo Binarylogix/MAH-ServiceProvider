@@ -568,9 +568,12 @@ const statusColors = {
 const getTodayISO = () => new Date().toISOString().slice(0, 10);
 
 const BookingCard = ({ item, onComplete, completing }) => {
-  const bookingStatus = item?.status || item?.status;
+  const bookingStatus = item.status;
   const canComplete = bookingStatus === 'Paid';
-  const businessCard = item?.booking?.businessCard || item?.businessCard;
+  const businessCard = item.vendor?.businessCard;
+
+  console.log('items', item);
+  console.log('nnnn', item?.user?.profileImg);
 
   return (
     <View style={styles.card}>
@@ -590,28 +593,30 @@ const BookingCard = ({ item, onComplete, completing }) => {
       <View style={styles.contentRow}>
         <Image
           source={{
-            uri: businessCard
-              ? `https://www.makeahabit.com/api/v1/uploads/business/${businessCard}`
+            uri: item?.user?.profileImg
+              ? `https://www.makeahabit.com/api/v1/uploads/customer/${item?.user?.profileImg}`
               : 'https://cdn-icons-png.flaticon.com/512/1973/1973701.png',
           }}
           style={styles.salonImage}
         />
         <View style={styles.details}>
-          <Text style={styles.salonName}>{item?.vendor?.businessName}</Text>
-          <Text style={styles.address}>
-            {item?.vendor?.city}, {item?.vendor?.state}
-          </Text>
+          <Text style={styles.salonName}>{item?.user?.fullName}</Text>
+          {/* <Text style={styles.address}>
+            {item.user?.city}, {item?.user?.state}
+          </Text> */}
           <Text style={styles.timeText}>
             <Text style={{ fontWeight: '600' }}>Time: </Text>
-            {item?.booking?.time}
+            {item.booking?.time}
           </Text>
           <Text style={styles.services}>
             <Text style={{ fontWeight: '600' }}>Services: </Text>
-            {item?.booking?.services?.map(s => s?.service?.name).join(', ')}
+            {item.booking?.services
+              ?.map(s => s.service?.serviceName)
+              .join(', ')}
           </Text>
           <Text style={styles.price}>
             <Text style={{ fontWeight: '600' }}>Price: </Text>₹
-            {item?.booking?.totalPrice}
+            {item.booking?.totalPrice}
           </Text>
         </View>
       </View>
@@ -896,8 +901,14 @@ const styles = StyleSheet.create({
   dateText: { fontSize: 12, color: '#666' },
   statusBadge: { paddingHorizontal: 12, paddingVertical: 5, borderRadius: 14 },
   statusText: { color: '#fff', fontWeight: '600', fontSize: 11 },
-  contentRow: { flexDirection: 'row', marginBottom: 8 },
-  salonImage: { width: 55, height: 55, borderRadius: 6, marginRight: 10 },
+  contentRow: { flexDirection: 'row', marginBottom: 2 },
+  salonImage: {
+    width: 55,
+    height: 55,
+    borderRadius: 6,
+    marginRight: 10,
+    resizeMode: 'contain',
+  },
   details: { flex: 1, justifyContent: 'center' },
   salonName: { fontSize: 14, fontWeight: '700', color: '#111' },
   address: { fontSize: 11, color: '#666' },

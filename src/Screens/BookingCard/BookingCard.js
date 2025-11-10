@@ -15,7 +15,7 @@ const defaultProfile = { uri: 'https://randomuser.me/api/portraits/men/1.jpg' };
 const statusColors = {
   pending: '#ffa500',
   approved: '#4CAF50',
-  paid: '#4CAF50',
+  paid: '#b1fab4ff',
   completed: '#4CAF50',
   canceled: '#9E9E9E',
 };
@@ -23,23 +23,22 @@ const statusColors = {
 const getTodayISO = () => new Date().toISOString().slice(0, 10);
 
 const BookingCardItem = ({ booking }) => {
-  console.log('lkshdfjd', booking);
   const {
     date = booking?.booking?.date,
     status = booking?.booking?.status,
     customerName = booking?.user?.fullName,
-    services = booking?.booking?.services,
+    services = booking?.booking?.services || [],
     price = booking?.booking?.totalPrice,
-    profileImage = defaultProfile,
-  } = booking.booking || {};
+    profileImage = booking?.user?.profileImg,
+  } = booking || {};
 
-  const servicesText = services.join(', ');
+  // Map to get service names safely
+  const servicesText = services.map(s => s.service?.serviceName).join(', ');
 
   return (
     <View style={styles.bookingCard}>
       <View style={styles.bookingHeader}>
         <Text>{new Date(date).toLocaleString()}</Text>
-
         <View
           style={[
             styles.statusBox,
@@ -50,7 +49,14 @@ const BookingCardItem = ({ booking }) => {
         </View>
       </View>
       <View style={styles.bookingUserRow}>
-        <Image source={profileImage} style={styles.bookingImg} />
+        <Image
+          source={{
+            uri: profileImage
+              ? `https://www.makeahabit.com/api/v1/uploads/customer/${profileImage}`
+              : 'https://cdn-icons-png.flaticon.com/512/1973/1973701.png',
+          }}
+          style={styles.bookingImg}
+        />
         <View style={{ flex: 1, marginLeft: 10 }}>
           <Text style={styles.bookingName}>{customerName}</Text>
           <Text style={styles.bookingService}>Services: {servicesText}</Text>
@@ -112,7 +118,7 @@ export default BookingCard;
 const styles = StyleSheet.create({
   sectionTitle: {
     fontWeight: 'bold',
-    fontSize: 18,
+    fontSize: 16,
     marginTop: 26,
     marginBottom: 6,
     color: '#222',
@@ -130,6 +136,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    fontSize: 12,
   },
   statusBox: {
     borderRadius: 11,
@@ -137,8 +144,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   statusText: {
-    color: '#fff',
-    fontSize: 13,
+    color: '#223e2cff',
+    fontSize: 12,
     fontWeight: 'bold',
     textTransform: 'capitalize',
   },
@@ -151,14 +158,15 @@ const styles = StyleSheet.create({
   bookingImg: {
     width: 43,
     height: 43,
-    borderRadius: 21.5,
+    borderRadius: 12,
+    resizeMode: 'contain',
   },
   bookingName: {
     fontWeight: 'bold',
     fontSize: 15,
   },
   bookingService: {
-    fontSize: 13,
+    fontSize: 12,
     color: '#444',
   },
 });

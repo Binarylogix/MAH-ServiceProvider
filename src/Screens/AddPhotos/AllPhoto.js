@@ -210,7 +210,7 @@ export default function AllPhoto() {
           <Image
             source={{ uri: imageUrl }}
             style={styles.image}
-            resizeMode="cover"
+            resizeMode="contain"
           />
 
           {/* Delete Button at Top-Right */}
@@ -381,29 +381,29 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   card: {
-    backgroundColor: '#fff',
+    // backgroundColor: '#fff',
     borderRadius: 20,
     marginBottom: 14,
     overflow: 'hidden',
     width: width / 2 - 24,
-    height: 210,
-    shadowColor: '#000',
+    height: 120,
+    // shadowColor: '#000',
     shadowOpacity: 0.15,
     shadowRadius: 8,
-    elevation: 6,
+    // elevation: 6,
     transform: [{ scale: 1 }],
   },
   image: {
     width: '100%',
     height: '100%',
     borderRadius: 13,
-    borderWidth: 2,
-    borderColor: '#fff',
+    // borderWidth: 2,
+    // borderColor: '#fff',
     shadowColor: '#00D65F',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
-    elevation: 8,
+    // elevation: 8,
     transform: [{ scale: 0.98 }],
   },
   overlay: {
@@ -433,13 +433,13 @@ const styles = StyleSheet.create({
   deleteBtnTopRight: {
     position: 'absolute',
     top: 8,
-    right: 8,
+    right: 2,
     backgroundColor: '#ff4444',
     borderRadius: 8,
-    padding: 7,
+    padding: 2,
     elevation: 3,
     shadowColor: '#ff4444',
-    shadowRadius: 2,
+    // shadowRadius: 2,
   },
 
   // deleteBtn: {

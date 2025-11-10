@@ -112,12 +112,12 @@ const styles = StyleSheet.create({
     marginLeft: 12,
   },
   cardTitle: {
-    fontSize: width * 0.045,
-    fontWeight: '600',
+    fontSize: width * 0.035,
+    fontWeight: '500',
     color: '#000',
   },
   cardSubtitle: {
-    fontSize: width * 0.035,
+    fontSize: width * 0.03,
     color: '#777',
     marginTop: 2,
   },

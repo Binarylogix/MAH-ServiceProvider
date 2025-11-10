@@ -10,6 +10,8 @@ import {
   Alert,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { Linking } from 'react-native';
+
 import { useDispatch, useSelector } from 'react-redux';
 import LinearGradient from 'react-native-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -27,6 +29,23 @@ export default function Profile() {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const { vendor, loading, error } = useSelector(state => state.vendorDetails);
+
+  const openTermsLink = async () => {
+    const rawUrl =
+      'https://www.makeahabit.com/api/v1/uploads/term/1757062792113-Terms & Conditions_MaH (1).pdf';
+    const url = encodeURI(rawUrl);
+    try {
+      const supported = await Linking.canOpenURL(url);
+      if (supported) {
+        await Linking.openURL(url);
+      } else {
+        alert("Can't open the terms and conditions link.");
+      }
+    } catch (error) {
+      console.error('Failed to open URL:', error);
+      alert('An error occurred while trying to open the link.');
+    }
+  };
 
   useEffect(() => {
     dispatch(fetchVendorDetails());
@@ -160,7 +179,12 @@ export default function Profile() {
             label="Help and Support"
             onPress={() => navigation.navigate('HelpAndSupportScreen')}
           />
-          <MenuCard icon="file" label="Terms & Conditions" onPress={() => {}} />
+          <MenuCard
+            icon="file"
+            label="Terms & Conditions"
+            onPress={openTermsLink}
+          />
+
           <MenuCard
             icon="shield"
             label="Privacy and Policy"
