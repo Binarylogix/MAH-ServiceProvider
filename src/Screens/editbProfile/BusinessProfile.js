@@ -41,25 +41,16 @@ export default function BusinessProfile() {
   const [googleBusinessLink, setGoogleBusinessLink] = useState('');
   const [description, setDescription] = useState('');
 
-  const weekdays = [
-    'monday',
-    'tuesday',
-    'wednesday',
-    'thursday',
-    'friday',
-    'saturday',
-    'sunday',
-  ];
+  const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
   const [daysModalVisible, setDaysModalVisible] = useState(false);
-  const [selectedDays, setSelectedDays] = useState([]); // array of selected days
+  const [selectedDays, setSelectedDays] = useState([]);
 
-  // Format selected days as string for display and submission
+  // Format selected days for UI display
   const formatSelectedDays = days => {
     if (days.length === 0) return 'Select Opening Days';
     if (days.length === 7) return 'Monday - Sunday';
-    if (days.length === 6 && !days.includes('Sunday'))
-      return 'Monday - Saturday';
+    if (days.length === 6 && !days.includes('Sun')) return 'Monday - Saturday';
     return days.join(', ');
   };
 
@@ -74,7 +65,6 @@ export default function BusinessProfile() {
   // Initialize selectedDays from openingDays (string) on vendor load
   useEffect(() => {
     if (typeof openingDays === 'string' && openingDays.trim() !== '') {
-      // Try to parse common formats like "Monday - Saturday" or comma-separated
       if (openingDays.includes('-')) {
         const parts = openingDays.split('-').map(s => s.trim());
         const startIndex = weekdays.indexOf(parts[0]);
@@ -87,7 +77,6 @@ export default function BusinessProfile() {
         setSelectedDays(splitDays.filter(day => weekdays.includes(day)));
       }
     } else {
-      // If openingDays is undefined or empty, clear selection or set default
       setSelectedDays([]);
     }
   }, [openingDays]);
@@ -200,14 +189,14 @@ export default function BusinessProfile() {
       formData.append('city', city);
       formData.append('pincode', pincode);
       formData.append('addressName', address);
-      // formData.append('openingDays', formatSelectedDays(selectedDays));
+      // Change below line to append array items individually
+      selectedDays.forEach(day => formData.append('openingDays[]', day));
       formData.append('openingTime', openingTime);
       formData.append('closingTime', closingTime);
       formData.append('websiteLink', websiteLink);
       formData.append('googleBusinessLink', googleBusinessLink);
       formData.append('description', description);
 
-      console.log('Sending FormData...');
       const res = await axios.put(
         `https://www.makeahabit.com/api/v1/auth/update-business-profile-byId/${vendorId}`,
         formData,
@@ -228,8 +217,6 @@ export default function BusinessProfile() {
           ],
         },
       );
-
-      console.log('Response:', res.data);
 
       if (res.data?.success) {
         Alert.alert('Success', 'Business profile updated successfully!');

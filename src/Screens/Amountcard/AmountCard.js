@@ -1,16 +1,61 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchBookings } from '../../redux/Vendor/BookingSlice';
 
-export default function AmountCard({
-  totalAmount = 0,
-  completed = 0,
-  upcoming = 0,
-}) {
+export default function AmountCard() {
+  const dispatch = useDispatch();
+  const { bookings, loading } = useSelector(state => state.booking);
+
+  const [totalAmount, setTotalAmount] = useState(0);
+  const [completed, setCompleted] = useState(0);
+  const [upcoming, setUpcoming] = useState(0);
+
+  useEffect(() => {
+    dispatch(fetchBookings());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (!loading && bookings.length) {
+      const total = bookings
+        .filter(b => b.status.toLowerCase() !== 'canceled')
+        .reduce((sum, b) => sum + (b.booking?.totalPrice || 0), 0);
+
+      const completedCount = bookings.filter(
+        b => b.status.toLowerCase() === 'completed',
+      ).length;
+      const upcomingCount = bookings.filter(
+        b =>
+          b.status.toLowerCase() === 'paid' ||
+          b.status.toLowerCase() === 'approved',
+      ).length;
+
+      console.log('amouint', total);
+
+      setTotalAmount(total);
+      setCompleted(completedCount);
+      setUpcoming(upcomingCount);
+    }
+  }, [loading, bookings]);
+
+  if (loading) {
+    return (
+      <View
+        style={[
+          styles.amountCard,
+          { justifyContent: 'center', alignItems: 'center' },
+        ]}
+      >
+        <Text style={{ color: '#fff' }}>Loading...</Text>
+      </View>
+    );
+  }
+
   return (
     <LinearGradient
-      colors={['#00D65F', '#01823A']} // adjust colors to your brand or preference
+      colors={['#00D65F', '#01823A']}
       style={{ flex: 1, borderRadius: 20, marginBottom: 12 }}
     >
       <View style={styles.amountCard}>
@@ -40,7 +85,6 @@ export default function AmountCard({
 
 const styles = StyleSheet.create({
   amountCard: {
-    // backgroundColor: '#06d764f4',
     borderRadius: 20,
     padding: 20,
     marginBottom: 10,
@@ -59,7 +103,6 @@ const styles = StyleSheet.create({
     borderRadius: 13,
     alignItems: 'center',
     flex: 1,
-    // marginRight: 19,
     padding: 4,
   },
   statCardTitle: {
@@ -72,6 +115,5 @@ const styles = StyleSheet.create({
     color: '#14AD5F',
     fontWeight: 'bold',
     fontSize: 18,
-    // marginTop: 4,
   },
 });

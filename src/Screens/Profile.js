@@ -95,12 +95,16 @@ export default function Profile() {
             />
 
             <Text style={styles.profileName}>
+              {vendor?.data?.businessName || 'Vendor Name'}
+            </Text>
+
+            <Text style={styles.businessName}>
               {vendor?.data?.fullName || 'Vendor Name'}
             </Text>
 
-            <Text style={styles.profileEmail}>
+            {/* <Text style={styles.profileEmail}>
               {vendor?.data?.email || 'vendor@example.com'}
-            </Text>
+            </Text> */}
 
             <TouchableOpacity
               onPress={() => navigation.navigate('EditProfile')}
@@ -207,7 +211,7 @@ const styles = StyleSheet.create({
     width: 110,
     height: 110,
     borderRadius: 55,
-    marginBottom: 15,
+    marginBottom: 6,
     borderWidth: 3,
     borderColor: '#fff',
     objectFit: 'contain ',
@@ -215,8 +219,15 @@ const styles = StyleSheet.create({
   },
 
   profileName: {
-    fontSize: 23,
-    fontWeight: '800',
+    fontSize: 16,
+    fontWeight: '600',
+    textAlign: 'center',
+    color: '#0e0e0e',
+    marginBottom: 2,
+  },
+  businessName: {
+    fontSize: 14,
+    // fontWeight: '500',
     color: '#0e0e0e',
     marginBottom: 4,
   },
@@ -228,22 +239,22 @@ const styles = StyleSheet.create({
   },
 
   editButtonWrapper: {
-    borderRadius: 25,
+    borderRadius: 12,
     overflow: 'hidden',
   },
 
   editButton: {
-    height: 45,
-    width: 160,
+    height: 25,
+    width: 100,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 25,
+    borderRadius: 12,
   },
 
   editButtonText: {
     color: '#fff',
     fontWeight: '700',
-    fontSize: 16,
+    fontSize: 12,
   },
 
   menucard: {

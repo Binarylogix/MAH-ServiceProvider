@@ -12,6 +12,7 @@ export const fetchBookings = createAsyncThunk(
         'https://www.makeahabit.com/api/v1/booking/vendorBooking',
         { headers: { Authorization: `Bearer ${token}` } },
       );
+      console.log('booking', response.data.data);
       if (response.data?.success) {
         return response.data.data;
       } else {

@@ -3,7 +3,6 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Feather from 'react-native-vector-icons/Feather';
 
-
 export default function MenuCard({ icon, label, onPress, highlight }) {
   return (
     <TouchableOpacity
@@ -14,16 +13,16 @@ export default function MenuCard({ icon, label, onPress, highlight }) {
       <View style={styles.leftGroup}>
         <Feather
           name={icon}
-          size={22}
-          color={highlight ? '#e04444' : '#52bc79ff'}
+          size={20}
+          color={highlight ? '#e04444' : '#0e0e0eff'}
         />
-        <Text style={[styles.label, highlight && { color: '#e04444'  }]}>
+        <Text style={[styles.label, highlight && { color: '#e04444' }]}>
           {label}
         </Text>
       </View>
       <MaterialCommunityIcons
         name="chevron-right"
-        size={25}
+        size={20}
         color="#161616"
         style={{ opacity: highlight ? 0 : 1 }}
       />
@@ -40,12 +39,12 @@ const styles = StyleSheet.create({
     borderBottomColor: '#e7e8ec',
     justifyContent: 'space-between',
     paddingVertical: 17,
-    backgroundColor: '#eeeeeeff',
+    backgroundColor: '#f7f6f6ff',
     marginBottom: 10,
-    borderRadius: 12,
+    borderRadius: 8,
     shadowColor: '#000',
     shadowOpacity: 0.05,
-    shadowRadius: 5,
+    shadowRadius: 3,
     elevation: 2,
   },
   leftGroup: {
@@ -53,8 +52,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   label: {
-    fontSize: 16,
-    marginLeft: 16,
+    fontSize: 14,
+    marginLeft: 12,
     color: '#181818',
   },
 });

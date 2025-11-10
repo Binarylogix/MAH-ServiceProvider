@@ -49,9 +49,9 @@ export default function EditProfile() {
       setMobile(v?.mobileNumber || '');
       setGender(v?.gender || '');
 
-      if (v?.profileImg) {
+      if (v?.businessCard) {
         setProfileImage({
-          uri: `https://www.makeahabit.com/api/v1/uploads/vendorProfile/${v?.profileImg}`,
+          uri: `https://www.makeahabit.com/api/v1/uploads/business/${v?.businessCard}`,
         });
       }
     }

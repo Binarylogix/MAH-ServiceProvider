@@ -1,4 +1,3 @@
-// redux/slices/vendorDetailsSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -8,6 +7,7 @@ export const fetchVendorDetails = createAsyncThunk(
     try {
       const token = await AsyncStorage.getItem('vendorToken');
       const id = await AsyncStorage.getItem('vendorId');
+      console.log(token);
 
       if (!token || !id) return rejectWithValue('Token or ID missing');
 

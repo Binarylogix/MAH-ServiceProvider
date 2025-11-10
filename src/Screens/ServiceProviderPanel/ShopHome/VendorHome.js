@@ -5,34 +5,38 @@ import {
   StyleSheet,
   Image,
   ScrollView,
-  Alert,
   TouchableOpacity,
-  Linking,
+  RefreshControl,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import QuickCard from '../../Quickcard/Quickcard';
-import AmountCard from '../../Amountcard/AmountCard';
-import { useNavigation } from '@react-navigation/native';
-import LinearGradient from 'react-native-linear-gradient';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import HeaderCom from '../../../Component/HeaderCom';
-import CurrentLocation from '../../../Component/currentlocation/CurrentLocation';
+import LinearGradient from 'react-native-linear-gradient';
+import { useNavigation } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchVendorDetails } from '../../../redux/Vendor/vendorDetailsSlice';
+import HeaderCom from '../../../Component/HeaderCom';
+import CurrentLocation from '../../../Component/currentlocation/CurrentLocation';
+import QuickCard from '../../Quickcard/Quickcard';
+import AmountCard from '../../Amountcard/AmountCard';
+import BookingCard from '../../BookingCard/BookingCard';
 
 const defaultProfile = { uri: 'https://randomuser.me/api/portraits/men/1.jpg' };
 
 export default function VendorHome() {
   const dispatch = useDispatch();
   const { vendor } = useSelector(state => state.vendorDetails);
+  const navigation = useNavigation();
 
-  // Fetch vendor details when component mounts
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    dispatch(fetchVendorDetails()).finally(() => setRefreshing(false));
+  }, [dispatch]);
+
   useEffect(() => {
     dispatch(fetchVendorDetails());
   }, [dispatch]);
-  const navigation = useNavigation();
 
   const goToAddService = () => {
     navigation.navigate('AllServices');
@@ -45,16 +49,19 @@ export default function VendorHome() {
   const goToAddPhotos = () => {
     navigation.navigate('AllPhoto');
   };
+
   const goToAddStaff = () => {
     navigation.navigate('AllStaff');
   };
 
   return (
-    <LinearGradient
-      colors={['#e6f0c1ff', '#fbfffdff']} // adjust colors to your brand or preference
-      style={{ flex: 1 }}
-    >
-      <ScrollView style={styles.container}>
+    <LinearGradient colors={['#e6f0c1ff', '#fbfffdff']} style={{ flex: 1 }}>
+      <ScrollView
+        style={styles.container}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
         <HeaderCom />
         {/* Header */}
         <View style={styles.header}>
@@ -88,14 +95,14 @@ export default function VendorHome() {
           </TouchableOpacity>
         </View>
 
-        {/* Amount and Stats (extracted) */}
+        {/* Amount and Stats */}
         <AmountCard
           totalAmount={vendor?.totalAmount || 0}
           completed={vendor?.completedBookings || 0}
           upcoming={vendor?.upcomingBookings || 0}
         />
 
-        {/* Quick Cards Row (example usage) */}
+        {/* Quick Cards Row */}
         <View style={styles.quickRow}>
           <QuickCard label="Add Service" icon="tags" onPress={goToAddService} />
           <QuickCard label="Add Staff" icon="users" onPress={goToAddStaff} />
@@ -109,27 +116,7 @@ export default function VendorHome() {
           />
         </View>
 
-        <View style={{ paddingHorizontal: 6 }}>
-          <Text style={styles.sectionTitle}>Recent Booking</Text>
-          <View style={styles.bookingCard}>
-            <View style={styles.bookingHeader}>
-              <Text>Dec 22, 2024 10:00 AM</Text>
-              <View style={styles.statusBox}>
-                <Text style={styles.statusText}>pending</Text>
-              </View>
-            </View>
-            <View style={styles.bookingUserRow}>
-              <Image source={defaultProfile} style={styles.bookingImg} />
-              <View style={{ flex: 1, marginLeft: 10 }}>
-                <Text style={styles.bookingName}>Customer name</Text>
-                <Text style={styles.bookingService}>
-                  Services: Undercut Haircut, Regular Shaving,
-                </Text>
-                <Text style={styles.bookingService}>Price : 250</Text>
-              </View>
-            </View>
-          </View>
-        </View>
+        <BookingCard />
       </ScrollView>
     </LinearGradient>
   );
@@ -151,29 +138,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderRadius: 13,
-
     paddingTop: 4,
     marginBottom: 18,
   },
-
   headerTitle: {
     fontSize: 14,
     fontWeight: '700',
-    // color: '#FFFFFF',
   },
-  headerSub: {
-    fontSize: 14,
-    // color: '#FFFFFF',
-  },
-  profileImg: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    borderWidth: 2,
-    borderColor: '#FFD700', // golden border as accent
-    marginLeft: 12,
-  },
-
   profileImg: {
     width: 44,
     height: 44,
