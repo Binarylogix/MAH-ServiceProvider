@@ -86,12 +86,13 @@ export default function VendorHome() {
             style={{
               flexDirection: 'row',
               alignItems: 'center',
-              backgroundColor: '#ffffffff',
+              backgroundColor: '#000',
               padding: 8,
               borderRadius: 50,
             }}
+            onPress={() => navigation.navigate('Notification')}
           >
-            <Ionicons name="notifications-outline" size={20} color="#000" />
+            <Ionicons name="notifications-outline" size={20} color="#fff" />
           </TouchableOpacity>
         </View>
 

@@ -10,7 +10,6 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import Feather from 'react-native-vector-icons/Feather';
 
-
 const SIZES = {
   width: Dimensions.get('window').width,
   height: Dimensions.get('window').height,
@@ -134,10 +133,10 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    fontSize: SIZES.width * 0.044,
+    fontSize: SIZES.width * 0.036,
     color: COLORS.primary,
     paddingHorizontal: 8,
-    fontWeight: 'bold',
+    fontWeight: '500',
     // letterSpacing: 0.2,
     flexShrink: 1,
   },

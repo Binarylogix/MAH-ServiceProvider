@@ -32,7 +32,7 @@ export const registerVendor = createAsyncThunk(
         return rejectWithValue(data?.message || 'Registration failed');
       }
 
-      console.log('🎉 Registration successful:', data);
+      console.log('🎉 Registration successfull:', data);
       return data;
     } catch (error) {
       console.error('❌ Registration API error:', error);

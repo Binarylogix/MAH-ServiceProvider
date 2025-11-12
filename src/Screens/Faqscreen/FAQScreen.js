@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import HeaderLeft from '../../Component/Header/HeaderLeft';
+import LinearGradient from 'react-native-linear-gradient';
 
 // Demo FAQ data
 const demoFAQs = [
@@ -118,25 +119,22 @@ const FAQItem = ({ item }) => {
 
 const FAQScreen = () => {
   return (
-    <ScrollView style={styles.container}>
-      <HeaderLeft />
-      <Text style={styles.header}>Frequently Asked Questions</Text>
+    <LinearGradient colors={['#e6f0c1ff', '#fbfffdff']} style={{ flex: 1 }}>
+      <ScrollView style={styles.container}>
+        <HeaderLeft />
+        <Text style={styles.header}>Frequently Asked Questions</Text>
 
-      {demoFAQs.map(item => (
-        <FAQItem key={item.id} item={item} />
-      ))}
-    </ScrollView>
+        {demoFAQs.map(item => (
+          <FAQItem key={item.id} item={item} />
+        ))}
+      </ScrollView>
+    </LinearGradient>
   );
 };
 
 export default FAQScreen;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F5F7FB',
-    // padding: 16,
-  },
   header: {
     fontSize: 20,
     fontWeight: 'bold',

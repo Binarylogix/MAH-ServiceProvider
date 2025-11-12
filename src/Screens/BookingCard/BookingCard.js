@@ -6,9 +6,11 @@ import {
   Image,
   FlatList,
   ActivityIndicator,
+  TouchableOpacity,
 } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchBookings } from '../../redux/Vendor/BookingSlice';
+import { useNavigation } from '@react-navigation/native';
 
 const defaultProfile = { uri: 'https://randomuser.me/api/portraits/men/1.jpg' };
 
@@ -23,6 +25,7 @@ const statusColors = {
 const getTodayISO = () => new Date().toISOString().slice(0, 10);
 
 const BookingCardItem = ({ booking }) => {
+  const navigation = useNavigation();
   const {
     date = booking?.booking?.date,
     status = booking?.booking?.status,
@@ -36,7 +39,12 @@ const BookingCardItem = ({ booking }) => {
   const servicesText = services.map(s => s.service?.serviceName).join(', ');
 
   return (
-    <View style={styles.bookingCard}>
+    <TouchableOpacity
+      style={styles.bookingCard}
+      onPress={
+        () => navigation.navigate('BookingDetails', { booking: booking }) // ✅ Navigate to details screen
+      }
+    >
       <View style={styles.bookingHeader}>
         <Text>{new Date(date).toLocaleString()}</Text>
         <View
@@ -63,7 +71,7 @@ const BookingCardItem = ({ booking }) => {
           <Text style={styles.bookingService}>Price: ₹{price}</Text>
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 

@@ -10,6 +10,7 @@ import {
 import RenderHtml from 'react-native-render-html';
 import HeaderLeft from '../../Component/Header/HeaderLeft';
 import axios from 'axios';
+import LinearGradient from 'react-native-linear-gradient';
 
 const PrivacyPolicyScreen = () => {
   const { width } = Dimensions.get('window');
@@ -32,10 +33,10 @@ const PrivacyPolicyScreen = () => {
         // Combine title, app name (bold), introduction (bold), sections, agreement
         const rawText = `
 <strong>${title}</strong><br/>
-<strong>${appName}</strong><br/><br/>
+<strong>${appName}</strong><br/>
 <strong>Introduction</strong><br/>
-${introduction}<br/><br/>
-${sections}<br/><br/>
+${introduction}
+${sections}<br/>
 ${agreement}
         `;
 
@@ -83,7 +84,10 @@ ${agreement}
   }
 
   return (
-    <View style={{ flex: 1 }}>
+    <LinearGradient
+      colors={['#e6f0c1ff', '#fbfffdff']}
+      style={{ flex: 1, padding: 12 }}
+    >
       <HeaderLeft title="Privacy Policy" />
       <ScrollView contentContainerStyle={styles.container}>
         <RenderHtml
@@ -92,14 +96,13 @@ ${agreement}
           baseStyle={styles.htmlText}
         />
       </ScrollView>
-    </View>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { padding: 12 },
-  htmlText: { fontSize: 16, lineHeight: 24, color: '#333' },
-  loaderContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  htmlText: { fontSize: 12, color: '#333' },
+  loaderContainer: { justifyContent: 'center', alignItems: 'center' },
 });
 
 export default PrivacyPolicyScreen;

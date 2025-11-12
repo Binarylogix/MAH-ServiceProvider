@@ -13,11 +13,23 @@ import {
 } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchTransactions } from '../../redux/Vendor/transactionSlice';
+import LinearGradient from 'react-native-linear-gradient';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const scale = size => (SCREEN_WIDTH / 360) * size;
 
 export default function TransactionScreen() {
+  const [refreshing, setRefreshing] = useState(false);
+
+  const handleRefresh = async () => {
+    try {
+      setRefreshing(true);
+      await dispatch(fetchTransactions());
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
   const dispatch = useDispatch();
   const { transactions, loading, error } = useSelector(
     state => state.transaction,
@@ -31,12 +43,31 @@ export default function TransactionScreen() {
     dispatch(fetchTransactions());
   }, [dispatch]);
 
+  // 🕒 Filter by tab and search text
   const filteredTransactions = transactions.filter(txn => {
-    if (!searchText) return true;
-    return (
-      txn?.transactionId.toLowerCase().includes(searchText.toLowerCase()) ||
-      (txn?.name && txn?.name?.toLowerCase().includes(searchText.toLowerCase()))
-    );
+    // Skip if no valid date
+    if (!txn?.createdAt) return false;
+
+    const txnDate = new Date(txn.createdAt);
+    const today = new Date();
+    const isToday =
+      txnDate.getDate() === today.getDate() &&
+      txnDate.getMonth() === today.getMonth() &&
+      txnDate.getFullYear() === today.getFullYear();
+
+    // Filter by tab (today / total)
+    if (activeTab === 'today' && !isToday) return false;
+
+    // Filter by search text
+    if (searchText) {
+      const text = searchText.toLowerCase();
+      return (
+        txn?.transactionId?.toLowerCase()?.includes(text) ||
+        txn?.user?.fullName?.toLowerCase()?.includes(text)
+      );
+    }
+
+    return true;
   });
 
   if (loading) {
@@ -53,187 +84,201 @@ export default function TransactionScreen() {
   }
 
   return (
-    <View style={styles.container}>
-      {/* Search Bar */}
-      <View style={styles.searchBar}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search..."
-          placeholderTextColor="#AAA"
-          value={searchText}
-          onChangeText={setSearchText}
-        />
-      </View>
-
-      {/* Tabs */}
-      <View style={styles.tabRow}>
-        <TouchableOpacity
-          style={[styles.tabBtn, activeTab === 'today' && styles.tabBtnActive]}
-          onPress={() => setActiveTab('today')}
-        >
-          <Text
-            style={[
-              styles.tabText,
-              activeTab === 'today' && styles.tabTextActive,
-            ]}
-          >
-            Today's Transaction
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.tabBtn,
-            activeTab === 'transaction' && styles.tabBtnActive,
-          ]}
-          onPress={() => setActiveTab('transaction')}
-        >
-          <Text
-            style={[
-              styles.tabText,
-              activeTab === 'transaction' && styles.tabTextActive,
-            ]}
-          >
-            Transaction
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Transactions List */}
-      <View style={styles.listWrapper}>
-        <FlatList
-          data={filteredTransactions}
-          keyExtractor={item => item._id || item.id}
-          renderItem={({ item, index }) => (
-            <TouchableOpacity
-              activeOpacity={0.8}
-              onPress={() => setSelectedTransaction(item)}
-              style={styles.transactionRow}
-            >
-              <Text style={styles.idx}>{index + 1}</Text>
-              <View style={styles.infoCol}>
-                <Text style={styles.txnId}>
-                  {item?.user?.fullName || item._id}
-                </Text>
-                <View>
-                  <Text style={styles.name}>
-                    {item.transactionId || item._id}
-                  </Text>
-                  <Text style={styles.date}>
-                    {item.createdAt
-                      ? new Date(item.createdAt).toLocaleDateString()
-                      : 'N/A'}
-                  </Text>
-                </View>
-              </View>
-              <Text style={styles.tid}>{item.tid || '-'}</Text>
-              <Text style={styles.amount}>₹{item.amount || '-'}</Text>
-            </TouchableOpacity>
-          )}
-          ListEmptyComponent={
-            <Text style={{ textAlign: 'center', marginTop: 20, color: '#999' }}>
-              No transactions found.
-            </Text>
-          }
-        />
-      </View>
-
-      {/* Detail Modal */}
-      <Modal
-        visible={!!selectedTransaction}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={() => setSelectedTransaction(null)}
-      >
-        <View style={styles.modalBackground}>
-          <View style={styles.modalCard}>
-            <ScrollView>
-              <Text style={styles.modalTitle}>Transaction Details</Text>
-
-              {selectedTransaction && (
-                <View style={{ gap: 8 }}>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      gap: 4,
-                    }}
-                  >
-                    <Text style={styles.modalLabel}>Name:</Text>
-                    <Text style={styles.modalValue}>
-                      {selectedTransaction.user?.fullName || '-'}
-                    </Text>
-                  </View>
-
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      gap: 4,
-                    }}
-                  >
-                    <Text style={styles.modalLabel}>TID:</Text>
-                    <Text
-                      style={styles.modalValue}
-                      numberOfLines={2}
-                      ellipsizeMode="tail"
-                    >
-                      {selectedTransaction.transactionId ||
-                        selectedTransaction._id}
-                    </Text>
-                  </View>
-
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      gap: 4,
-                    }}
-                  >
-                    <Text style={styles.modalLabel}>Date:</Text>
-                    <Text style={styles.modalValue}>
-                      {selectedTransaction.createdAt
-                        ? new Date(
-                            selectedTransaction.createdAt,
-                          ).toLocaleString()
-                        : '-'}
-                    </Text>
-                  </View>
-
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      gap: 4,
-                    }}
-                  >
-                    <Text style={styles.modalLabel}>Amount:</Text>
-                    <Text style={styles.modalValue}>
-                      ₹{selectedTransaction.amount || '-'}
-                    </Text>
-                  </View>
-
-                  {/* Add more fields as required */}
-                </View>
-              )}
-
-              <TouchableOpacity
-                style={styles.closeButton}
-                onPress={() => setSelectedTransaction(null)}
-              >
-                <Text style={styles.closeButtonText}>Close</Text>
-              </TouchableOpacity>
-            </ScrollView>
-          </View>
+    <LinearGradient colors={['#e6f0c1ff', '#fbfffdff']} style={{ flex: 1 }}>
+      <View style={styles.container}>
+        {/* Search Bar */}
+        <View style={styles.searchBar}>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search..."
+            placeholderTextColor="#AAA"
+            value={searchText}
+            onChangeText={setSearchText}
+          />
         </View>
-      </Modal>
-    </View>
+
+        {/* Tabs */}
+        <View style={styles.tabRow}>
+          <TouchableOpacity
+            style={[
+              styles.tabBtn,
+              activeTab === 'today' && styles.tabBtnActive,
+            ]}
+            onPress={() => setActiveTab('today')}
+          >
+            <Text
+              style={[
+                styles.tabText,
+                activeTab === 'today' && styles.tabTextActive,
+              ]}
+            >
+              Today's Transactions
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.tabBtn,
+              activeTab === 'transaction' && styles.tabBtnActive,
+            ]}
+            onPress={() => setActiveTab('transaction')}
+          >
+            <Text
+              style={[
+                styles.tabText,
+                activeTab === 'transaction' && styles.tabTextActive,
+              ]}
+            >
+              Total Transactions
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Transactions List */}
+        <View style={styles.listWrapper}>
+          <FlatList
+            data={filteredTransactions}
+            keyExtractor={item => item._id || item.id}
+            renderItem={({ item, index }) => (
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={() => setSelectedTransaction(item)}
+                style={styles.transactionRow}
+              >
+                <Text style={styles.idx}>{index + 1}</Text>
+                <View style={styles.infoCol}>
+                  <Text style={styles.txnId}>
+                    {item?.user?.fullName || item._id}
+                  </Text>
+                  <View>
+                    <Text style={styles.name}>
+                      {item.transactionId || item._id}
+                    </Text>
+                    <Text style={styles.date}>
+                      {item.createdAt
+                        ? new Date(item.createdAt).toLocaleDateString('en-GB', {
+                            weekday: 'short',
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: '2-digit',
+                          })
+                        : 'N/A'}
+                    </Text>
+                  </View>
+                </View>
+                <Text style={styles.tid}>{item.tid || '-'}</Text>
+                <Text style={styles.amount}>₹{item.amount || '-'}</Text>
+              </TouchableOpacity>
+            )}
+            ListEmptyComponent={
+              <Text
+                style={{ textAlign: 'center', marginTop: 20, color: '#999' }}
+              >
+                {activeTab === 'today'
+                  ? 'No transactions for today.'
+                  : 'No transactions found.'}
+              </Text>
+            }
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+          />
+        </View>
+
+        {/* Detail Modal */}
+        <Modal
+          visible={!!selectedTransaction}
+          animationType="slide"
+          transparent={true}
+          onRequestClose={() => setSelectedTransaction(null)}
+        >
+          <View style={styles.modalBackground}>
+            <View style={styles.modalCard}>
+              <ScrollView>
+                <Text style={styles.modalTitle}>Transaction Details</Text>
+
+                {selectedTransaction && (
+                  <View style={{ gap: 8 }}>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        gap: 4,
+                      }}
+                    >
+                      <Text style={styles.modalLabel}>Name:</Text>
+                      <Text style={styles.modalValue}>
+                        {selectedTransaction.user?.fullName || '-'}
+                      </Text>
+                    </View>
+
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        gap: 4,
+                      }}
+                    >
+                      <Text style={styles.modalLabel}>TID:</Text>
+                      <Text
+                        style={styles.modalValue}
+                        numberOfLines={2}
+                        ellipsizeMode="tail"
+                      >
+                        {selectedTransaction.transactionId ||
+                          selectedTransaction._id}
+                      </Text>
+                    </View>
+
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        gap: 4,
+                      }}
+                    >
+                      <Text style={styles.modalLabel}>Date:</Text>
+                      <Text style={styles.modalValue}>
+                        {selectedTransaction.createdAt
+                          ? new Date(
+                              selectedTransaction.createdAt,
+                            ).toLocaleString()
+                          : '-'}
+                      </Text>
+                    </View>
+
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        gap: 4,
+                      }}
+                    >
+                      <Text style={styles.modalLabel}>Amount:</Text>
+                      <Text style={styles.modalValue}>
+                        ₹{selectedTransaction.amount || '-'}
+                      </Text>
+                    </View>
+
+                    {/* Add more fields as required */}
+                  </View>
+                )}
+
+                <TouchableOpacity
+                  style={styles.closeButton}
+                  onPress={() => setSelectedTransaction(null)}
+                >
+                  <Text style={styles.closeButtonText}>Close</Text>
+                </TouchableOpacity>
+              </ScrollView>
+            </View>
+          </View>
+        </Modal>
+      </View>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#EFFCF6',
     paddingHorizontal: scale(14),
     paddingTop: scale(18),
   },
@@ -257,21 +302,21 @@ const styles = StyleSheet.create({
   tabRow: {
     flexDirection: 'row',
     // marginBottom: scale(10),
-    backgroundColor: '#E8F5E9',
+    backgroundColor: '#fff',
     borderRadius: scale(12),
-    paddingTop: scale(4),
+    // paddingTop: scale(4),
   },
   tabBtn: {
     flex: 1,
     paddingVertical: scale(8),
     borderRadius: scale(10),
     alignItems: 'center',
-    backgroundColor: 'transparent',
   },
   tabBtnActive: {
     backgroundColor: '#18A558',
     shadowColor: '#18A558',
     shadowOpacity: 0.25,
+    borderRadius: scale(10),
     shadowOffset: { width: 0, height: 1 },
     shadowRadius: scale(8),
   },

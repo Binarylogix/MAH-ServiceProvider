@@ -311,28 +311,6 @@ const AllServices1 = ({ route }) => {
   };
 
   // Suggestion rendering inside modal for icon autocomplete
-  const renderIconSuggestion = icon => (
-    <TouchableOpacity
-      key={icon._id}
-      style={[
-        styles.suggestionItem,
-        selectedIcon?._id === icon._id && styles.selectedSuggestion,
-      ]}
-      onPress={() => {
-        setSelectedIcon(icon);
-        setIconSearch(icon.name);
-        setFilteredIcons([]);
-      }}
-    >
-      <Image
-        source={{
-          uri: `https://www.makeahabit.com/api/v1/uploads/icon/${icon.img}`,
-        }}
-        style={styles.suggestionIcon}
-      />
-      <Text style={styles.suggestionText}>{icon.name}</Text>
-    </TouchableOpacity>
-  );
 
   // Render single service card
   const renderService = ({ item }) => (
@@ -542,7 +520,7 @@ const AllServices1 = ({ route }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, alignItems: 'center' },
+  container: { flex: 1, alignItems: 'center' },
   topRow: {
     flexDirection: 'row',
     width: '100%',
@@ -566,8 +544,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   categoryName: {
-    fontSize: 18,
-    fontWeight: '700',
+    fontSize: 15,
+    fontWeight: '500',
     color: '#333',
     textAlign: 'center',
     marginTop: 8,
@@ -582,8 +560,8 @@ const styles = StyleSheet.create({
   },
   addServiceButtonText: { color: '#fff', fontWeight: '600' },
   servicesHeader: {
-    fontSize: 20,
-    fontWeight: '700',
+    fontSize: 18,
+    fontWeight: '600',
     alignSelf: 'flex-start',
     marginBottom: 10,
   },
@@ -597,7 +575,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   serviceImage: { width: 60, height: 60, borderRadius: 8 },
-  serviceName: { fontSize: 16, fontWeight: '600', color: '#222' },
+  serviceName: { fontSize: 12, fontWeight: '500', color: '#222' },
   servicePrice: { color: '#14ad5f', fontWeight: '600' },
   iconButton: { padding: 6 },
   modalOverlay: {

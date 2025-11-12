@@ -142,7 +142,7 @@ const AddOfferScreen = () => {
 
   return (
     <LinearGradient
-      colors={['#E8F5E9', '#F9FFFB']}
+      colors={['#e6f0c1ff', '#fbfffdff']}
       style={{ flex: 1, padding: 16 }}
     >
       <View style={styles.headerRow}>
@@ -157,7 +157,7 @@ const AddOfferScreen = () => {
             end={{ x: 1, y: 0 }}
             style={styles.addBtnGradient}
           >
-            <Text style={styles.addBtnText}>Request Offer</Text>
+            <Text style={styles.addBtnText}>Add Offer</Text>
           </LinearGradient>
         </TouchableOpacity>
       </View>
@@ -183,7 +183,7 @@ const AddOfferScreen = () => {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <ScrollView>
-              <Text style={styles.modalTitle}>Request Offer</Text>
+              <Text style={styles.modalTitle}>Add Offer</Text>
 
               <Text style={styles.label}>Offer Title *</Text>
               <TextInput
@@ -258,7 +258,7 @@ const AddOfferScreen = () => {
                   style={[styles.modalBtn, { backgroundColor: '#00B96D' }]}
                   onPress={handleSubmit}
                 >
-                  <Text style={styles.modalBtnText}>Submit</Text>
+                  <Text style={styles.modalBtnText}>Add</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={[styles.modalBtn, { backgroundColor: '#B0BEC5' }]}
@@ -404,13 +404,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#fff',
     textAlign: 'center',
-    marginBottom: 10,
+    // marginBottom: 6,
   },
 
   modalDivider: {
     height: 1,
     backgroundColor: 'rgba(255,255,255,0.3)',
-    marginVertical: 10,
+    // marginVertical: 10,
   },
 
   modalRow: {
@@ -501,14 +501,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   addBtnGradient: {
-    height: 36,
+    height: 30,
     borderRadius: 10,
     width: 100,
     alignItems: 'center',
     justifyContent: 'center',
-    elevation: 2,
   },
-  addBtnText: { color: '#fff', fontWeight: '700', fontSize: 12 },
+  addBtnText: { color: '#fff', fontWeight: '500', fontSize: 12 },
   card: {
     backgroundColor: '#fff',
     padding: 16,
@@ -557,11 +556,11 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     fontWeight: '700',
-    marginBottom: 12,
+    // marginBottom: 12,
     textAlign: 'center',
     color: '#1E1E1E',
   },
-  label: { fontWeight: '600', marginBottom: 6, marginTop: 12, color: '#333' },
+  label: { fontWeight: '600', marginBottom: 0, marginTop: 12, color: '#333' },
   input: {
     borderWidth: 1,
     borderColor: '#D9D9D9',

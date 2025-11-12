@@ -31,6 +31,8 @@ import RateUsScreen from '../Screens/RateUs/RateUsScreen';
 import HelpAndSupportScreen from '../Screens/helpSupport/HelpAndSupportScreen';
 import PrivacyPolicyScreen from '../Screens/privacyPolicy/PrivacyPolicyScreen';
 import BusinessProfile from '../Screens/editbProfile/BusinessProfile';
+import Notification from '../Screens/Notification/Notification';
+import BookingDetailsScreen from '../Screens/bookingscreen/BookingDetailsScreen';
 const Stack = createNativeStackNavigator();
 export default function VendorStack() {
   return (
@@ -73,6 +75,7 @@ export default function VendorStack() {
       <Stack.Screen name="AllServices1" component={AllServices1} />
       <Stack.Screen name="FAQScreen" component={FAQScreen} />
       <Stack.Screen name="RateUsScreen" component={RateUsScreen} />
+      <Stack.Screen name="Notification" component={Notification} />
       <Stack.Screen
         name="PrivacyPolicyScreen"
         component={PrivacyPolicyScreen}
@@ -81,6 +84,7 @@ export default function VendorStack() {
         name="HelpAndSupportScreen"
         component={HelpAndSupportScreen}
       />
+      <Stack.Screen name="BookingDetails" component={BookingDetailsScreen} />
     </Stack.Navigator>
     // </NavigationContainer>
   );

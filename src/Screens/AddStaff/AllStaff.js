@@ -336,7 +336,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 16,
+    marginBottom: 10,
   },
   AddBtn: {
     // padding: 6,
@@ -346,7 +346,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  Addservice: { color: '#fff', fontWeight: 'bold', fontSize: 14 },
+  Addservice: { color: '#fff', fontWeight: '500', fontSize: 12 },
   card: {
     flexDirection: 'row',
     backgroundColor: '#fff',

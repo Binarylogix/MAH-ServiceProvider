@@ -91,8 +91,11 @@ export default function Profile() {
   }
 
   return (
-    <View style={styles.container}>
-      <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
+    <LinearGradient
+      colors={['#e6f0c1ff', '#fbfffdff']}
+      style={styles.container}
+    >
+      <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
         {/* Top Header Decorative Curve */}
         <LinearGradient
           colors={['#00D65F', '#009F4A']}
@@ -171,7 +174,7 @@ export default function Profile() {
           />
           <MenuCard
             icon="help-circle"
-            label="FAQ"
+            label="FAQs"
             onPress={() => navigation.navigate('FAQScreen')}
           />
           <MenuCard
@@ -198,12 +201,12 @@ export default function Profile() {
           />
         </View>
       </ScrollView>
-    </View>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
+  container: { flex: 1 },
 
   center: { justifyContent: 'center', alignItems: 'center' },
 
