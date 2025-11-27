@@ -4,11 +4,11 @@ import axios from 'axios';
 // ✅ Verify OTP API
 export const verifyVendorOtp = createAsyncThunk(
   'vendorAuth/verifyOtp',
-  async ({ email, otp }, { rejectWithValue }) => {
+  async ({ email, otp, fcmToken }, { rejectWithValue }) => {
     try {
       const response = await axios.post(
         'https://www.makeahabit.com/api/v1/newauth/verifyotp/vendor',
-        { email, otp },
+        { email, otp, fcmToken },
         { headers: { 'Content-Type': 'application/json' } },
       );
 
