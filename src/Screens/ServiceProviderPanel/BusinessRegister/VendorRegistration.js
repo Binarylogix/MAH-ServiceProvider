@@ -98,7 +98,7 @@ export default function VendorRegistration({ navigation }) {
         }
       })
       .catch(err => console.log('Error fetching categories:', err));
-  }, []); // Handle Redux success/error
+  }, []);
 
   useEffect(() => {
     if (success && data) {
@@ -109,7 +109,7 @@ export default function VendorRegistration({ navigation }) {
         const userId = data?.data?._id;
         AsyncStorage.setItem('vendorToken', token);
         AsyncStorage.setItem('vendorId', userId);
-        // console.log('token id saved');
+
         navigation.navigate('VendorTab');
       }
       dispatch(resetVendorState());

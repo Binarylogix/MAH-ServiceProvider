@@ -15,6 +15,7 @@ import {
   navigate,
 } from './src/Screens/notificationservice/NavigationService';
 import NoInternetScreen from './src/Screens/Notification/Notification';
+import { AndroidImportance } from '@notifee/react-native';
 function App() {
   const [isConnected, setIsConnected] = useState(true);
   const [checkingConnection, setCheckingConnection] = useState(true);
@@ -78,6 +79,7 @@ function App() {
         id: 'default',
         name: 'Default Channel',
         sound: 'default',
+        importance: AndroidImportance.HIGH,
       });
     }
     setupChannel();
@@ -92,6 +94,7 @@ function App() {
         android: {
           channelId: 'default',
           smallIcon: 'ic_launcher',
+          importance: AndroidImportance.HIGH,
           sound: 'default',
           pressAction: { id: 'default' },
         },

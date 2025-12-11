@@ -260,7 +260,7 @@ const ServiceDividedByCategory = ({ route }) => {
 
         {/* 🔸 Heading Row */}
         <View style={styles.nearestRow}>
-          <Text style={styles.nearestText}>Nearest Salons</Text>
+          <Text style={styles.nearestText}>Nearest {ShopCategory}</Text>
           <TouchableOpacity>
             <Text style={styles.allSalonText}>All Salons</Text>
           </TouchableOpacity>
