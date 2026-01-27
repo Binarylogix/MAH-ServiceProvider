@@ -152,6 +152,12 @@ export default function Profile() {
             label="Business Profile"
             onPress={() => navigation.navigate('Bprofile')}
           />
+
+          <MenuCard
+            icon="layers"
+            label="Bank Details"
+            onPress={() => navigation.navigate('BankDetails')}
+          />
           <MenuCard
             icon="layers"
             label="Service"

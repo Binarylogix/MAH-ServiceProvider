@@ -9,6 +9,7 @@ import vendorReducer from './Vendor/CreateVendorSlice';
 import vendorDetailsReducer from './Vendor/vendorDetailsSlice';
 import bookingReducer from './Vendor/BookingSlice';
 import transactionReducer from './Vendor/transactionSlice';
+import bankDetailsReducer from './Vendor/bankDetailsSlice';
 
 const store = configureStore({
   reducer: {
@@ -22,6 +23,7 @@ const store = configureStore({
     vendor: vendorReducer,
     vendorDetails: vendorDetailsReducer,
     transaction: transactionReducer,
+    bankDetails: bankDetailsReducer,
   },
 });
 
