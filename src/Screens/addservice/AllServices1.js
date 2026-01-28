@@ -37,7 +37,7 @@ const AllServices1 = ({ route }) => {
   const [iconSearch, setIconSearch] = useState('');
   const [filteredIcons, setFilteredIcons] = useState([]);
   const [isSaving, setIsSaving] = useState(false);
-
+  const [iconsLoading, setIconsLoading] = useState(false);
   // Fetch vendor services
   const fetchServices = async () => {
     setLoading(true);
@@ -56,12 +56,15 @@ const AllServices1 = ({ route }) => {
   // Fetch icons for autocomplete
   const fetchIcons = async () => {
     try {
+      setIconsLoading(true);
       const res = await axios.get(
         'https://www.makeahabit.com/api/v1/service/service-icon-list',
       );
       if (res.data.success) setIcons(res.data.icons);
     } catch {
       Alert.alert('Error', 'Failed to load icons');
+    } finally {
+      setIconsLoading(false);
     }
   };
 
@@ -95,6 +98,7 @@ const AllServices1 = ({ route }) => {
     setIconSearch('');
     setFilteredIcons([]);
     setModalVisible(true);
+    fetchIcons();
   };
 
   // Open modal for edit
@@ -102,87 +106,10 @@ const AllServices1 = ({ route }) => {
     console.log(service._id);
     setEditMode(true);
     setEditServiceId(service._id);
-    // setServiceName(service.service?.serviceName || '');
-    // setServicePrice(service.price?.toString() || '');
-    // const iconId = service.service?.icon?._id || service.service?.icon;
-    // const matchIcon = icons.find(i => i._id === iconId) || null;
-    // setSelectedIcon(matchIcon);
-    // setIconSearch(matchIcon?.name || '');
-    // setFilteredIcons([]);
+
     setModalVisible(true);
   };
 
-  // Add or update service handler
-  // const handleAddOrEditService = async () => {
-  //   if (!serviceName.trim() || !servicePrice.trim() || !selectedIcon) {
-  //     Alert.alert(
-  //       'Validation',
-  //       'Please fill all fields including icon selection',
-  //     );
-  //     return;
-  //   }
-
-  //   setIsSaving(true);
-  //   try {
-  //     const vendorId = await AsyncStorage.getItem('vendorId');
-  //     const token = await AsyncStorage.getItem('vendorToken');
-
-  //     // Check if service exists globally
-  //     const allServicesRes = await axios.get(
-  //       'https://www.makeahabit.com/api/v1/newservice/all',
-  //     );
-  //     let serviceId = allServicesRes.data.data?.find(
-  //       s => s.serviceName.toLowerCase() === serviceName.toLowerCase(),
-  //     )?._id;
-  //     console.log('dd');
-  //     if (editMode) {
-  //       // Update vendor service
-  //       await axios.put(
-  //         `https://www.makeahabit.com/api/v1/vendorservices/update/${editServiceId}`,
-  //         { price: Number(servicePrice), service: serviceId },
-  //         { headers: { Authorization: `Bearer ${token}` } },
-  //       );
-  //       Alert.alert('Success', 'Service updated successfully');
-  //     } else {
-  //       // Add new vendor service
-  //       console.log('aa', vendorId, {
-  //         Vendor: vendorId,
-  //         category: categoryId,
-  //         serviceCategory: categoryId,
-  //         service: serviceId,
-  //         price: Number(servicePrice),
-  //       });
-  //       await axios.post(
-  //         'https://www.makeahabit.com/api/v1/vendorservices/addVendorService',
-  //         {
-  //           Vendor: vendorId,
-  //           category: categoryId,
-  //           serviceCategory: categoryId,
-  //           service: serviceId,
-  //           price: Number(servicePrice),
-  //         },
-  //         { headers: { Authorization: `Bearer ${token}` } },
-  //       );
-  //       Alert.alert('Success', 'Service added successfully');
-  //     }
-
-  //     setModalVisible(false);
-  //     fetchServices();
-
-  //     // Reset form states
-  //     setEditMode(false);
-  //     setEditServiceId(null);
-  //     setServiceName('');
-  //     setServicePrice('');
-  //     setSelectedIcon(null);
-  //     setIconSearch('');
-  //     setFilteredIcons([]);
-  //   } catch (error) {
-  //     Alert.alert('Error', 'Failed to add or update service');
-  //     console.log(error);
-  //   }
-  //   setIsSaving(false);
-  // };
   const [allServices, setAllServices] = useState([]);
   const [selectedFullService, setSelectedFullService] = useState(null);
 
@@ -224,14 +151,6 @@ const AllServices1 = ({ route }) => {
 
   // Adjust handleAddOrEditService to use selectedFullService._id
   const handleAddOrEditService = async () => {
-    // if (!serviceName.trim() || !servicePrice.trim() || !selectedFullService) {
-    //   Alert.alert(
-    //     'Validation',
-    //     'Please fill all fields including valid service selection.',
-    //   );
-    //   return;
-    // }
-
     setIsSaving(true);
     try {
       const vendorId = await AsyncStorage.getItem('vendorId');
