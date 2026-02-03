@@ -31,9 +31,11 @@ export const addBankDetailsAPI = createAsyncThunk(
           },
         },
       );
-      console.log(response.data);
+      // console.log(response.data);
       return response.data;
     } catch (error) {
+      // console.log(error);
+      // console.log(error);
       return rejectWithValue(
         error?.response?.data || { message: 'Add bank details failed' },
       );
@@ -55,9 +57,10 @@ export const getBankDetailsAPI = createAsyncThunk(
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log(response.data);
+      // console.log(response.data);
       return response.data;
     } catch (error) {
+      // console.log(error);
       return rejectWithValue(
         error?.response?.data || { message: 'Fetch bank details failed' },
       );

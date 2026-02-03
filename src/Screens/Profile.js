@@ -154,9 +154,10 @@ export default function Profile() {
           />
 
           <MenuCard
-            icon="layers"
+            icon="bank"
             label="Bank Details"
             onPress={() => navigation.navigate('BankDetails')}
+            isFeather={false}
           />
           <MenuCard
             icon="layers"

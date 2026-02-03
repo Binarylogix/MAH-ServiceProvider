@@ -34,6 +34,7 @@ const BookingCardItem = ({ booking }) => {
     price = booking?.booking?.totalPrice,
     profileImage = booking?.user?.profileImg,
   } = booking || {};
+  // console.log('sdkjncsdkj', booking);
 
   // Map to get service names safely
   const servicesText = services.map(s => s.service?.serviceName).join(', ');
@@ -61,7 +62,7 @@ const BookingCardItem = ({ booking }) => {
           source={{
             uri: profileImage
               ? `https://www.makeahabit.com/api/v1/uploads/customer/${profileImage}`
-              : 'https://cdn-icons-png.flaticon.com/512/1973/1973701.png',
+              : 'https://www.makeahabit.com/assets/lg-habit-d0c8eeda.png',
           }}
           style={styles.bookingImg}
         />
@@ -81,7 +82,7 @@ const BookingCard = () => {
   const [todayBookings, setTodayBookings] = useState([]);
   const todayISO = getTodayISO();
 
-  console.log('bokings', todayBookings);
+  // console.log('bokings', todayBookings);
 
   useEffect(() => {
     dispatch(fetchBookings());

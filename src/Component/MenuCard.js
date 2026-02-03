@@ -3,7 +3,15 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Feather from 'react-native-vector-icons/Feather';
 
-export default function MenuCard({ icon, label, onPress, highlight }) {
+export default function MenuCard({
+  icon,
+  label,
+  onPress,
+  highlight,
+  isFeather = true,
+}) {
+  const IconComponent = isFeather ? Feather : MaterialCommunityIcons;
+
   return (
     <TouchableOpacity
       style={[styles.card, highlight && { borderBottomWidth: 0 }]}
@@ -11,7 +19,7 @@ export default function MenuCard({ icon, label, onPress, highlight }) {
       activeOpacity={0.7}
     >
       <View style={styles.leftGroup}>
-        <Feather
+        <IconComponent
           name={icon}
           size={20}
           color={highlight ? '#e04444' : '#0e0e0eff'}
@@ -40,7 +48,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: 17,
     backgroundColor: '#f7f6f6ff',
-    marginBottom: 10,
+    marginBottom: 7,
     borderRadius: 8,
     shadowColor: '#000',
     shadowOpacity: 0.05,
@@ -53,7 +61,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 14,
-    marginLeft: 12,
+    marginLeft: 10,
     color: '#181818',
   },
 });

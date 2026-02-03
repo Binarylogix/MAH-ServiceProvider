@@ -443,8 +443,12 @@ const styles = StyleSheet.create({
   topRow: {
     flexDirection: 'row',
     width: '100%',
-    marginBottom: 20,
+    marginBottom: 16,
     justifyContent: 'space-between',
+    backgroundColor: '#ebfaeb',
+    borderRadius: 20,
+    // elevation: 3,
+    padding: 6,
   },
   leftSide: {
     flexDirection: 'column',
@@ -463,9 +467,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   categoryName: {
-    fontSize: 15,
+    fontSize: 12,
     fontWeight: '500',
-    color: '#333',
+    color: '#232323',
     textAlign: 'center',
     marginTop: 8,
   },
@@ -487,7 +491,7 @@ const styles = StyleSheet.create({
   serviceCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 12,
+    padding: 10,
     backgroundColor: '#fff',
     borderRadius: 10,
     marginBottom: 10,
