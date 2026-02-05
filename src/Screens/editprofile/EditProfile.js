@@ -18,9 +18,10 @@ import axios from 'axios';
 import HeaderLeft from '../../Component/Header/HeaderLeft';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchVendorDetails } from '../../redux/Vendor/vendorDetailsSlice';
+import ImageResizer from 'react-native-image-resizer';
 
 const defaultProfileImg = {
-  uri: 'https://randomuser.me/api/portraits/men/1.jpg',
+  uri: 'https://www.makeahabit.com/assets/lg-habit-d0c8eeda.png',
 };
 
 export default function EditProfile() {
@@ -59,9 +60,42 @@ export default function EditProfile() {
 
   // Image Picker
   const pickImage = async () => {
-    const result = await launchImageLibrary({ mediaType: 'photo' });
-    if (result.assets && result.assets.length > 0) {
-      setProfileImage({ uri: result.assets[0].uri });
+    const result = await launchImageLibrary({
+      mediaType: 'photo',
+      includeBase64: false,
+    });
+
+    if (result.didCancel) return;
+
+    if (result.errorCode) {
+      Alert.alert('Error', 'Image selection failed');
+      return;
+    }
+
+    try {
+      const asset = result.assets[0];
+
+      // 🔥 Resize profile image
+      const resizedImage = await ImageResizer.createResizedImage(
+        asset.uri, // original uri
+        600, // max width (profile image = small)
+        600, // max height
+        'JPEG', // format
+        75, // quality
+        0, // rotation
+      );
+
+      const fileName =
+        asset.fileName?.replace(/\.[^/.]+$/, '.jpg') || 'profile.jpg';
+
+      setProfileImage({
+        uri: resizedImage.uri,
+        type: 'image/jpeg',
+        name: fileName,
+      });
+    } catch (err) {
+      console.log('Image resize error:', err);
+      Alert.alert('Error', 'Unable to process image');
     }
   };
 
@@ -82,13 +116,14 @@ export default function EditProfile() {
       formData.append('mobileNumber', mobile);
       formData.append('gender', gender);
 
-      if (profileImage.uri && !profileImage.uri.includes('randomuser')) {
-        formData.append('profileImage', {
+      if (profileImage?.uri && profileImage?.name) {
+        formData.append('businessCard', {
           uri: profileImage.uri,
-          name: 'profile.jpg',
-          type: 'image/jpeg',
+          name: profileImage.name,
+          type: profileImage.type || 'image/jpeg',
         });
       }
+
       console.log(formData);
       const res = await axios.put(
         `https://www.makeahabit.com/api/v1/auth/update-business-profile-byId/${vendorId}`,
@@ -224,7 +259,13 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
 
-  avatar: { width: 110, height: 110, borderRadius: 55, marginBottom: 12 },
+  avatar: {
+    width: 110,
+    height: 110,
+    backgroundColor: '#bebebe',
+    borderRadius: 55,
+    marginBottom: 12,
+  },
 
   cameraBtn: {
     marginTop: 10,

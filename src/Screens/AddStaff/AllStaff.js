@@ -19,6 +19,7 @@ import HeaderLeft from '../../Component/Header/HeaderLeft';
 import { launchImageLibrary } from 'react-native-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import ImageResizer from 'react-native-image-resizer';
 
 const BASE_URL = 'https://www.makeahabit.com/api/v1/staff';
 
@@ -58,18 +59,54 @@ export default function AllStaff() {
   }, []);
 
   // 📷 Pick Image
-  const pickImage = () => {
-    launchImageLibrary({ mediaType: 'photo' }, res => {
-      if (!res.didCancel && res.assets?.length > 0) {
-        setStaffImage(res.assets[0]);
-      }
+  const pickImage = async () => {
+    const result = await launchImageLibrary({
+      mediaType: 'photo',
+      includeBase64: false,
     });
+
+    if (result.didCancel) return;
+
+    if (result.errorCode) {
+      Alert.alert('Error', 'Image selection failed');
+      return;
+    }
+
+    try {
+      const asset = result.assets[0];
+
+      // 🔥 Resize image before upload
+      const resizedImage = await ImageResizer.createResizedImage(
+        asset.uri, // original image
+        800, // max width (staff image = small)
+        800, // max height
+        'JPEG', // format
+        75, // quality
+        0, // rotation
+      );
+
+      const fileName =
+        asset.fileName?.replace(/\.[^/.]+$/, '.jpg') || 'staff.jpg';
+
+      setStaffImage({
+        uri: resizedImage.uri,
+        type: 'image/jpeg',
+        name: fileName,
+      });
+    } catch (err) {
+      console.log('Image resize error:', err);
+      Alert.alert('Error', 'Unable to process image');
+    }
   };
 
   // 🧾 Handle Create or Update
   const handleSubmit = async () => {
     if (!staffName || !staffWork || !staffPhone) {
       Alert.alert('Missing Info', 'Please fill all required fields.');
+      return;
+    }
+    if (!staffImage) {
+      Alert.alert('Add Profile Image', 'Please select staff profile image.');
       return;
     }
 
@@ -92,8 +129,8 @@ export default function AllStaff() {
       if (staffImage) {
         formData.append('img', {
           uri: staffImage.uri,
-          name: staffImage.fileName || 'photo.jpg',
           type: staffImage.type || 'image/jpeg',
+          name: staffImage.name || 'staff.jpg',
         });
       }
 

@@ -15,6 +15,8 @@ import {
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { launchImageLibrary } from 'react-native-image-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import ImageResizer from 'react-native-image-resizer';
+
 import Geolocation from 'react-native-geolocation-service';
 import axios from 'axios';
 import Geocoder from 'react-native-geocoding';
@@ -24,6 +26,7 @@ import {
   resetVendorState,
 } from '../../../redux/Vendor/CreateVendorSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import messaging from '@react-native-firebase/messaging';
 
 // Initialize Geocoder with Google Maps API key
 Geocoder.init('AIzaSyBg3zH3KMal8ApDRBnO72mkrPXp_OQqNUc');
@@ -47,34 +50,70 @@ export default function VendorRegistration({ navigation }) {
     state: '',
     city: '',
     pincode: '',
-    addressName: '',
+    address: '',
     description: '',
     websiteLink: '',
     googleBusinessLink: '',
     openingDays: [],
-    openingTime: '',
-    closingTime: '',
+    area: '',
+    timeSlots: [{ openingTime: '', closingTime: '' }],
     latitude: '',
     longitude: '',
-    panImage: null,
-    businessCardImage: null,
-    profileImage: null,
+    panCard: null,
+    businessCard: null,
+    profileImg: null,
+    fcmToken: '',
   });
 
   const IMAGE_BASE_URL = 'https://www.makeahabit.com/api/v1/uploads/category/';
   const [categoryList, setCategoryList] = useState([]);
   const [errors, setErrors] = useState({});
+  const [fcmToken, setFcmToken] = useState('');
+
   const [showTimePicker, setShowTimePicker] = useState({
-    type: '',
     visible: false,
+    slotIndex: null,
+    type: '',
   });
+
   const [imagePreviewUri, setImagePreviewUri] = useState(null);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
+
+  const toAmPmFromDate = date => {
+    let hh = date.getHours();
+    const mm = date.getMinutes();
+    const suffix = hh >= 12 ? 'PM' : 'AM';
+
+    hh = hh % 12;
+    if (hh === 0) hh = 12;
+
+    return `${hh.toString().padStart(2, '0')}:${mm
+      .toString()
+      .padStart(2, '0')} ${suffix}`;
+  };
+
+  const amPmToDate = time => {
+    if (!time) return new Date();
+    const m = /^(0[1-9]|1[0-2]):([0-5][0-9])\s(AM|PM)$/.exec(time);
+    if (!m) return new Date();
+
+    let hh = parseInt(m[1], 10);
+    const mm = parseInt(m[2], 10);
+    const suf = m[3];
+
+    if (suf === 'PM' && hh !== 12) hh += 12;
+    if (suf === 'AM' && hh === 12) hh = 0;
+
+    const d = new Date();
+    d.setHours(hh, mm, 0, 0);
+    return d;
+  };
 
   useEffect(() => {
     const getEmailFromStorage = async () => {
       try {
         const savedEmail = await AsyncStorage.getItem('vendorEmail');
+
         if (savedEmail) {
           updateField('email', savedEmail);
         }
@@ -84,6 +123,18 @@ export default function VendorRegistration({ navigation }) {
     };
 
     getEmailFromStorage();
+  }, []);
+
+  useEffect(() => {
+    async function fetchFcmToken() {
+      try {
+        const token = await messaging().getToken();
+        updateField('fcmToken', token); // ✅ SAME KEY
+      } catch (e) {
+        console.log('FCM error', e);
+      }
+    }
+    fetchFcmToken();
   }, []);
 
   useEffect(() => {
@@ -135,60 +186,102 @@ export default function VendorRegistration({ navigation }) {
 
   const handleTimeChange = (event, selectedTime) => {
     if (event.type === 'dismissed') {
-      setShowTimePicker({ type: '', visible: false });
+      setShowTimePicker({ visible: false, slotIndex: null, type: '' });
       return;
     }
-    const time = selectedTime || new Date();
-    let hours = time.getHours();
-    let minutes = time.getMinutes();
-    const ampm = hours >= 12 ? 'PM' : 'AM';
-    hours = hours % 12 || 12;
 
-    const hourString = hours === 12 ? '12' : hours.toString().padStart(2, '0');
-    const formatted = `${hourString}:${minutes
-      .toString()
-      .padStart(2, '0')} ${ampm}`;
+    const formatted = toAmPmFromDate(selectedTime);
 
-    if (showTimePicker.type === 'opening')
-      updateField('openingTime', formatted);
-    else if (showTimePicker.type === 'closing')
-      updateField('closingTime', formatted);
+    setForm(prev => {
+      const updated = [...prev.timeSlots];
+      updated[showTimePicker.slotIndex] = {
+        ...updated[showTimePicker.slotIndex],
+        [showTimePicker.type === 'opening' ? 'openingTime' : 'closingTime']:
+          formatted,
+      };
+      return { ...prev, timeSlots: updated };
+    });
 
-    setShowTimePicker({ type: '', visible: false });
+    setShowTimePicker({ visible: false, slotIndex: null, type: '' });
   };
 
   const handleRegister = () => {
-    dispatch(registerVendor(form));
-  };
-  // const validateForm = () => {
-  //   const e = {};
-  //   const phoneRegex = /^[0-9]{10}$/;
-  //   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const invalidSlot = form.timeSlots.some(
+      s => !s.openingTime || !s.closingTime,
+    );
 
-  //   if (!form.fullName || form.fullName.toString().trim() === '')
-  //     e.fullName = 'Full Name is required';
-  //   if (!phoneRegex.test(form.mobileNumber))
-  //     e.mobileNumber = 'Enter a valid 10-digit mobile number';
-  //   if (!form.email || !emailRegex.test(form.email))
-  //     e.email = 'Enter a valid email address';
-  //   if (!form.gender) e.gender = 'Please select gender';
-  //   if (!form.category) e.category = 'Please select business category';
-  //   if (!form.profileImage) e.profileImage = 'Please upload Profile image';
-  //   // if (!form.panImage) e.panImage = 'Please upload Aadhar card image';
-  //   if (!form.businessCardImage)
-  //     e.businessCardImage = 'Please upload Business card image';
+    if (invalidSlot) {
+      Alert.alert('Validation', 'Please fill all time slots');
+      return;
+    }
 
-  //   setErrors(e);
-  //   if (Object.keys(e).length === 0) {
-  //     dispatch(registerVendor(form));
-  //   }
-  // };
+    const formData = new FormData();
 
-  const pickImage = field => {
-    launchImageLibrary({ mediaType: 'photo', quality: 0.7 }, response => {
-      if (response.didCancel) return;
-      if (response.assets?.[0]?.uri) updateField(field, response.assets[0].uri);
+    // ✅ TEXT FIELDS
+    Object.keys(form).forEach(key => {
+      if (
+        ![
+          'profileImg',
+          'panCard',
+          'businessCard',
+          'timeSlots',
+          'openingDays',
+        ].includes(key)
+      ) {
+        if (form[key] !== null && form[key] !== '') {
+          formData.append(key, String(form[key]));
+        }
+      }
     });
+
+    // ✅ ARRAYS
+    formData.append('openingDays', JSON.stringify(form.openingDays));
+    formData.append('timeSlots', JSON.stringify(form.timeSlots));
+
+    // ✅ IMAGE (ONLY ONE — SAME AS GALLERY)
+    if (form.profileImg) {
+      formData.append('img', form.profileImg);
+    }
+
+    console.log('📦 Final FormData ready');
+
+    dispatch(registerVendor(formData));
+  };
+
+  const pickImage = async field => {
+    launchImageLibrary(
+      {
+        mediaType: 'photo',
+        includeBase64: false,
+        quality: 1,
+      },
+      async res => {
+        if (res.didCancel || !res.assets?.[0]) return;
+
+        try {
+          const asset = res.assets[0];
+
+          const resized = await ImageResizer.createResizedImage(
+            asset.uri,
+            900,
+            900,
+            'JPEG',
+            75,
+            0,
+          );
+
+          // ✅ STORE FULL OBJECT (IMPORTANT)
+          updateField(field, {
+            uri: resized.uri,
+            type: 'image/jpeg',
+            name: asset.fileName || 'vendor.jpg',
+          });
+        } catch (err) {
+          console.log('Image resize error:', err);
+          Alert.alert('Error', 'Unable to process image');
+        }
+      },
+    );
   };
 
   const removeImage = field => updateField(field, null);
@@ -209,7 +302,7 @@ export default function VendorRegistration({ navigation }) {
             updateField('state', getComp('administrative_area_level_1'));
             updateField('city', getComp('locality') || getComp('sublocality'));
             updateField('pincode', getComp('postal_code'));
-            updateField('addressName', addr.formatted_address);
+            updateField('address', addr.formatted_address);
           }
         } catch {
           Alert.alert('Error', 'Unable to get address.');
@@ -227,11 +320,11 @@ export default function VendorRegistration({ navigation }) {
       <ImageUpload
         label="Upload Profile Image"
         icon="account-circle-outline"
-        image={form.profileImage}
-        onPress={() => pickImage('profileImage')}
-        onRemove={() => removeImage('profileImage')}
+        image={form.profileImg}
+        onPress={() => pickImage('profileImg')}
+        onRemove={() => removeImage('profileImg')}
         onPreview={setImagePreviewUri}
-        error={errors.profileImage}
+        error={errors.profileImg}
       />
       <FormInput
         label="Full Name"
@@ -365,28 +458,28 @@ export default function VendorRegistration({ navigation }) {
       <ImageUpload
         label="Upload Pan Card"
         icon="card-account-details-outline"
-        image={form.panImage}
-        onPress={() => pickImage('panImage')}
-        onRemove={() => removeImage('panImage')}
+        image={form.panCard}
+        onPress={() => pickImage('panCard')}
+        onRemove={() => removeImage('panCard')}
         onPreview={setImagePreviewUri}
-        error={errors.panImage}
+        error={errors.panCard}
       />
       <ImageUpload
         label="Upload Business Card"
         icon="credit-card-outline"
-        image={form.businessCardImage}
-        onPress={() => pickImage('businessCardImage')}
-        onRemove={() => removeImage('businessCardImage')}
+        image={form.businessCard}
+        onPress={() => pickImage('businessCard')}
+        onRemove={() => removeImage('businessCard')}
         onPreview={setImagePreviewUri}
-        error={errors.businessCardImage}
+        error={errors.businessCard}
       />
       {/* Address & Location */}
       <Text style={styles.sectionLabel}>Address & Location</Text>
       <FormInput
         label="Address"
         icon="home-map-marker"
-        value={form.addressName}
-        onChangeText={v => updateField('addressName', v)}
+        value={form.address}
+        onChangeText={v => updateField('address', v)}
         placeholder="Shop/building address"
       />
       <FormInput
@@ -410,6 +503,13 @@ export default function VendorRegistration({ navigation }) {
         onChangeText={v => updateField('pincode', v)}
         keyboardType="number-pad"
         placeholder="6-digit area code"
+      />
+      <FormInput
+        label="Area"
+        icon="map-marker-radius"
+        value={form.area}
+        onChangeText={v => updateField('area', v)}
+        placeholder="Enter area / locality"
       />
       <TouchableOpacity
         style={[styles.button, { backgroundColor: '#14ad5f' }]}
@@ -441,34 +541,88 @@ export default function VendorRegistration({ navigation }) {
           </TouchableOpacity>
         ))}
       </View>
-      <View style={styles.timeRowContainer}>
-        <TouchableOpacity
-          style={styles.timeBox}
-          onPress={() => setShowTimePicker({ type: 'opening', visible: true })}
-        >
-          <MaterialCommunityIcons
-            name="clock-outline"
-            size={20}
-            color="#14ad5f"
-          />
-          <Text style={styles.timeText}>
-            {form.openingTime ? form.openingTime : 'Opening Time'}
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.timeBox}
-          onPress={() => setShowTimePicker({ type: 'closing', visible: true })}
-        >
-          <MaterialCommunityIcons
-            name="clock-outline"
-            size={20}
-            color="#14ad5f"
-          />
-          <Text style={styles.timeText}>
-            {form.closingTime ? form.closingTime : 'Closing Time'}
-          </Text>
-        </TouchableOpacity>
-      </View>
+      <Text style={styles.sectionLabel}>Time Slots</Text>
+      {form.timeSlots.map((slot, index) => (
+        <View key={index} style={{ marginBottom: 10 }}>
+          <View style={styles.timeRowContainer}>
+            <TouchableOpacity
+              style={styles.timeBox}
+              onPress={() =>
+                setShowTimePicker({
+                  visible: true,
+                  slotIndex: index,
+                  type: 'opening',
+                })
+              }
+            >
+              <MaterialCommunityIcons
+                name="clock-outline"
+                size={20}
+                color="#14ad5f"
+              />
+              <Text style={styles.timeText}>
+                {slot.openingTime || 'Opening Time'}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.timeBox}
+              onPress={() =>
+                setShowTimePicker({
+                  visible: true,
+                  slotIndex: index,
+                  type: 'closing',
+                })
+              }
+            >
+              <MaterialCommunityIcons
+                name="clock-outline"
+                size={20}
+                color="#14ad5f"
+              />
+              <Text style={styles.timeText}>
+                {slot.closingTime || 'Closing Time'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          {form.timeSlots.length > 1 && (
+            <TouchableOpacity
+              onPress={() =>
+                setForm(f => ({
+                  ...f,
+                  timeSlots: f.timeSlots.filter((_, i) => i !== index),
+                }))
+              }
+              style={{ alignSelf: 'flex-end', marginTop: 4 }}
+            >
+              <Text style={{ color: 'crimson', fontWeight: '600' }}>
+                Remove Slot
+              </Text>
+            </TouchableOpacity>
+          )}
+        </View>
+      ))}
+      <TouchableOpacity
+        onPress={() =>
+          setForm(f => ({
+            ...f,
+            timeSlots: [...f.timeSlots, { openingTime: '', closingTime: '' }],
+          }))
+        }
+        style={[
+          styles.button,
+          {
+            backgroundColor: '#eefaf3',
+            borderWidth: 1,
+            borderColor: '#14ad5f',
+          },
+        ]}
+      >
+        <Text style={{ color: '#14ad5f', fontWeight: '700' }}>
+          Add Time Slot
+        </Text>
+      </TouchableOpacity>
       {/* Loader */}
       {loading && <ActivityIndicator size="large" color="#14ad5f" />}
       {/* Submit */}
@@ -503,7 +657,11 @@ export default function VendorRegistration({ navigation }) {
       {/* Time Picker */}
       {showTimePicker.visible && (
         <DateTimePicker
-          value={new Date()}
+          value={amPmToDate(
+            form.timeSlots[showTimePicker.slotIndex]?.[
+              showTimePicker.type === 'opening' ? 'openingTime' : 'closingTime'
+            ],
+          )}
           mode="time"
           is24Hour={false}
           display="default"

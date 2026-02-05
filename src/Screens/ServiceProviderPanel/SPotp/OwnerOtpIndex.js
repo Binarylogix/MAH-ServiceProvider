@@ -38,7 +38,7 @@ export default function OwnerOtpIndex({ route, navigation }) {
       try {
         const token = await messaging().getToken();
         setFcmToken(token);
-        console.log('FCM Token:', token);
+        // console.log('FCM Token:', token);
       } catch (error) {
         console.log('Failed to get FCM token', error);
       }

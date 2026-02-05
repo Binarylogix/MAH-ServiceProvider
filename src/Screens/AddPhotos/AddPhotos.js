@@ -52,7 +52,7 @@ const AddPhotos = ({ navigation }) => {
         type: selectedImage.type,
         name: selectedImage.fileName || 'photo.jpg',
       });
-
+      console.log('img', formData);
       const response = await axios.post(
         'https://www.makeahabit.com/api/v1/galary/create',
         formData,

@@ -8,42 +8,30 @@ const initialState = {
   data: null,
 };
 
-// ✅ Async thunk using Axios + console logs
 export const registerVendor = createAsyncThunk(
   'vendor/registerVendor',
-  async (payload, { rejectWithValue }) => {
-    console.log('📤 Sending vendor registration data:', payload); // log input data
-
+  async (formData, { rejectWithValue }) => {
+    console.log(formData);
     try {
       const response = await axios.post(
         'https://www.makeahabit.com/api/v1/newauth/registerVendor',
-        payload,
+        formData,
         {
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
         },
       );
 
-      console.log('✅ Server response:', response.data); // log full response
-
-      const data = response.data;
-
-      if (!data?.success) {
-        console.warn('⚠️ Registration failed with message:', data?.message);
-        return rejectWithValue(data?.message || 'Registration failed');
+      if (!response.data?.success) {
+        return rejectWithValue(response.data?.message || 'Registration failed');
       }
 
-      console.log('🎉 Registration successfull:', data);
-      return data;
+      return response.data;
     } catch (error) {
-      console.error('❌ Registration API error:', error);
-
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        'Network error, please try again';
-
-      console.log('⚠️ Error message returned to slice:', message);
-      return rejectWithValue(message);
+      return rejectWithValue(
+        error.response?.data || error.message || 'Network error',
+      );
     }
   },
 );

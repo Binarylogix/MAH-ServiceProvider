@@ -20,6 +20,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { launchImageLibrary } from 'react-native-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ImageViewer from 'react-native-image-zoom-viewer';
+import ImageResizer from 'react-native-image-resizer';
 
 const { width } = Dimensions.get('window');
 
@@ -68,14 +69,39 @@ export default function AllPhoto() {
   const pickImage = async () => {
     const result = await launchImageLibrary({
       mediaType: 'photo',
-      quality: 0.8,
+      includeBase64: false,
     });
+
     if (result.didCancel) return;
     if (result.errorCode) {
-      Alert.alert('Error', 'Something went wrong while selecting the image.');
+      Alert.alert('Error', 'Image selection failed');
       return;
     }
-    setSelectedImage(result.assets[0]);
+
+    try {
+      const asset = result.assets[0];
+
+      const resizedImage = await ImageResizer.createResizedImage(
+        asset.uri,
+        1000,
+        1000,
+        'JPEG',
+        75,
+        0,
+      );
+
+      const fileName =
+        asset.fileName?.replace(/\.[^/.]+$/, '.jpg') || 'gallery.jpg';
+
+      setSelectedImage({
+        uri: resizedImage.uri,
+        type: 'image/jpeg',
+        name: fileName,
+      });
+    } catch (err) {
+      console.log('Image resize error:', err);
+      Alert.alert('Error', 'Unable to process image');
+    }
   };
 
   const uploadImage = async () => {
@@ -88,8 +114,10 @@ export default function AllPhoto() {
       formData.append('img', {
         uri: selectedImage.uri,
         type: selectedImage.type,
-        name: selectedImage.fileName || 'photo.jpg',
+        name: selectedImage.name,
       });
+
+      console.log('sdsdf', formData);
       const response = await axios.post(
         'https://www.makeahabit.com/api/v1/galary/create',
         formData,

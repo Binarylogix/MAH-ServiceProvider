@@ -21,10 +21,10 @@ import Geolocation from 'react-native-geolocation-service';
 import Geocoder from 'react-native-geocoding';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
-// Initialize Google Geocoder
 Geocoder.init('AIzaSyBg3zH3KMal8ApDRBnO72mkrPXp_OQqNUc');
 
 export default function BusinessProfile() {
+  /* ================= STATES ================= */
   const [email, setEmail] = useState('');
   const [businessName, setBusinessName] = useState('');
   const [businessType, setBusinessType] = useState('');
@@ -34,151 +34,131 @@ export default function BusinessProfile() {
   const [city, setCity] = useState('');
   const [pincode, setPincode] = useState('');
   const [address, setAddress] = useState('');
-  const [openingDays, setOpeningDays] = useState('');
-  const [openingTime, setOpeningTime] = useState('');
-  const [closingTime, setClosingTime] = useState('');
+  const [area, setArea] = useState('');
   const [websiteLink, setWebsiteLink] = useState('');
   const [googleBusinessLink, setGoogleBusinessLink] = useState('');
   const [description, setDescription] = useState('');
 
+  const [openingDays, setOpeningDays] = useState([]);
+  const [timeSlots, setTimeSlots] = useState([
+    { openingTime: '', closingTime: '' },
+  ]);
+
   const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
   const [daysModalVisible, setDaysModalVisible] = useState(false);
-  const [selectedDays, setSelectedDays] = useState([]);
-
-  // Format selected days for UI display
-  const formatSelectedDays = days => {
-    if (days.length === 0) return 'Select Opening Days';
-    if (days.length === 7) return 'Monday - Sunday';
-    if (days.length === 6 && !days.includes('Sun')) return 'Monday - Saturday';
-    return days.join(', ');
-  };
-
-  const toggleDay = day => {
-    if (selectedDays.includes(day)) {
-      setSelectedDays(selectedDays.filter(d => d !== day));
-    } else {
-      setSelectedDays([...selectedDays, day]);
-    }
-  };
-
-  // Initialize selectedDays from openingDays (string) on vendor load
-  useEffect(() => {
-    if (typeof openingDays === 'string' && openingDays.trim() !== '') {
-      if (openingDays.includes('-')) {
-        const parts = openingDays.split('-').map(s => s.trim());
-        const startIndex = weekdays.indexOf(parts[0]);
-        const endIndex = weekdays.indexOf(parts[1]);
-        if (startIndex !== -1 && endIndex !== -1 && endIndex >= startIndex) {
-          setSelectedDays(weekdays.slice(startIndex, endIndex + 1));
-        }
-      } else {
-        const splitDays = openingDays.split(',').map(d => d.trim());
-        setSelectedDays(splitDays.filter(day => weekdays.includes(day)));
-      }
-    } else {
-      setSelectedDays([]);
-    }
-  }, [openingDays]);
-
   const [showTimePicker, setShowTimePicker] = useState({
-    type: '',
     visible: false,
+    index: null,
+    type: '',
   });
   const [loading, setLoading] = useState(false);
 
   const dispatch = useDispatch();
   const { vendor } = useSelector(state => state.vendorDetails);
 
-  // Fetch vendor details
+  /* ================= EFFECTS ================= */
+
   useEffect(() => {
     dispatch(fetchVendorDetails());
   }, [dispatch]);
 
-  // Populate vendor data
   useEffect(() => {
-    if (vendor?.data) {
-      const v = vendor.data;
-      setEmail(v?.email || '');
-      setBusinessName(v?.businessName || '');
-      setBusinessType(v?.businessType || '');
-      setAadharNumber(v?.aadharNumber || '');
-      setGstNumber(v?.gstNumber || '');
-      setState(v?.state || '');
-      setCity(v?.city || '');
-      setPincode(v?.pincode || '');
-      setAddress(v?.addressName || '');
-      setOpeningDays(v?.openingDays || '');
-      setOpeningTime(v?.openingTime || '');
-      setClosingTime(v?.closingTime || '');
-      setWebsiteLink(v?.websiteLink || '');
-      setGoogleBusinessLink(v?.googleBusinessLink || '');
-      setDescription(v?.description || '');
+    if (!vendor?.data) return;
+    const v = vendor.data;
+
+    setEmail(v.email || '');
+    setBusinessName(v.businessName || '');
+    setBusinessType(v.businessType || '');
+    setAadharNumber(v.aadharNumber || '');
+    setGstNumber(v.gstNumber || '');
+    setState(v.state || '');
+    setCity(v.city || '');
+    setPincode(v.pincode || '');
+    setAddress(v.addressName || '');
+    setArea(v.area || '');
+    setWebsiteLink(v.websiteLink || '');
+    setGoogleBusinessLink(v.googleBusinessLink || '');
+    setDescription(v.description || '');
+
+    if (Array.isArray(v.openingDays)) {
+      setOpeningDays(v.openingDays);
+    }
+
+    if (Array.isArray(v.timeSlots) && v.timeSlots.length) {
+      setTimeSlots(
+        v.timeSlots.map(({ openingTime, closingTime }) => ({
+          openingTime,
+          closingTime,
+        })),
+      );
     }
   }, [vendor]);
 
-  // Handle time change
-  const handleTimeChange = (event, selectedTime) => {
-    if (event.type === 'dismissed') {
-      setShowTimePicker({ type: '', visible: false });
-      return;
-    }
-    const time = selectedTime || new Date();
-    let hours = time.getHours();
-    let minutes = time.getMinutes();
-    const ampm = hours >= 12 ? 'PM' : 'AM';
-    hours = hours % 12 || 12;
-    const formatted = `${hours.toString().padStart(2, '0')}:${minutes
-      .toString()
-      .padStart(2, '0')} ${ampm}`;
+  /* ================= HELPERS ================= */
 
-    if (showTimePicker.type === 'opening') setOpeningTime(formatted);
-    if (showTimePicker.type === 'closing') setClosingTime(formatted);
+  const formatSelectedDays = days =>
+    days.length ? days.join(', ') : 'Select Opening Days';
 
-    setShowTimePicker({ type: '', visible: false });
-  };
-
-  // Get current location
-  const getCurrentLocation = () => {
-    Geolocation.getCurrentPosition(
-      async position => {
-        const { latitude, longitude } = position.coords;
-        try {
-          const json = await Geocoder.from(latitude, longitude);
-          if (json.results.length > 0) {
-            const addr = json.results[0];
-            const comps = addr.address_components;
-            const getComp = type =>
-              (comps.find(c => c.types.includes(type)) || {}).long_name || '';
-            setState(getComp('administrative_area_level_1'));
-            setCity(getComp('locality') || getComp('sublocality'));
-            setPincode(getComp('postal_code'));
-            setAddress(addr.formatted_address);
-          }
-        } catch {
-          Alert.alert('Error', 'Unable to get address.');
-        }
-      },
-      error => {
-        console.log(error);
-        Alert.alert('Error', 'Unable to fetch location.');
-      },
-      { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 },
+  const toggleDay = day => {
+    setOpeningDays(prev =>
+      prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day],
     );
   };
 
-  // Save profile (update API)
+  const handleTimeChange = (event, selectedTime) => {
+    if (event.type === 'dismissed') {
+      setShowTimePicker({ visible: false, index: null, type: '' });
+      return;
+    }
+
+    let hh = selectedTime.getHours();
+    const mm = selectedTime.getMinutes();
+    const ampm = hh >= 12 ? 'PM' : 'AM';
+    hh = hh % 12 || 12;
+
+    const formatted = `${hh.toString().padStart(2, '0')}:${mm
+      .toString()
+      .padStart(2, '0')} ${ampm}`;
+
+    setTimeSlots(prev => {
+      const updated = [...prev];
+      updated[showTimePicker.index] = {
+        ...updated[showTimePicker.index],
+        [showTimePicker.type === 'opening' ? 'openingTime' : 'closingTime']:
+          formatted,
+      };
+      return updated;
+    });
+
+    setShowTimePicker({ visible: false, index: null, type: '' });
+  };
+
+  const getCurrentLocation = () => {
+    Geolocation.getCurrentPosition(
+      async pos => {
+        const { latitude, longitude } = pos.coords;
+        const geo = await Geocoder.from(latitude, longitude);
+        const addr = geo.results[0];
+        const get = t =>
+          addr.address_components.find(c => c.types.includes(t))?.long_name ||
+          '';
+        setState(get('administrative_area_level_1'));
+        setCity(get('locality'));
+        setPincode(get('postal_code'));
+        setAddress(addr.formatted_address);
+      },
+      () => Alert.alert('Error', 'Unable to fetch location'),
+    );
+  };
+
+  /* ================= SAVE ================= */
+
   const handleSave = async () => {
     try {
       setLoading(true);
-
       const vendorId = await AsyncStorage.getItem('vendorId');
       const token = await AsyncStorage.getItem('vendorToken');
-
-      if (!vendorId || !token) {
-        Alert.alert('Error', 'Missing vendor credentials.');
-        return;
-      }
 
       const formData = new FormData();
       formData.append('businessName', businessName);
@@ -189,14 +169,13 @@ export default function BusinessProfile() {
       formData.append('city', city);
       formData.append('pincode', pincode);
       formData.append('addressName', address);
-      // Change below line to append array items individually
-      selectedDays.forEach(day => formData.append('openingDays[]', day));
-      formData.append('openingTime', openingTime);
-      formData.append('closingTime', closingTime);
+      formData.append('area', area);
+      formData.append('openingDays', JSON.stringify(openingDays));
+      formData.append('timeSlots', JSON.stringify(timeSlots));
       formData.append('websiteLink', websiteLink);
       formData.append('googleBusinessLink', googleBusinessLink);
       formData.append('description', description);
-
+      console.log('formdata : ', formData);
       const res = await axios.put(
         `https://www.makeahabit.com/api/v1/auth/update-business-profile-byId/${vendorId}`,
         formData,
@@ -205,33 +184,18 @@ export default function BusinessProfile() {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'multipart/form-data',
           },
-          transformResponse: [
-            data => {
-              try {
-                return JSON.parse(data);
-              } catch {
-                console.log('Non-JSON response:', data);
-                return { success: false, message: data };
-              }
-            },
-          ],
         },
       );
-
+      console.log('response : ', res.data);
       if (res.data?.success) {
-        Alert.alert('Success', 'Business profile updated successfully!');
+        Alert.alert('Success', 'Business profile updated');
         dispatch(fetchVendorDetails());
       } else {
         Alert.alert('Error', res.data?.message || 'Update failed');
       }
-    } catch (err) {
-      if (err.response) {
-        console.log('Raw response:', err.response.data);
-        console.log('Status:', err.response.status);
-      } else {
-        console.log('Error message:', err.message);
-      }
-      Alert.alert('Error', 'Failed to update profile.');
+    } catch (e) {
+      console.log(e);
+      Alert.alert('Error', 'Something went wrong');
     } finally {
       setLoading(false);
     }
@@ -308,6 +272,13 @@ export default function BusinessProfile() {
           keyboardType="number-pad"
           placeholder="Enter pincode"
         />
+        <Text style={styles.label}>Area</Text>
+        <TextInput
+          style={styles.input}
+          value={area}
+          onChangeText={setArea}
+          placeholder="Enter area / locality"
+        />
 
         <Text style={styles.label}>Address</Text>
         <TextInput
@@ -336,44 +307,87 @@ export default function BusinessProfile() {
         >
           <Text
             style={{
-              color: selectedDays.length ? '#000' : '#777',
+              color: openingDays.length ? '#000' : '#777',
               fontSize: 15,
             }}
           >
-            {formatSelectedDays(selectedDays)}
+            {formatSelectedDays(openingDays)}
           </Text>
         </TouchableOpacity>
 
         <Text style={[styles.label, { marginTop: 14 }]}>Business Timings</Text>
-        <View style={styles.timeRow}>
-          <TouchableOpacity
-            style={styles.timeBox}
-            onPress={() =>
-              setShowTimePicker({ type: 'opening', visible: true })
-            }
-          >
-            <MaterialCommunityIcons
-              name="clock-outline"
-              size={20}
-              color="#14ad5f"
-            />
-            <Text style={styles.timeText}>{openingTime || 'Opening Time'}</Text>
-          </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.timeBox}
-            onPress={() =>
-              setShowTimePicker({ type: 'closing', visible: true })
-            }
-          >
-            <MaterialCommunityIcons
-              name="clock-outline"
-              size={20}
-              color="#14ad5f"
-            />
-            <Text style={styles.timeText}>{closingTime || 'Closing Time'}</Text>
-          </TouchableOpacity>
-        </View>
+        {timeSlots.map((slot, index) => (
+          <View key={index} style={{ marginBottom: 10 }}>
+            <View style={styles.timeRow}>
+              <TouchableOpacity
+                style={styles.timeBox}
+                onPress={() =>
+                  setShowTimePicker({
+                    type: 'opening',
+                    visible: true,
+                    index,
+                  })
+                }
+              >
+                <MaterialCommunityIcons
+                  name="clock-outline"
+                  size={20}
+                  color="#14ad5f"
+                />
+                <Text style={styles.timeText}>
+                  {slot.openingTime || 'Opening Time'}
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.timeBox}
+                onPress={() =>
+                  setShowTimePicker({
+                    type: 'closing',
+                    visible: true,
+                    index,
+                  })
+                }
+              >
+                <MaterialCommunityIcons
+                  name="clock-outline"
+                  size={20}
+                  color="#14ad5f"
+                />
+                <Text style={styles.timeText}>
+                  {slot.closingTime || 'Closing Time'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            {timeSlots.length > 1 && (
+              <TouchableOpacity
+                onPress={() =>
+                  setTimeSlots(prev => prev.filter((_, i) => i !== index))
+                }
+                style={{ alignSelf: 'flex-end', marginTop: 5 }}
+              >
+                <Text style={{ color: 'crimson', fontWeight: '600' }}>
+                  Remove Slot
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        ))}
+
+        <TouchableOpacity
+          onPress={() =>
+            setTimeSlots(prev => [
+              ...prev,
+              { openingTime: '', closingTime: '' },
+            ])
+          }
+        >
+          <Text style={{ color: '#14ad5f', fontWeight: '700' }}>
+            + Add Time Slot
+          </Text>
+        </TouchableOpacity>
 
         <Text style={styles.label}>Website Link</Text>
         <TextInput
@@ -437,7 +451,7 @@ export default function BusinessProfile() {
               Select Opening Days
             </Text>
             {weekdays.map(day => {
-              const selected = selectedDays.includes(day);
+              const selected = openingDays.includes(day);
               return (
                 <TouchableOpacity
                   key={day}
@@ -467,6 +481,7 @@ export default function BusinessProfile() {
                 </TouchableOpacity>
               );
             })}
+
             <TouchableOpacity
               style={{
                 marginTop: 20,

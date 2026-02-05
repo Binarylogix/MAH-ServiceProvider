@@ -22,7 +22,7 @@ import {
 } from '../redux/Vendor/vendorDetailsSlice';
 
 const defaultProfileImg = {
-  uri: 'https://randomuser.me/api/portraits/men/1.jpg',
+  uri: 'https://www.makeahabit.com/assets/lg-habit-d0c8eeda.png',
 };
 
 export default function Profile() {
@@ -39,11 +39,11 @@ export default function Profile() {
       if (supported) {
         await Linking.openURL(url);
       } else {
-        alert("Can't open the terms and conditions link.");
+        Alert.alert("Can't open the terms and conditions link.");
       }
     } catch (error) {
       console.error('Failed to open URL:', error);
-      alert('An error occurred while trying to open the link.');
+      Alert.alert('An error occurred while trying to open the link.');
     }
   };
 
@@ -250,6 +250,7 @@ const styles = StyleSheet.create({
     borderColor: '#fff',
     objectFit: 'contain ',
     resizeMode: 'contain ',
+    backgroundColor: '#bebebe',
   },
 
   profileName: {

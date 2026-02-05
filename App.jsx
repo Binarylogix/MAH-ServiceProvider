@@ -16,6 +16,7 @@ import {
 } from './src/Screens/notificationservice/NavigationService';
 import NoInternetScreen from './src/Screens/Notification/Notification';
 import { AndroidImportance } from '@notifee/react-native';
+import VendorRegistration from './src/Screens/ServiceProviderPanel/BusinessRegister/VendorRegistration';
 function App() {
   const [isConnected, setIsConnected] = useState(true);
   const [checkingConnection, setCheckingConnection] = useState(true);

@@ -46,7 +46,7 @@ export default function VendorStack() {
       initialRouteName="SplaceScreen"
     >
       <Stack.Screen name="SplaceScreen" component={SplaceIndex} />
-      <Stack.Screen name="CreateUserProfile" component={CreateUserProfile} />
+
       <Stack.Screen
         name="ShopProfile"
         component={ShopProfile}

@@ -19,6 +19,7 @@ import { Dropdown } from 'react-native-element-dropdown';
 import { launchImageLibrary } from 'react-native-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/FontAwesome6';
+import messaging from '@react-native-firebase/messaging';
 
 export default function CreateUserProfile({ navigation }) {
   const [name, setName] = useState('');
@@ -28,6 +29,7 @@ export default function CreateUserProfile({ navigation }) {
   const [mobile, setMobile] = useState('');
   const [profileImage, setProfileImage] = useState('');
   const [loading, setLoading] = useState(false);
+  const [fcmToken, setFcmToken] = useState('');
 
   useEffect(() => {
     (async () => {
@@ -39,6 +41,9 @@ export default function CreateUserProfile({ navigation }) {
   const requestPermission = async () => {
     if (Platform.OS === 'android') {
       try {
+        const token = await messaging().getToken();
+        setFcmToken(token);
+        console.log('FCM Token:', token);
         const granted = await PermissionsAndroid.request(
           PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
           {
@@ -87,6 +92,7 @@ export default function CreateUserProfile({ navigation }) {
         role: 'user',
         address,
         userprofileImage: profileImage || null,
+        fcmToken,
       };
 
       const res = await axios.post(
@@ -130,7 +136,10 @@ export default function CreateUserProfile({ navigation }) {
 
         {/* Form Card */}
         <View style={styles.card}>
-          <TouchableOpacity style={styles.imageWrapper} onPress={selectProfileImage}>
+          <TouchableOpacity
+            style={styles.imageWrapper}
+            onPress={selectProfileImage}
+          >
             {profileImage ? (
               <Image source={{ uri: profileImage }} style={styles.image} />
             ) : (
@@ -141,7 +150,7 @@ export default function CreateUserProfile({ navigation }) {
             )}
           </TouchableOpacity>
 
-             <TextInput
+          <TextInput
             style={[styles.input, { backgroundColor: '#f5f5f5' }]}
             value={email}
             editable={false}
@@ -154,7 +163,6 @@ export default function CreateUserProfile({ navigation }) {
             onChangeText={setName}
           />
 
-
           <TextInput
             style={styles.input}
             placeholder="Mobile Number"
@@ -164,7 +172,7 @@ export default function CreateUserProfile({ navigation }) {
             onChangeText={setMobile}
           />
 
-           <Dropdown
+          <Dropdown
             style={styles.input}
             data={[
               { label: 'Male', value: 'male' },
@@ -178,7 +186,7 @@ export default function CreateUserProfile({ navigation }) {
             onChange={item => setGender(item.value)}
           />
 
-           <TextInput
+          <TextInput
             style={styles.input}
             placeholder="Address"
             value={address}
@@ -204,8 +212,6 @@ export default function CreateUserProfile({ navigation }) {
 
 const styles = StyleSheet.create({
   container: {
-    // flexGrow: 1,
-    // paddingHorizontal: 20,
     paddingBottom: 30,
   },
   header: {
@@ -221,7 +227,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 22,
     fontWeight: '700',
-    // marginTop: 10,
   },
   card: {
     backgroundColor: '#fff',

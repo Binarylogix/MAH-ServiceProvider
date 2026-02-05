@@ -89,27 +89,43 @@ export default function BankDetailsScreen() {
   }, [form]); // ✅ RUN ON EVERY FORM CHANGE
 
   const handleSubmit = () => {
-    if (formValid) {
-      const validForm = {
-        ...form,
-        ifsc: form.ifsc.toUpperCase().trim(),
-      };
+    if (!formValid) return;
 
-      dispatch(addBankDetailsAPI(validForm)).then(res => {
-        if (!res.error) {
-          setModalVisible(false);
-          setForm({
-            accountHolderName: '',
-            bankName: '',
-            ifsc: '',
-            accountNumber: '',
-          });
-          setErrors({});
-          dispatch(clearBankState());
-          dispatch(getBankDetailsAPI());
-        }
-      });
-    }
+    Alert.alert(
+      'Confirm Bank Details',
+      'Are you sure you want to confirm your bank details?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Yes, Confirm',
+          onPress: () => {
+            const validForm = {
+              ...form,
+              ifsc: form.ifsc.toUpperCase().trim(),
+            };
+
+            dispatch(addBankDetailsAPI(validForm)).then(res => {
+              if (!res.error) {
+                setModalVisible(false);
+                setForm({
+                  accountHolderName: '',
+                  bankName: '',
+                  ifsc: '',
+                  accountNumber: '',
+                });
+                setErrors({});
+                dispatch(clearBankState());
+                dispatch(getBankDetailsAPI());
+              }
+            });
+          },
+        },
+      ],
+      { cancelable: true },
+    );
   };
 
   const handleInputChange = (field, value) => {
@@ -175,6 +191,10 @@ export default function BankDetailsScreen() {
           </Text>
         </View>
       )}
+
+      <Text style={styles.infoText}>
+        To change your bank details, please contact admin.
+      </Text>
 
       {/* ADD BANK DETAILS MODAL */}
       <Modal transparent visible={modalVisible} animationType="slide">
@@ -261,6 +281,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F7FB',
     padding: 16,
   },
+  infoText: {
+    marginTop: 12,
+    textAlign: 'center',
+    fontSize: 12,
+    color: '#999',
+  },
+
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
