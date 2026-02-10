@@ -161,7 +161,10 @@ export default function VendorRegistration({ navigation }) {
         AsyncStorage.setItem('vendorToken', token);
         AsyncStorage.setItem('vendorId', userId);
 
-        navigation.navigate('VendorTab');
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'VendorTab' }],
+        });
       }
       dispatch(resetVendorState());
     } else if (error) {
@@ -240,7 +243,7 @@ export default function VendorRegistration({ navigation }) {
 
     // ✅ IMAGE (ONLY ONE — SAME AS GALLERY)
     if (form.profileImg) {
-      formData.append('img', form.profileImg);
+      formData.append('businessCard', form.profileImg);
     }
 
     console.log('📦 Final FormData ready');
